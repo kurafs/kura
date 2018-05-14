@@ -1,0 +1,67 @@
+LOG
+===
+
+Leveled execution logs for Go; minimal interface with fine grained control
+(file level, sub-package level, severity) for log evaluation.
+
+This is an amalgamation of ideas from multiple logger implementations, notably:
+  - google/glog
+  - go-kit/kit/log
+  - upspin/log
+  - cockroachdb/pkg/log
+
+Intended top-level usage:
+
+  $ <binary-name> -help
+  Usage of <binary-name>:
+    -log-dir string
+          Write log files in this directory.
+    -log-to-stderr
+          Log to standard error.
+    -log-level (info|debug|warn|error)
+          Log level for logs emitted (global, can be overrode using -log-filter).
+    -log-filter value
+          Comma-separated list of pattern:level settings for file-filtered logging.
+    -log-backtrace-at value
+          Comma-separated list of filename:N settings, when any logging statement at
+          the specified locations are executed, a stack trace will be emitted.
+
+  $ <binary-name> -log-level info \
+                  -log-dir /path/to/dir \
+                  -log-to-stderr \
+                  -log-filter f.go:warn,g/h/*.go:debug \
+                  -log-backtrace-at y.go:42
+
+The flags (or some variation thereof) will have to be provided/registered by
+the library user, this library simply provides the hooks the user can then use
+to configure the logger as needed. These hooks can be invoked at runtime (in
+fact, we explicitly avoid init time hooks and global loggers). What this means
+is that if needed, a running service could opt-in to provide open endpoints
+to accept logger reconfigurations (via RPCs or otherwise).
+
+Assuming <binary-name> from above allows for an authenticated RPC from another
+helper binary:
+
+  $ <binary-name>-debugger -help
+  Usage of <binary-name>-debugger:
+    -addr host:port
+          Server address in form of host:port for running instance of
+          <binary-name> that is to be configured.
+    -log-dir string
+          Configure server to write log files in this directory.
+    -log-to-stderr
+          Configure server to log to standard error.
+    -log-level (info|debug|warn|error|fatal)
+          Configure server to log at specified level.
+    -log-filter value
+          Comma-separated list of pattern:N settings for file-filtered logging
+          to configure server to apply.
+    -log-backtrace-at value
+          Comma-separated list of filename:N settings, when any logging statement at
+          the specified locations are executed, a stack trace will be emitted.
+
+  $ <binary-name>-debugger -addr <host>:<port> \
+                           -log-level debug \
+                           -log-dir /path/to/another/dir \
+                           -log-filter x.go:debug \
+                           -log-backtrace-at y.go:42
