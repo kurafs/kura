@@ -49,7 +49,7 @@ func TestInfoLog(t *testing.T) {
 	logger := New(Writer(buffer))
 	{
 		logger.Info("info")
-		regex := "^I.*: info"
+		regex := "^I.*] info"
 		match, err := regexp.Match(regex, buffer.Bytes())
 		if err != nil {
 			t.Error(err)
@@ -61,7 +61,7 @@ func TestInfoLog(t *testing.T) {
 	}
 	{
 		logger.Infof("infof")
-		regex := "^I.*: infof"
+		regex := "^I.*] infof"
 		match, err := regexp.Match(regex, buffer.Bytes())
 		if err != nil {
 			t.Error(err)
@@ -73,7 +73,7 @@ func TestInfoLog(t *testing.T) {
 	}
 	{
 		logger.Infof("%t %d %s", true, 1, "infof")
-		regex := "^I.*: true 1 infof"
+		regex := "^I.*] true 1 infof"
 		match, err := regexp.Match(regex, buffer.Bytes())
 		if err != nil {
 			t.Error(err)
@@ -109,7 +109,7 @@ func TestDebugModeEnableDisable(t *testing.T) {
 	SetGlobalLogMode(DebugMode)
 	{
 		logger.Debug("debug")
-		regex := "^D.*: debug"
+		regex := "^D.*] debug"
 		match, err := regexp.Match(regex, buffer.Bytes())
 		if err != nil {
 			t.Error(err)
@@ -163,7 +163,7 @@ func TestEnableTracePoint(t *testing.T) {
 			t.Error(err)
 		}
 
-		functionSignatureRegex := "^github.com/irfansharif/log.TestEnableTracePoint"
+		functionSignatureRegex := "^github.com/.*/log.TestEnableTracePoint"
 		match, err = regexp.Match(functionSignatureRegex, []byte(line))
 		if err != nil {
 			t.Error(err)

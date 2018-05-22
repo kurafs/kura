@@ -64,7 +64,7 @@ func Process(abstract string, commands Commands) error {
 
 	// If '<program> help cmd' is used, we ensure there's only one command provided.
 	if command == "help" && len(args) > 2 {
-		fmt.Fprintln(os.Stderr, "Usage: %s help [command]", program)
+		fmt.Fprintln(os.Stderr, fmt.Sprintf("Usage: %s help [command]", program))
 		fmt.Fprintln(os.Stderr)
 		fmt.Fprintln(os.Stderr, "Too many arguments given.")
 		os.Exit(2) // failed at 'go help'
@@ -75,9 +75,9 @@ func Process(abstract string, commands Commands) error {
 		cmd := args[1]
 		err := printCommandUsage(program, cmd, commands)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "Unknown help topic '%s'", cmd)
+			fmt.Fprintln(os.Stderr, fmt.Sprintf("Unknown help topic '%s'", cmd))
 			fmt.Fprintln(os.Stderr)
-			fmt.Fprintln(os.Stderr, "Run '%s help' for available topics.", program)
+			fmt.Fprintln(os.Stderr, fmt.Sprintf("Run '%s help' for available topics.", program))
 			os.Exit(2) // Failed at '<program> help cmd'.
 		}
 		return nil
@@ -113,9 +113,9 @@ func Process(abstract string, commands Commands) error {
 		os.Exit(2)
 	}
 
-	fmt.Fprintln(os.Stderr, "Unknown command '%s'", command)
+	fmt.Fprintln(os.Stderr, fmt.Sprintf("Unknown command '%s'", command))
 	fmt.Fprintln(os.Stderr)
-	fmt.Fprintln(os.Stderr, "Run '%s help' for available commands.\n", program)
+	fmt.Fprintln(os.Stderr, fmt.Sprintf("Run '%s help' for available commands.\n", program))
 	os.Exit(2)
 	return nil
 }
