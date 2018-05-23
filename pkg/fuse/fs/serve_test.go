@@ -21,7 +21,6 @@ import (
 	"github.com/kurafs/kura/pkg/fuse/fs/fstestutil"
 	"github.com/kurafs/kura/pkg/fuse/fs/fstestutil/record"
 	"github.com/kurafs/kura/pkg/fuse/fuseutil"
-	"github.com/kurafs/kura/pkg/xattr"
 	"golang.org/x/net/context"
 	"golang.org/x/sys/unix"
 )
@@ -1777,7 +1776,7 @@ func TestGetxattr(t *testing.T) {
 	defer mnt.Close()
 
 	buf := make([]byte, 8192)
-	n, err := xattr.Getxattr(mnt.Dir+"/child", "not-there", buf)
+	n, err := unix.Getxattr(mnt.Dir+"/child", "not-there", buf)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return
@@ -1813,7 +1812,7 @@ func TestGetxattrTooSmall(t *testing.T) {
 	defer mnt.Close()
 
 	buf := make([]byte, 3)
-	_, err = xattr.Getxattr(mnt.Dir+"/child", "whatever", buf)
+	_, err = unix.Getxattr(mnt.Dir+"/child", "whatever", buf)
 	if err == nil {
 		t.Error("Getxattr = nil; want some error")
 	}
@@ -1843,7 +1842,7 @@ func TestGetxattrSize(t *testing.T) {
 	}
 	defer mnt.Close()
 
-	n, err := xattr.Getxattr(mnt.Dir+"/child", "whatever", nil)
+	n, err := unix.Getxattr(mnt.Dir+"/child", "whatever", nil)
 	if err != nil {
 		t.Errorf("Getxattr unexpected error: %v", err)
 		return
@@ -1876,7 +1875,7 @@ func TestListxattr(t *testing.T) {
 	defer mnt.Close()
 
 	buf := make([]byte, 8192)
-	n, err := xattr.Listxattr(mnt.Dir+"/child", buf)
+	n, err := unix.Listxattr(mnt.Dir+"/child", buf)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return
@@ -1915,7 +1914,7 @@ func TestListxattrTooSmall(t *testing.T) {
 	defer mnt.Close()
 
 	buf := make([]byte, 3)
-	_, err = xattr.Listxattr(mnt.Dir+"/child", buf)
+	_, err = unix.Listxattr(mnt.Dir+"/child", buf)
 	if err == nil {
 		t.Error("Listxattr = nil; want some error")
 	}
@@ -1945,7 +1944,7 @@ func TestListxattrSize(t *testing.T) {
 	}
 	defer mnt.Close()
 
-	n, err := xattr.Listxattr(mnt.Dir+"/child", nil)
+	n, err := unix.Listxattr(mnt.Dir+"/child", nil)
 	if err != nil {
 		t.Errorf("Listxattr unexpected error: %v", err)
 		return
@@ -1978,7 +1977,7 @@ func testSetxattr(t *testing.T, size int) {
 
 	const g = "hello, world"
 	greeting := strings.Repeat(g, size/len(g)+1)[:size]
-	err = xattr.Setxattr(mnt.Dir+"/child", "greeting", []byte(greeting), 0)
+	err = unix.Setxattr(mnt.Dir+"/child", "greeting", []byte(greeting), 0)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return
@@ -2029,7 +2028,7 @@ func TestRemovexattr(t *testing.T) {
 	}
 	defer mnt.Close()
 
-	err = xattr.Removexattr(mnt.Dir+"/child", "greeting")
+	err = unix.Removexattr(mnt.Dir+"/child", "greeting")
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 		return

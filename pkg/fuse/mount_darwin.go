@@ -16,6 +16,13 @@ import (
 var (
 	errNoAvail   = errors.New("no available fuse devices")
 	errNotLoaded = errors.New("osxfuse is not loaded")
+
+	// ErrOSXFUSENotFound is returned from Mount when the OSXFUSE
+	// installation is not detected.
+	//
+	// Only happens on OS X. Make sure OSXFUSE is installed, or see
+	// OSXFUSELocations for customization.
+	ErrOSXFUSENotFound = errors.New("cannot locate OSXFUSE")
 )
 
 func loadOSXFUSE(bin string) error {
