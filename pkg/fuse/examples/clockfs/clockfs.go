@@ -58,12 +58,6 @@ func run(mountpoint string) error {
 	if err := srv.Serve(filesys); err != nil {
 		return err
 	}
-
-	// Check if the mount process has an error to report.
-	<-c.Ready
-	if err := c.MountError; err != nil {
-		return err
-	}
 	return nil
 }
 

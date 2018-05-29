@@ -21,26 +21,31 @@ import (
 	"github.com/kurafs/kura/pkg/cli"
 
 	cacheserver "github.com/kurafs/kura/cmd/cache-server"
+	fuseserver "github.com/kurafs/kura/cmd/fuse-server"
 	identityserver "github.com/kurafs/kura/cmd/identity-server"
 	metadataserver "github.com/kurafs/kura/cmd/metadata-server"
 	storageserver "github.com/kurafs/kura/cmd/storage-server"
 )
 
 func main() {
-	// We aggregate all the top-level commands, accessible via 'kura <command> ...', as needed.
+	// We aggregate all the top-level commands (i.e. 'kura <command> ...') as
+	// needed.
 	var commands cli.Commands
 
-	// We include top level commands for {cache,storage,metadata,identity} servers.
+	// We include top level commands for
+	// {cache,storage,metadata,identity}-servers.
+	commands = append(commands, fuseserver.FuseServerCmd)
 	commands = append(commands, cacheserver.CacheServerCmd)
 	commands = append(commands, metadataserver.MetadataServerCmd)
 	commands = append(commands, identityserver.IdentityServerCmd)
 	commands = append(commands, storageserver.StorageServerCmd)
 
-	// We also include a documentation pseudo-command for Kura's security model and architecture.
+	// We also include a documentation pseudo-command for Kura's security model
+	// and architecture.
 	commands = append(commands, doc.SecurityModelCmd)
 	commands = append(commands, doc.ArchitectureCmd)
 
-	// We define the top level CLI blurb here.
+	// We define the top level CLI abstract here.
 	abstract := "Kura is an end-to-end encrypted, synchronized, global file system in Go."
 	if err := cli.Process(abstract, commands); err != nil {
 		os.Exit(1)

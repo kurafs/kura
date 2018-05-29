@@ -131,9 +131,7 @@ func TestMountOptionAllowOtherThenAllowRoot(t *testing.T) {
 	)
 	if err == nil {
 		mnt.Close()
-	}
-	if g, e := err, fuse.ErrCannotCombineAllowOtherAndAllowRoot; g != e {
-		t.Fatalf("wrong error: %v != %v", g, e)
+		t.Fatalf("Expected error, AllowOther and AllowRoot not allowed simultaneously")
 	}
 }
 
@@ -147,9 +145,7 @@ func TestMountOptionAllowRootThenAllowOther(t *testing.T) {
 	)
 	if err == nil {
 		mnt.Close()
-	}
-	if g, e := err, fuse.ErrCannotCombineAllowOtherAndAllowRoot; g != e {
-		t.Fatalf("wrong error: %v != %v", g, e)
+		t.Fatalf("Expected error, AllowOther and AllowRoot not allowed simultaneously")
 	}
 }
 

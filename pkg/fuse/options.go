@@ -13,16 +13,11 @@ var noop = func(_ *mountConfig) error { return nil }
 // mountConfig holds the configuration for a mount operation.
 // Use it by passing MountOption values to Mount.
 type mountConfig struct {
-	options          map[string]string
+	options map[string]string
+
 	maxReadahead     uint32
 	initFlags        InitFlags
 	osxfuseLocations []OSXFUSEPaths
-}
-
-func escapeComma(s string) string {
-	s = strings.Replace(s, `\`, `\\`, -1)
-	s = strings.Replace(s, `,`, `\,`, -1)
-	return s
 }
 
 // getOptions makes a string of options suitable for passing to FUSE
@@ -139,15 +134,13 @@ func DaemonTimeout(name string) MountOption {
 	return daemonTimeout(name)
 }
 
-var ErrCannotCombineAllowOtherAndAllowRoot = errors.New("cannot combine AllowOther and AllowRoot")
-
 // AllowOther allows other users to access the file system.
 //
 // Only one of AllowOther or AllowRoot can be used.
 func AllowOther() MountOption {
 	return func(conf *mountConfig) error {
 		if _, ok := conf.options["allow_root"]; ok {
-			return ErrCannotCombineAllowOtherAndAllowRoot
+			return errors.New("cannot combine AllowOther with AllowRoot")
 		}
 		conf.options["allow_other"] = ""
 		return nil
@@ -162,7 +155,7 @@ func AllowOther() MountOption {
 func AllowRoot() MountOption {
 	return func(conf *mountConfig) error {
 		if _, ok := conf.options["allow_other"]; ok {
-			return ErrCannotCombineAllowOtherAndAllowRoot
+			return errors.New("cannot combine AllowOther with AllowRoot")
 		}
 		conf.options["allow_root"] = ""
 		return nil
@@ -274,6 +267,10 @@ var (
 		Mount:        "/Library/Filesystems/osxfusefs.fs/Support/mount_osxfusefs",
 		DaemonVar:    "MOUNT_FUSEFS_DAEMON_PATH",
 	}
+	DefaultOSXFuseLocations = []OSXFUSEPaths{
+		OSXFUSELocationV3,
+		OSXFUSELocationV2,
+	}
 )
 
 // OSXFUSELocations sets where to look for OSXFUSE files. The
@@ -306,4 +303,10 @@ func AllowNonEmptyMount() MountOption {
 		conf.options["nonempty"] = ""
 		return nil
 	}
+}
+
+func escapeComma(s string) string {
+	s = strings.Replace(s, `\`, `\\`, -1)
+	s = strings.Replace(s, `,`, `\,`, -1)
+	return s
 }

@@ -1,52 +1,13 @@
-// Hellofs implements a simple "hello world" file system.
-package main
+package fuseserver
 
 import (
-	"flag"
-	"fmt"
-	"log"
+	"context"
 	"os"
 
 	"github.com/kurafs/kura/pkg/fuse"
 	"github.com/kurafs/kura/pkg/fuse/fs"
-	_ "github.com/kurafs/kura/pkg/fuse/fs/fstestutil"
-	"golang.org/x/net/context"
 )
 
-func usage() {
-	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "  %s MOUNTPOINT\n", os.Args[0])
-}
-
-func main() {
-	flag.Usage = usage
-	flag.Parse()
-
-	if flag.NArg() != 1 {
-		usage()
-		os.Exit(2)
-	}
-	mountpoint := flag.Arg(0)
-
-	c, err := fuse.Mount(
-		mountpoint,
-		fuse.FSName("helloworld"),
-		fuse.Subtype("hellofs"),
-		fuse.LocalVolume(),
-		fuse.VolumeName("Hello world!"),
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer c.Close()
-
-	err = fs.Serve(c, FS{})
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// FS implements the hello world file system.
 type FS struct{}
 
 func (FS) Root() (fs.Node, error) {
@@ -63,14 +24,14 @@ func (Dir) Attr(ctx context.Context, a *fuse.Attr) error {
 }
 
 func (Dir) Lookup(ctx context.Context, name string) (fs.Node, error) {
-	if name == "hello" {
+	if name == "kura.txt" {
 		return File{}, nil
 	}
 	return nil, fuse.ENOENT
 }
 
 var dirDirs = []fuse.Dirent{
-	{Inode: 2, Name: "hello", Type: fuse.DT_File},
+	{Inode: 2, Name: "kura.txt", Type: fuse.DT_File},
 }
 
 func (Dir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
@@ -80,7 +41,7 @@ func (Dir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 // File implements both Node and Handle for the hello file.
 type File struct{}
 
-const greeting = "hello, world\n"
+const greeting = "hello, kura"
 
 func (File) Attr(ctx context.Context, a *fuse.Attr) error {
 	a.Inode = 2

@@ -1,7 +1,6 @@
 package fstestutil
 
 import (
-	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -83,19 +82,7 @@ func MountedFunc(fn func(*Mount) fs.FS, conf *fs.Config, options ...fuse.MountOp
 		serveErr <- server.Serve(filesys)
 	}()
 
-	select {
-	case <-mnt.Conn.Ready:
-		if err := mnt.Conn.MountError; err != nil {
-			return nil, err
-		}
-		return mnt, nil
-	case err = <-mnt.Error:
-		// Serve quit early
-		if err != nil {
-			return nil, err
-		}
-		return nil, errors.New("Serve exited early")
-	}
+	return mnt, nil
 }
 
 // Mounted mounts the fuse.Server at a temporary directory.
