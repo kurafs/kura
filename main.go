@@ -20,9 +20,9 @@ import (
 	"github.com/kurafs/kura/doc"
 	"github.com/kurafs/kura/pkg/cli"
 
-	blobserver "github.com/kurafs/kura/cmd/blob-server"
-	directoryserver "github.com/kurafs/kura/cmd/directory-server"
+	cacheserver "github.com/kurafs/kura/cmd/cache-server"
 	identityserver "github.com/kurafs/kura/cmd/identity-server"
+	metadataserver "github.com/kurafs/kura/cmd/metadata-server"
 	storageserver "github.com/kurafs/kura/cmd/storage-server"
 )
 
@@ -30,9 +30,9 @@ func main() {
 	// We aggregate all the top-level commands, accessible via 'kura <command> ...', as needed.
 	var commands cli.Commands
 
-	// We include top level commands for {blob,storage,directory,identity} servers.
-	commands = append(commands, blobserver.BlobServerCmd)
-	commands = append(commands, directoryserver.DirectoryServerCmd)
+	// We include top level commands for {cache,storage,metadata,identity} servers.
+	commands = append(commands, cacheserver.CacheServerCmd)
+	commands = append(commands, metadataserver.MetadataServerCmd)
 	commands = append(commands, identityserver.IdentityServerCmd)
 	commands = append(commands, storageserver.StorageServerCmd)
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package blobserver
+package metadataserver
 
 import (
 	"fmt"
@@ -20,16 +20,16 @@ import (
 	"github.com/kurafs/kura/pkg/cli"
 )
 
-var BlobServerCmd = &cli.Command{
-	Run:       blobServerCmdRun,
-	UsageLine: "blob-server [-f] [-a arg]",
-	Short:     "blob-server command overview",
+var MetadataServerCmd = &cli.Command{
+	Run:       metadataServerCmdRun,
+	UsageLine: "metadata-server [-f] [-a arg]",
+	Short:     "metadata-server command overview",
 	Long: `
-Blob server detailed overview.
+Metadata server detailed overview.
     `,
 }
 
-func blobServerCmdRun(cmd *cli.Command, args []string) error {
+func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 	f := cmd.FlagSet.Bool("f", false, "Flag usage")
 	a := cmd.FlagSet.String("a", "", "Argument parameter usage")
 	if err := cmd.FlagSet.Parse(args); err != nil {

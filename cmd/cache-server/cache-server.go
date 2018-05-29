@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package directoryserver
+package cacheserver
 
 import (
 	"fmt"
@@ -20,16 +20,16 @@ import (
 	"github.com/kurafs/kura/pkg/cli"
 )
 
-var DirectoryServerCmd = &cli.Command{
-	Run:       directoryServerCmdRun,
-	UsageLine: "directory-server [-f] [-a arg]",
-	Short:     "directory-server command overview",
+var CacheServerCmd = &cli.Command{
+	Run:       cacheServerCmdRun,
+	UsageLine: "cache-server [-f] [-a arg]",
+	Short:     "cache-server command overview",
 	Long: `
-Directory server detailed overview.
+cache server detailed overview.
     `,
 }
 
-func directoryServerCmdRun(cmd *cli.Command, args []string) error {
+func cacheServerCmdRun(cmd *cli.Command, args []string) error {
 	f := cmd.FlagSet.Bool("f", false, "Flag usage")
 	a := cmd.FlagSet.String("a", "", "Argument parameter usage")
 	if err := cmd.FlagSet.Parse(args); err != nil {
