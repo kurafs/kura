@@ -19,17 +19,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Portions of this code originated in the Go source code, under cmd/go/internal/help.
+// Portions of this code originated in the Go source code, under
+// cmd/go/internal/help.
 
 package cli
 
 import (
 	"errors"
 	"fmt"
-	"html/template"
 	"io"
 	"os"
 	"strings"
+	"text/template"
 	"unicode"
 )
 
@@ -79,14 +80,14 @@ func tmpl(w io.Writer, templateText, program, abstract string, data interface{})
 	}
 }
 
-// printFullUsage prints out to os.Stdout the entire top level usage, including the program abstract,
-// all commands and help topics.
+// printFullUsage prints out to os.Stdout the entire top level usage, including
+// the program abstract, all commands and help topics.
 func printFullUsage(program, abstract string, commands Commands) {
 	tmpl(os.Stdout, usageTemplate, program, abstract, commands)
 }
 
-// printCommandUsage prints out to os.Stdout the help output for the given command. This is what's
-// visible when '<program> help command' is invoked.
+// printCommandUsage prints out to os.Stdout the help output for the given
+// command. This is what's visible when '<program> help command' is invoked.
 func printCommandUsage(program, command string, commands Commands) error {
 	for _, cmd := range commands {
 		if cmd.Name() == command {
@@ -98,8 +99,8 @@ func printCommandUsage(program, command string, commands Commands) error {
 	return errors.New("command not found")
 }
 
-// printCommandParsingError prints out to os.Stderr the command flags parsing error along with brief
-// usage information.
+// printCommandParsingError prints out to os.Stderr the command flags parsing
+// error along with brief usage information.
 func printCommandParsingError(program string, cmd *Command, err error) {
 	if !strings.Contains(err.Error(), "help requested") {
 		fmt.Fprintln(os.Stderr, upcaseInitial(err.Error()))
@@ -109,17 +110,18 @@ func printCommandParsingError(program string, cmd *Command, err error) {
 	cmd.FlagSet.PrintDefaults()
 }
 
-// printCommandHelp prints out to os.Stdout the default flags for the given command. This is what's
-// visible when '<program> command -h' is invoked.
+// printCommandHelp prints out to os.Stdout the default flags for the given
+// command. This is what's visible when '<program> command -h' is invoked.
 func printCommandHelp(program string, cmd *Command) {
 	tmpl(os.Stdout, cmdErrorHelpTemplate, program, "", cmd)
 	cmd.FlagSet.SetOutput(os.Stderr)
 	cmd.FlagSet.PrintDefaults()
 }
 
-// HACK: Unicode points (runes) can consist of multiple bytes. This implementation exits on encountering
-// the first rune without any consideration for its width, but is sufficient for when the first
-// character is known to be single byte width (as is the case for stdlib flag errors).
+// HACK: Unicode points (runes) can consist of multiple bytes. This
+// implementation exits on encountering the first rune without any consideration
+// for its width, but is sufficient for when the first character is known to be
+// single byte width (as is the case for stdlib flag errors).
 func upcaseInitial(str string) string {
 	for i, v := range str {
 		return string(unicode.ToUpper(v)) + str[i+1:]

@@ -15,19 +15,21 @@
 package cli
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
 )
 
-// Process is the entry point for CLI commands. User provided arguments are captured and processed
-// through the defined commands, and the appropriate one (if any), is executed.
-// As is structured at the time of writing, there's no root level command or flags. Given this when
-// <program> is invoked without any arguments, the full usage is printed out instead.
+// Process is the entry point for CLI commands. User provided arguments are
+// captured and processed through the defined commands, and the appropriate one
+// (if any), is executed.  As is structured at the time of writing, there's no
+// root level command or flags. Given this when <program> is invoked without any
+// arguments, the full usage is printed out instead.
 //
-// All CLI errors are printed out to os.Stderr and follow with os.Exit(2). Command execution errors
-// are propagated to the caller. All remaining printed output is directed at os.Stdout.
+// All CLI errors are printed out to os.Stderr and follow with os.Exit(2).
+// Command execution errors are propagated to the caller. All remaining printed
+// output is directed at os.Stdout.
 //
 // The abstract is used in generating structured help messages. Example:
 //
@@ -38,12 +40,14 @@ import (
 //          ...
 //
 func Process(abstract string, commands Commands) error {
-	// We capture the program name and remaining arguments. The prints out the relative path of the
-	// binary if that's how the command is invoke, but we don't account for this as the alternative
-	// would mean asking the caller to pass in the program name.
+	// We capture the program name and remaining arguments. The prints out the
+	// relative path of the binary if that's how the command is invoke, but we
+	// don't account for this as the alternative would mean asking the caller to
+	// pass in the program name.
 	program, args := os.Args[0], os.Args[1:]
 
-	// 	FlagSet outputs are discarded for composability with the rest of this package.
+	// 	FlagSet outputs are discarded for composability with the rest of this
+	// 	package.
 	for _, cmd := range commands {
 		cmd.FlagSet.SetOutput(ioutil.Discard)
 	}
@@ -55,14 +59,16 @@ func Process(abstract string, commands Commands) error {
 	}
 
 	command := args[0]
-	// We also provide an out of the box '<program> help' command that simply prints out default
-	// usage.  '<program> -h' is a special allowance accounted for.
+	// We also provide an out of the box '<program> help' command that simply
+	// prints out default usage.  '<program> -h' is a special allowance
+	// accounted for.
 	if (command == "help" || command == "-h") && len(args) == 1 {
 		printFullUsage(program, abstract, commands)
 		return nil
 	}
 
-	// If '<program> help cmd' is used, we ensure there's only one command provided.
+	// If '<program> help cmd' is used, we ensure there's only one command
+	// provided.
 	if command == "help" && len(args) > 2 {
 		fmt.Fprintln(os.Stderr, fmt.Sprintf("Usage: %s help [command]", program))
 		fmt.Fprintln(os.Stderr)
@@ -70,7 +76,8 @@ func Process(abstract string, commands Commands) error {
 		os.Exit(2) // failed at 'go help'
 	}
 
-	// '<program> help' should also work with every other command (i.e. '<program> help cmd').
+	// '<program> help' should also work with every other command (i.e.
+	// '<program> help cmd').
 	if command == "help" && len(args) == 2 {
 		cmd := args[1]
 		err := printCommandUsage(program, cmd, commands)
@@ -83,7 +90,8 @@ func Process(abstract string, commands Commands) error {
 		return nil
 	}
 
-	// A non-help command is executed, we look to find the one provided and if runnable, we run it.
+	// A non-help command is executed, we look to find the one provided and if
+	// runnable, we run it.
 	for _, cmd := range commands {
 		if !(cmd.Name() == command) {
 			continue
@@ -93,17 +101,17 @@ func Process(abstract string, commands Commands) error {
 			continue
 		}
 
-		// If a custom CLI parse error is returned we can selectively handle that here, and
-		// propagate everything else up above.
+		// If a custom CLI parse error is returned we can selectively handle
+		// that here, and propagate everything else up above.
 		err := cmd.Run(cmd, args[1:])
 		if _, ok := err.(cmdParseError); !ok {
 			return err
 		}
 
-		// We handle the flag error where help is requested as a special case as this is a valid
-		// state, despite the flag.Parse error response. We also do this after cmd.Run as the flags
-		// may have been defined there.
-		if strings.Contains(err.Error(), "help requested") {
+		// We handle the flag error where help is requested as a special case as
+		// this is a valid state, despite the flag.Parse error response. We also
+		// do this after cmd.Run as the flags may have been defined there.
+		if err == flag.ErrHelp {
 			printCommandHelp(program, cmd)
 			return nil
 		}

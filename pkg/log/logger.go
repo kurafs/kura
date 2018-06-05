@@ -34,8 +34,6 @@ import (
 	"time"
 )
 
-// TODO(irfansharif): Implement an _ import like debug/pprof for logger config?
-// TODO(irfansharif): Implement a catchall global logger with warning?
 // TODO(irfansharif): Implement tagging API?
 // TODO(irfansharif): Implement custom leveling/verbosity with filtering?
 
@@ -72,44 +70,44 @@ func New(options ...option) *Logger {
 	return l
 }
 
-// Info logs to the INFO log. Arguments are handled in the manner of fmt.Println;
-// a newline is appended at the end.
+// Info logs to the INFO log. Arguments are handled in the manner of
+// fmt.Println; a newline is appended at the end.
 func (l *Logger) Info(v ...interface{}) {
 	l.log(InfoMode, fmt.Sprintln(v...))
 }
 
-// Infof logs to the INFO log. Arguments are handled in the manner of fmt.Printf;
-// a newline is appended at the end.
+// Infof logs to the INFO log. Arguments are handled in the manner of
+// fmt.Printf; a newline is appended at the end.
 func (l *Logger) Infof(format string, v ...interface{}) {
 	l.log(InfoMode, fmt.Sprintf(format, v...))
 }
 
-// Warn logs to the WARN log. Arguments are handled in the manner of fmt.Println;
-// a newline is appended at the end.
+// Warn logs to the WARN log. Arguments are handled in the manner of
+// fmt.Println; a newline is appended at the end.
 func (l *Logger) Warn(v ...interface{}) {
 	l.log(WarnMode, fmt.Sprintln(v...))
 }
 
-// Warnf logs to the WARN log. Arguments are handled in the manner of fmt.Printf;
-// a newline is appended at the end.
+// Warnf logs to the WARN log. Arguments are handled in the manner of
+// fmt.Printf; a newline is appended at the end.
 func (l *Logger) Warnf(format string, v ...interface{}) {
 	l.log(WarnMode, fmt.Sprintf(format, v...))
 }
 
-// Error logs to the ERROR log. Arguments are handled in the manner of fmt.Println;
-// a newline is appended at the end.
+// Error logs to the ERROR log. Arguments are handled in the manner of
+// fmt.Println; a newline is appended at the end.
 func (l *Logger) Error(v ...interface{}) {
 	l.log(ErrorMode, fmt.Sprintln(v...))
 }
 
-// Errorf logs to the ERROR log. Arguments are handled in the manner of fmt.Printf;
-// a newline is appended at the end.
+// Errorf logs to the ERROR log. Arguments are handled in the manner of
+// fmt.Printf; a newline is appended at the end.
 func (l *Logger) Errorf(format string, v ...interface{}) {
 	l.log(ErrorMode, fmt.Sprintf(format, v...))
 }
 
-// Fatal logs to the FATAL log. Arguments are handled in the manner of fmt.Println;
-// a newline is appended at the end.
+// Fatal logs to the FATAL log. Arguments are handled in the manner of
+// fmt.Println; a newline is appended at the end.
 //
 // TODO(irfansharif): Including a stack trace of all running goroutines, then
 // calls os.Exit(255).
@@ -117,8 +115,8 @@ func (l *Logger) Fatal(v ...interface{}) {
 	l.log(FatalMode, fmt.Sprintln(v...))
 }
 
-// Fatalf logs to the FATAL log. Arguments are handled in the manner of fmt.Printf;
-// a newline is appended at the end.
+// Fatalf logs to the FATAL log. Arguments are handled in the manner of
+// fmt.Printf; a newline is appended at the end.
 //
 // TODO(irfansharif): Including a stack trace of all running goroutines, then
 // calls os.Exit(255).
@@ -126,25 +124,25 @@ func (l *Logger) Fatalf(format string, v ...interface{}) {
 	l.log(FatalMode, fmt.Sprintf(format, v...))
 }
 
-// Debug logs to the DEBUG log. Arguments are handled in the manner of fmt.Println;
-// a newline is appended at the end.
+// Debug logs to the DEBUG log. Arguments are handled in the manner of
+// fmt.Println; a newline is appended at the end.
 func (l *Logger) Debug(v ...interface{}) {
 	l.log(DebugMode, fmt.Sprintln(v...))
 }
 
-// Debugf logs to the DEBUG log. Arguments are handled in the manner of fmt.Printf;
-// a newline is appended at the end.
+// Debugf logs to the DEBUG log. Arguments are handled in the manner of
+// fmt.Printf; a newline is appended at the end.
 func (l *Logger) Debugf(format string, v ...interface{}) {
 	l.log(DebugMode, fmt.Sprintf(format, v...))
 }
 
 // Logger.log is only to be called from
-// Logger.{Info,Warn,Error,Fatal,Debug}{,f}. We use a depth of two to
-// retrieve the caller immediately preceding it.
+// Logger.{Info,Warn,Error,Fatal,Debug}{,f}. We use a depth of two to retrieve
+// the caller immediately preceding it.
 func (l *Logger) log(lmode Mode, data string) {
-	// TODO(irfansharif): Right now this isn't robust to shared filenames
-	// across varied sub packages (for tracepoints and file log modes both).
-	// This is a stand-in to allow for direct file name specification without
+	// TODO(irfansharif): Right now this isn't robust to shared filenames across
+	// varied sub packages (for tracepoints and file log modes both). This is a
+	// stand-in to allow for direct file name specification without
 	// fully-specified paths (in the host machine or relative to project root).
 	// We could implement for project root relative paths if project root was
 	// provided.
@@ -235,9 +233,9 @@ func (l *Logger) header(lmode Mode, t time.Time, file string, line int) []byte {
 	if l.flag&(Lshortfile|Llongfile) != 0 {
 		// This will panic with index out of range if the project path is
 		// improperly configured. Consider project path is defined to be
-		// [...]/app/pkg/subpkg (read: not the project root), and is used at
-		// the top level, [...]/app/main.go, it will panic is it's trying to
-		// drop the prefix [...]/app.
+		// [...]/app/pkg/subpkg (read: not the project root), and is used at the
+		// top level, [...]/app/main.go, it will panic is it's trying to drop
+		// the prefix [...]/app.
 		file = file[len(l.basePath):]
 		if len(l.basePath) != 0 {
 			// [1:] is for leading '/', if basePath is non-empty.
@@ -360,7 +358,8 @@ func stacktrace(skip int) []byte {
 // g.go: 36 }
 //
 func caller(depth int) (file string, line int) {
-	_, file, line, ok := runtime.Caller(depth + 1) // +1 to account for call to caller itself.
+	// +1 to account for call to caller itself.
+	_, file, line, ok := runtime.Caller(depth + 1)
 	if !ok {
 		file = "[???]"
 		line = -1
