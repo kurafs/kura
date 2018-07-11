@@ -1,4 +1,4 @@
-.PHONY: storage_rpc clean_storage_rpc 
+.PHONY: storage_rpc clean_storage_rpc clean_rpc rpc metadata_rpc clean_metadata_rpc
 
 clean_rpc: clean_storage_rpc clean_metadata_rpc
 
