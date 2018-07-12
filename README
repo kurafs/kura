@@ -19,5 +19,4 @@ as well as gRPC installed, which you can get by running:
 go get -u google.golang.org/grpc
 
 After you have all the required dependencies installed in your $GOBIN (remember to add $GOBIN to your path),
-then you can clean all the RPC code by running `make clean_rpc` and regenerate the RPC client/server code with
-`make rpc`.
+then you can generate all the protobuf client/server code with `go generate`
