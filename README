@@ -4,3 +4,19 @@ KURA
 An end-to-end encrypted, synchronized, global file system in Go.
 
     go get -u github.com/kurafs/kura
+
+
+Generating gRPC code
+====
+
+In order to generate the protobuf code, you need to have the protoc compiler,
+as well as the protoc plugin for go, which you can get by running:
+
+go get -u github.com/golang/protobuf/protoc-gen-go
+
+as well as gRPC installed, which you can get by running:
+
+go get -u google.golang.org/grpc
+
+After you have all the required dependencies installed in your $GOBIN (remember to add $GOBIN to your path),
+then you can generate all the protobuf client/server code with `go generate`

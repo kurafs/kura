@@ -1,0 +1,80 @@
+// Copyright 2018 The Kura Authors.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package metadata;
+
+// TODO (Franz): This should be encrypted; move this to 
+// the encryption server when its implemented
+message FileMetadata {
+    message UnixTimestamp {
+        int64 seconds = 1;
+        int64 nanoseconds = 2;
+    }
+    UnixTimestamp created = 1;
+    UnixTimestamp last_modified = 2;
+    string permissions = 3;
+    int64 size = 4;
+}
+
+message GetMetadataRequest {
+    string key = 1;
+}
+
+message GetMetadataResponse {
+    FileMetadata metadata = 1;
+}
+
+message SetMetadataRequest {
+    string key = 1;
+    FileMetadata metadata = 2;
+}
+
+message SetMetadataResponse {
+    bool successful = 1;
+}
+
+message GetFileRequest {
+    string key = 1;
+}
+
+message GetFileResponse {
+    bytes file_chunk = 1;
+}
+
+message PutFileRequest {
+    string key = 1;
+    bytes file_chunk = 2;
+}
+
+message PutFileResponse {
+    bool successful = 1;
+}
+
+message DeleteFileRequest {
+    string key = 1;
+}
+
+message DeleteFileResponse {
+    string successful = 1;
+}
+
+service StorageService {
+    rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse);
+    rpc SetMetadata (SetMetadataRequest) returns (SetMetadataResponse);
+    rpc GetFile (GetFileRequest) returns (stream GetFileResponse);
+    rpc PutFile (stream PutFileRequest) returns (PutFileResponse);
+    rpc DeleteFile (DeleteFileRequest) returns (DeleteFileResponse);
+}
