@@ -21,28 +21,24 @@ message GetFileRequest {
 }
 
 message GetFileResponse {
-    bytes file_chunk = 1;
+    bytes file = 1;
 }
 
 message PutFileRequest {
     string key = 1;
-    bytes file_chunk = 2;
+    bytes file = 2;
 }
 
-message PutFileResponse {
-    bool successful = 1;
-}
+message PutFileResponse { }
 
 message DeleteFileRequest {
     string key = 1;
 }
 
-message DeleteFileResponse {
-    bool successful = 1;
-}
+message DeleteFileResponse { }
 
 service StorageService {
-    rpc GetFile (GetFileRequest) returns (stream GetFileResponse);
-    rpc PutFile (stream PutFileRequest) returns (PutFileResponse);
+    rpc GetFile (GetFileRequest) returns (GetFileResponse);
+    rpc PutFile (PutFileRequest) returns (PutFileResponse);
     rpc DeleteFile (DeleteFileRequest) returns (DeleteFileResponse);
 }
