@@ -16,8 +16,14 @@ package storageserver
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net"
+	"os"
 
 	"github.com/kurafs/kura/pkg/cli"
+	"github.com/kurafs/kura/pkg/log"
+	pb "github.com/kurafs/kura/pkg/rpc/storage"
+	"google.golang.org/grpc"
 )
 
 var StorageServerCmd = &cli.Command{
@@ -30,12 +36,30 @@ Storage server detailed overview.
 }
 
 func storageServerCmdRun(cmd *cli.Command, args []string) error {
-	f := cmd.FlagSet.Bool("f", false, "Flag usage")
-	a := cmd.FlagSet.String("a", "", "Argument parameter usage")
+	var (
+		port int
+	)
+	cmd.FlagSet.IntVar(&port, "port", 10669, "Port which the server will run on")
 	if err := cmd.FlagSet.Parse(args); err != nil {
 		return cli.CmdParseError(err)
 	}
 
-	fmt.Println(fmt.Sprintf("%s: parsed successfully: %t, %s", cmd.Name(), *f, *a))
+	writer := log.MultiWriter(ioutil.Discard, os.Stderr)
+	writer = log.SynchronizedWriter(writer)
+	logf := log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC | log.Lmode
+	logger := log.New(log.Writer(writer), log.Flags(logf), log.SkipBasePath())
+
+	portConf := fmt.Sprintf(":%d", port)
+	lis, err := net.Listen("tcp", portConf)
+	if err != nil {
+		logger.Fatalf("failed to listen for reason %v", err)
+		return nil
+	}
+	s := grpc.NewServer()
+	pb.RegisterStorageServiceServer(s, newServer(logger))
+	logger.Infof("serving on port %d\n", port)
+	if err := s.Serve(lis); err != nil {
+		logger.Fatalf("failed to serve for reason %v", err)
+	}
 	return nil
 }

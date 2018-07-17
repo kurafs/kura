@@ -29,6 +29,12 @@ message FileMetadata {
     int64 size = 4;
 }
 
+message GetDirectoryKeysRequest {}
+
+message GetDirectoryKeysResponse {
+    repeated string keys = 1;
+}
+
 message GetMetadataRequest {
     string key = 1;
 }
@@ -68,10 +74,11 @@ message DeleteFileRequest {
 }
 
 message DeleteFileResponse {
-    string successful = 1;
+    bool successful = 1;
 }
 
-service StorageService {
+service MetadataService { 
+    rpc GetDirectoryKeys (GetDirectoryKeysRequest) returns (GetDirectoryKeysResponse);
     rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse);
     rpc SetMetadata (SetMetadataRequest) returns (SetMetadataResponse);
     rpc GetFile (GetFileRequest) returns (stream GetFileResponse);

@@ -39,7 +39,7 @@ func (m *FileMetadata) Reset()         { *m = FileMetadata{} }
 func (m *FileMetadata) String() string { return proto.CompactTextString(m) }
 func (*FileMetadata) ProtoMessage()    {}
 func (*FileMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{0}
+	return fileDescriptor_metadata_e15e91970f204200, []int{0}
 }
 func (m *FileMetadata) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_FileMetadata.Unmarshal(m, b)
@@ -99,7 +99,7 @@ func (m *FileMetadata_UnixTimestamp) Reset()         { *m = FileMetadata_UnixTim
 func (m *FileMetadata_UnixTimestamp) String() string { return proto.CompactTextString(m) }
 func (*FileMetadata_UnixTimestamp) ProtoMessage()    {}
 func (*FileMetadata_UnixTimestamp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{0, 0}
+	return fileDescriptor_metadata_e15e91970f204200, []int{0, 0}
 }
 func (m *FileMetadata_UnixTimestamp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_FileMetadata_UnixTimestamp.Unmarshal(m, b)
@@ -133,6 +133,74 @@ func (m *FileMetadata_UnixTimestamp) GetNanoseconds() int64 {
 	return 0
 }
 
+type GetDirectoryKeysRequest struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetDirectoryKeysRequest) Reset()         { *m = GetDirectoryKeysRequest{} }
+func (m *GetDirectoryKeysRequest) String() string { return proto.CompactTextString(m) }
+func (*GetDirectoryKeysRequest) ProtoMessage()    {}
+func (*GetDirectoryKeysRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_e15e91970f204200, []int{1}
+}
+func (m *GetDirectoryKeysRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetDirectoryKeysRequest.Unmarshal(m, b)
+}
+func (m *GetDirectoryKeysRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetDirectoryKeysRequest.Marshal(b, m, deterministic)
+}
+func (dst *GetDirectoryKeysRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDirectoryKeysRequest.Merge(dst, src)
+}
+func (m *GetDirectoryKeysRequest) XXX_Size() int {
+	return xxx_messageInfo_GetDirectoryKeysRequest.Size(m)
+}
+func (m *GetDirectoryKeysRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDirectoryKeysRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetDirectoryKeysRequest proto.InternalMessageInfo
+
+type GetDirectoryKeysResponse struct {
+	Keys                 []string `protobuf:"bytes,1,rep,name=keys,proto3" json:"keys,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetDirectoryKeysResponse) Reset()         { *m = GetDirectoryKeysResponse{} }
+func (m *GetDirectoryKeysResponse) String() string { return proto.CompactTextString(m) }
+func (*GetDirectoryKeysResponse) ProtoMessage()    {}
+func (*GetDirectoryKeysResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_e15e91970f204200, []int{2}
+}
+func (m *GetDirectoryKeysResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetDirectoryKeysResponse.Unmarshal(m, b)
+}
+func (m *GetDirectoryKeysResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetDirectoryKeysResponse.Marshal(b, m, deterministic)
+}
+func (dst *GetDirectoryKeysResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDirectoryKeysResponse.Merge(dst, src)
+}
+func (m *GetDirectoryKeysResponse) XXX_Size() int {
+	return xxx_messageInfo_GetDirectoryKeysResponse.Size(m)
+}
+func (m *GetDirectoryKeysResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDirectoryKeysResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetDirectoryKeysResponse proto.InternalMessageInfo
+
+func (m *GetDirectoryKeysResponse) GetKeys() []string {
+	if m != nil {
+		return m.Keys
+	}
+	return nil
+}
+
 type GetMetadataRequest struct {
 	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -144,7 +212,7 @@ func (m *GetMetadataRequest) Reset()         { *m = GetMetadataRequest{} }
 func (m *GetMetadataRequest) String() string { return proto.CompactTextString(m) }
 func (*GetMetadataRequest) ProtoMessage()    {}
 func (*GetMetadataRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{1}
+	return fileDescriptor_metadata_e15e91970f204200, []int{3}
 }
 func (m *GetMetadataRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetMetadataRequest.Unmarshal(m, b)
@@ -182,7 +250,7 @@ func (m *GetMetadataResponse) Reset()         { *m = GetMetadataResponse{} }
 func (m *GetMetadataResponse) String() string { return proto.CompactTextString(m) }
 func (*GetMetadataResponse) ProtoMessage()    {}
 func (*GetMetadataResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{2}
+	return fileDescriptor_metadata_e15e91970f204200, []int{4}
 }
 func (m *GetMetadataResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetMetadataResponse.Unmarshal(m, b)
@@ -221,7 +289,7 @@ func (m *SetMetadataRequest) Reset()         { *m = SetMetadataRequest{} }
 func (m *SetMetadataRequest) String() string { return proto.CompactTextString(m) }
 func (*SetMetadataRequest) ProtoMessage()    {}
 func (*SetMetadataRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{3}
+	return fileDescriptor_metadata_e15e91970f204200, []int{5}
 }
 func (m *SetMetadataRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SetMetadataRequest.Unmarshal(m, b)
@@ -266,7 +334,7 @@ func (m *SetMetadataResponse) Reset()         { *m = SetMetadataResponse{} }
 func (m *SetMetadataResponse) String() string { return proto.CompactTextString(m) }
 func (*SetMetadataResponse) ProtoMessage()    {}
 func (*SetMetadataResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{4}
+	return fileDescriptor_metadata_e15e91970f204200, []int{6}
 }
 func (m *SetMetadataResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SetMetadataResponse.Unmarshal(m, b)
@@ -304,7 +372,7 @@ func (m *GetFileRequest) Reset()         { *m = GetFileRequest{} }
 func (m *GetFileRequest) String() string { return proto.CompactTextString(m) }
 func (*GetFileRequest) ProtoMessage()    {}
 func (*GetFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{5}
+	return fileDescriptor_metadata_e15e91970f204200, []int{7}
 }
 func (m *GetFileRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetFileRequest.Unmarshal(m, b)
@@ -342,7 +410,7 @@ func (m *GetFileResponse) Reset()         { *m = GetFileResponse{} }
 func (m *GetFileResponse) String() string { return proto.CompactTextString(m) }
 func (*GetFileResponse) ProtoMessage()    {}
 func (*GetFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{6}
+	return fileDescriptor_metadata_e15e91970f204200, []int{8}
 }
 func (m *GetFileResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetFileResponse.Unmarshal(m, b)
@@ -381,7 +449,7 @@ func (m *PutFileRequest) Reset()         { *m = PutFileRequest{} }
 func (m *PutFileRequest) String() string { return proto.CompactTextString(m) }
 func (*PutFileRequest) ProtoMessage()    {}
 func (*PutFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{7}
+	return fileDescriptor_metadata_e15e91970f204200, []int{9}
 }
 func (m *PutFileRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutFileRequest.Unmarshal(m, b)
@@ -426,7 +494,7 @@ func (m *PutFileResponse) Reset()         { *m = PutFileResponse{} }
 func (m *PutFileResponse) String() string { return proto.CompactTextString(m) }
 func (*PutFileResponse) ProtoMessage()    {}
 func (*PutFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{8}
+	return fileDescriptor_metadata_e15e91970f204200, []int{10}
 }
 func (m *PutFileResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutFileResponse.Unmarshal(m, b)
@@ -464,7 +532,7 @@ func (m *DeleteFileRequest) Reset()         { *m = DeleteFileRequest{} }
 func (m *DeleteFileRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteFileRequest) ProtoMessage()    {}
 func (*DeleteFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{9}
+	return fileDescriptor_metadata_e15e91970f204200, []int{11}
 }
 func (m *DeleteFileRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteFileRequest.Unmarshal(m, b)
@@ -492,7 +560,7 @@ func (m *DeleteFileRequest) GetKey() string {
 }
 
 type DeleteFileResponse struct {
-	Successful           string   `protobuf:"bytes,1,opt,name=successful,proto3" json:"successful,omitempty"`
+	Successful           bool     `protobuf:"varint,1,opt,name=successful,proto3" json:"successful,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -502,7 +570,7 @@ func (m *DeleteFileResponse) Reset()         { *m = DeleteFileResponse{} }
 func (m *DeleteFileResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteFileResponse) ProtoMessage()    {}
 func (*DeleteFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_181d3367fd5df413, []int{10}
+	return fileDescriptor_metadata_e15e91970f204200, []int{12}
 }
 func (m *DeleteFileResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteFileResponse.Unmarshal(m, b)
@@ -522,16 +590,18 @@ func (m *DeleteFileResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeleteFileResponse proto.InternalMessageInfo
 
-func (m *DeleteFileResponse) GetSuccessful() string {
+func (m *DeleteFileResponse) GetSuccessful() bool {
 	if m != nil {
 		return m.Successful
 	}
-	return ""
+	return false
 }
 
 func init() {
 	proto.RegisterType((*FileMetadata)(nil), "metadata.FileMetadata")
 	proto.RegisterType((*FileMetadata_UnixTimestamp)(nil), "metadata.FileMetadata.UnixTimestamp")
+	proto.RegisterType((*GetDirectoryKeysRequest)(nil), "metadata.GetDirectoryKeysRequest")
+	proto.RegisterType((*GetDirectoryKeysResponse)(nil), "metadata.GetDirectoryKeysResponse")
 	proto.RegisterType((*GetMetadataRequest)(nil), "metadata.GetMetadataRequest")
 	proto.RegisterType((*GetMetadataResponse)(nil), "metadata.GetMetadataResponse")
 	proto.RegisterType((*SetMetadataRequest)(nil), "metadata.SetMetadataRequest")
@@ -552,49 +622,59 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion4
 
-// StorageServiceClient is the client API for StorageService service.
+// MetadataServiceClient is the client API for MetadataService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type StorageServiceClient interface {
+type MetadataServiceClient interface {
+	GetDirectoryKeys(ctx context.Context, in *GetDirectoryKeysRequest, opts ...grpc.CallOption) (*GetDirectoryKeysResponse, error)
 	GetMetadata(ctx context.Context, in *GetMetadataRequest, opts ...grpc.CallOption) (*GetMetadataResponse, error)
 	SetMetadata(ctx context.Context, in *SetMetadataRequest, opts ...grpc.CallOption) (*SetMetadataResponse, error)
-	GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (StorageService_GetFileClient, error)
-	PutFile(ctx context.Context, opts ...grpc.CallOption) (StorageService_PutFileClient, error)
+	GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (MetadataService_GetFileClient, error)
+	PutFile(ctx context.Context, opts ...grpc.CallOption) (MetadataService_PutFileClient, error)
 	DeleteFile(ctx context.Context, in *DeleteFileRequest, opts ...grpc.CallOption) (*DeleteFileResponse, error)
 }
 
-type storageServiceClient struct {
+type metadataServiceClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewStorageServiceClient(cc *grpc.ClientConn) StorageServiceClient {
-	return &storageServiceClient{cc}
+func NewMetadataServiceClient(cc *grpc.ClientConn) MetadataServiceClient {
+	return &metadataServiceClient{cc}
 }
 
-func (c *storageServiceClient) GetMetadata(ctx context.Context, in *GetMetadataRequest, opts ...grpc.CallOption) (*GetMetadataResponse, error) {
+func (c *metadataServiceClient) GetDirectoryKeys(ctx context.Context, in *GetDirectoryKeysRequest, opts ...grpc.CallOption) (*GetDirectoryKeysResponse, error) {
+	out := new(GetDirectoryKeysResponse)
+	err := c.cc.Invoke(ctx, "/metadata.MetadataService/GetDirectoryKeys", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *metadataServiceClient) GetMetadata(ctx context.Context, in *GetMetadataRequest, opts ...grpc.CallOption) (*GetMetadataResponse, error) {
 	out := new(GetMetadataResponse)
-	err := c.cc.Invoke(ctx, "/metadata.StorageService/GetMetadata", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/metadata.MetadataService/GetMetadata", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *storageServiceClient) SetMetadata(ctx context.Context, in *SetMetadataRequest, opts ...grpc.CallOption) (*SetMetadataResponse, error) {
+func (c *metadataServiceClient) SetMetadata(ctx context.Context, in *SetMetadataRequest, opts ...grpc.CallOption) (*SetMetadataResponse, error) {
 	out := new(SetMetadataResponse)
-	err := c.cc.Invoke(ctx, "/metadata.StorageService/SetMetadata", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/metadata.MetadataService/SetMetadata", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *storageServiceClient) GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (StorageService_GetFileClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_StorageService_serviceDesc.Streams[0], "/metadata.StorageService/GetFile", opts...)
+func (c *metadataServiceClient) GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (MetadataService_GetFileClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_MetadataService_serviceDesc.Streams[0], "/metadata.MetadataService/GetFile", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &storageServiceGetFileClient{stream}
+	x := &metadataServiceGetFileClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -604,16 +684,16 @@ func (c *storageServiceClient) GetFile(ctx context.Context, in *GetFileRequest, 
 	return x, nil
 }
 
-type StorageService_GetFileClient interface {
+type MetadataService_GetFileClient interface {
 	Recv() (*GetFileResponse, error)
 	grpc.ClientStream
 }
 
-type storageServiceGetFileClient struct {
+type metadataServiceGetFileClient struct {
 	grpc.ClientStream
 }
 
-func (x *storageServiceGetFileClient) Recv() (*GetFileResponse, error) {
+func (x *metadataServiceGetFileClient) Recv() (*GetFileResponse, error) {
 	m := new(GetFileResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -621,30 +701,30 @@ func (x *storageServiceGetFileClient) Recv() (*GetFileResponse, error) {
 	return m, nil
 }
 
-func (c *storageServiceClient) PutFile(ctx context.Context, opts ...grpc.CallOption) (StorageService_PutFileClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_StorageService_serviceDesc.Streams[1], "/metadata.StorageService/PutFile", opts...)
+func (c *metadataServiceClient) PutFile(ctx context.Context, opts ...grpc.CallOption) (MetadataService_PutFileClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_MetadataService_serviceDesc.Streams[1], "/metadata.MetadataService/PutFile", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &storageServicePutFileClient{stream}
+	x := &metadataServicePutFileClient{stream}
 	return x, nil
 }
 
-type StorageService_PutFileClient interface {
+type MetadataService_PutFileClient interface {
 	Send(*PutFileRequest) error
 	CloseAndRecv() (*PutFileResponse, error)
 	grpc.ClientStream
 }
 
-type storageServicePutFileClient struct {
+type metadataServicePutFileClient struct {
 	grpc.ClientStream
 }
 
-func (x *storageServicePutFileClient) Send(m *PutFileRequest) error {
+func (x *metadataServicePutFileClient) Send(m *PutFileRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *storageServicePutFileClient) CloseAndRecv() (*PutFileResponse, error) {
+func (x *metadataServicePutFileClient) CloseAndRecv() (*PutFileResponse, error) {
 	if err := x.ClientStream.CloseSend(); err != nil {
 		return nil, err
 	}
@@ -655,104 +735,123 @@ func (x *storageServicePutFileClient) CloseAndRecv() (*PutFileResponse, error) {
 	return m, nil
 }
 
-func (c *storageServiceClient) DeleteFile(ctx context.Context, in *DeleteFileRequest, opts ...grpc.CallOption) (*DeleteFileResponse, error) {
+func (c *metadataServiceClient) DeleteFile(ctx context.Context, in *DeleteFileRequest, opts ...grpc.CallOption) (*DeleteFileResponse, error) {
 	out := new(DeleteFileResponse)
-	err := c.cc.Invoke(ctx, "/metadata.StorageService/DeleteFile", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/metadata.MetadataService/DeleteFile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// StorageServiceServer is the server API for StorageService service.
-type StorageServiceServer interface {
+// MetadataServiceServer is the server API for MetadataService service.
+type MetadataServiceServer interface {
+	GetDirectoryKeys(context.Context, *GetDirectoryKeysRequest) (*GetDirectoryKeysResponse, error)
 	GetMetadata(context.Context, *GetMetadataRequest) (*GetMetadataResponse, error)
 	SetMetadata(context.Context, *SetMetadataRequest) (*SetMetadataResponse, error)
-	GetFile(*GetFileRequest, StorageService_GetFileServer) error
-	PutFile(StorageService_PutFileServer) error
+	GetFile(*GetFileRequest, MetadataService_GetFileServer) error
+	PutFile(MetadataService_PutFileServer) error
 	DeleteFile(context.Context, *DeleteFileRequest) (*DeleteFileResponse, error)
 }
 
-func RegisterStorageServiceServer(s *grpc.Server, srv StorageServiceServer) {
-	s.RegisterService(&_StorageService_serviceDesc, srv)
+func RegisterMetadataServiceServer(s *grpc.Server, srv MetadataServiceServer) {
+	s.RegisterService(&_MetadataService_serviceDesc, srv)
 }
 
-func _StorageService_GetMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MetadataService_GetDirectoryKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDirectoryKeysRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetadataServiceServer).GetDirectoryKeys(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/metadata.MetadataService/GetDirectoryKeys",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetadataServiceServer).GetDirectoryKeys(ctx, req.(*GetDirectoryKeysRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MetadataService_GetMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetMetadataRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StorageServiceServer).GetMetadata(ctx, in)
+		return srv.(MetadataServiceServer).GetMetadata(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/metadata.StorageService/GetMetadata",
+		FullMethod: "/metadata.MetadataService/GetMetadata",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StorageServiceServer).GetMetadata(ctx, req.(*GetMetadataRequest))
+		return srv.(MetadataServiceServer).GetMetadata(ctx, req.(*GetMetadataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _StorageService_SetMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MetadataService_SetMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SetMetadataRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StorageServiceServer).SetMetadata(ctx, in)
+		return srv.(MetadataServiceServer).SetMetadata(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/metadata.StorageService/SetMetadata",
+		FullMethod: "/metadata.MetadataService/SetMetadata",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StorageServiceServer).SetMetadata(ctx, req.(*SetMetadataRequest))
+		return srv.(MetadataServiceServer).SetMetadata(ctx, req.(*SetMetadataRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _StorageService_GetFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _MetadataService_GetFile_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(GetFileRequest)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(StorageServiceServer).GetFile(m, &storageServiceGetFileServer{stream})
+	return srv.(MetadataServiceServer).GetFile(m, &metadataServiceGetFileServer{stream})
 }
 
-type StorageService_GetFileServer interface {
+type MetadataService_GetFileServer interface {
 	Send(*GetFileResponse) error
 	grpc.ServerStream
 }
 
-type storageServiceGetFileServer struct {
+type metadataServiceGetFileServer struct {
 	grpc.ServerStream
 }
 
-func (x *storageServiceGetFileServer) Send(m *GetFileResponse) error {
+func (x *metadataServiceGetFileServer) Send(m *GetFileResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _StorageService_PutFile_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(StorageServiceServer).PutFile(&storageServicePutFileServer{stream})
+func _MetadataService_PutFile_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(MetadataServiceServer).PutFile(&metadataServicePutFileServer{stream})
 }
 
-type StorageService_PutFileServer interface {
+type MetadataService_PutFileServer interface {
 	SendAndClose(*PutFileResponse) error
 	Recv() (*PutFileRequest, error)
 	grpc.ServerStream
 }
 
-type storageServicePutFileServer struct {
+type metadataServicePutFileServer struct {
 	grpc.ServerStream
 }
 
-func (x *storageServicePutFileServer) SendAndClose(m *PutFileResponse) error {
+func (x *metadataServicePutFileServer) SendAndClose(m *PutFileResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *storageServicePutFileServer) Recv() (*PutFileRequest, error) {
+func (x *metadataServicePutFileServer) Recv() (*PutFileRequest, error) {
 	m := new(PutFileRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -760,87 +859,94 @@ func (x *storageServicePutFileServer) Recv() (*PutFileRequest, error) {
 	return m, nil
 }
 
-func _StorageService_DeleteFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _MetadataService_DeleteFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteFileRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(StorageServiceServer).DeleteFile(ctx, in)
+		return srv.(MetadataServiceServer).DeleteFile(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/metadata.StorageService/DeleteFile",
+		FullMethod: "/metadata.MetadataService/DeleteFile",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StorageServiceServer).DeleteFile(ctx, req.(*DeleteFileRequest))
+		return srv.(MetadataServiceServer).DeleteFile(ctx, req.(*DeleteFileRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _StorageService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "metadata.StorageService",
-	HandlerType: (*StorageServiceServer)(nil),
+var _MetadataService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "metadata.MetadataService",
+	HandlerType: (*MetadataServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "GetDirectoryKeys",
+			Handler:    _MetadataService_GetDirectoryKeys_Handler,
+		},
+		{
 			MethodName: "GetMetadata",
-			Handler:    _StorageService_GetMetadata_Handler,
+			Handler:    _MetadataService_GetMetadata_Handler,
 		},
 		{
 			MethodName: "SetMetadata",
-			Handler:    _StorageService_SetMetadata_Handler,
+			Handler:    _MetadataService_SetMetadata_Handler,
 		},
 		{
 			MethodName: "DeleteFile",
-			Handler:    _StorageService_DeleteFile_Handler,
+			Handler:    _MetadataService_DeleteFile_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "GetFile",
-			Handler:       _StorageService_GetFile_Handler,
+			Handler:       _MetadataService_GetFile_Handler,
 			ServerStreams: true,
 		},
 		{
 			StreamName:    "PutFile",
-			Handler:       _StorageService_PutFile_Handler,
+			Handler:       _MetadataService_PutFile_Handler,
 			ClientStreams: true,
 		},
 	},
 	Metadata: "metadata.proto",
 }
 
-func init() { proto.RegisterFile("metadata.proto", fileDescriptor_metadata_181d3367fd5df413) }
+func init() { proto.RegisterFile("metadata.proto", fileDescriptor_metadata_e15e91970f204200) }
 
-var fileDescriptor_metadata_181d3367fd5df413 = []byte{
-	// 461 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0x4d, 0x6f, 0xd3, 0x40,
-	0x10, 0x86, 0x65, 0xa7, 0x22, 0xcd, 0x24, 0x4d, 0x61, 0x2a, 0x21, 0x13, 0x5a, 0x14, 0x59, 0x80,
-	0x72, 0x8a, 0x4a, 0x80, 0x2b, 0x02, 0x81, 0x88, 0x5a, 0x54, 0x09, 0xad, 0xe1, 0xc2, 0xa5, 0x5a,
-	0xec, 0x09, 0xac, 0x6a, 0x7b, 0x8d, 0x77, 0x8d, 0x80, 0xdf, 0xc2, 0xdf, 0xe4, 0x8e, 0xec, 0xfa,
-	0x63, 0x9d, 0x3a, 0x51, 0x7a, 0xf3, 0xce, 0xc7, 0x33, 0x3b, 0xef, 0xbb, 0x32, 0x8c, 0x23, 0xd2,
-	0x3c, 0xe0, 0x9a, 0xcf, 0x93, 0x54, 0x6a, 0x89, 0xfb, 0xd5, 0xd9, 0xfd, 0x6b, 0xc3, 0xe8, 0xbd,
-	0x08, 0xe9, 0xa2, 0x0c, 0xe0, 0x2b, 0xe8, 0xfb, 0x29, 0x71, 0x4d, 0x81, 0x63, 0x4d, 0xad, 0xd9,
-	0x70, 0xf1, 0x78, 0x5e, 0x37, 0x9b, 0x85, 0xf3, 0xcf, 0xb1, 0xf8, 0xf5, 0x49, 0x44, 0xa4, 0x34,
-	0x8f, 0x12, 0x56, 0x35, 0xe1, 0x19, 0x1c, 0x84, 0x5c, 0xe9, 0xcb, 0x48, 0x06, 0x62, 0x25, 0x28,
-	0x70, 0xec, 0x5b, 0x50, 0x46, 0x79, 0xeb, 0x45, 0xd9, 0x89, 0x53, 0x18, 0x26, 0x94, 0x46, 0x42,
-	0x29, 0x21, 0x63, 0xe5, 0xf4, 0xa6, 0xd6, 0x6c, 0xc0, 0xcc, 0x10, 0x22, 0xec, 0x29, 0xf1, 0x87,
-	0x9c, 0xbd, 0xa9, 0x35, 0xeb, 0xb1, 0xe2, 0x7b, 0xf2, 0x01, 0x0e, 0x5a, 0x50, 0x74, 0xa0, 0xaf,
-	0xc8, 0x97, 0x71, 0xa0, 0x8a, 0x8d, 0x7a, 0xac, 0x3a, 0xe6, 0x03, 0x62, 0x1e, 0xcb, 0x2a, 0x6b,
-	0x17, 0x59, 0x33, 0xe4, 0x3e, 0x05, 0x5c, 0x92, 0xae, 0x6e, 0xcb, 0xe8, 0x47, 0x46, 0x4a, 0xe3,
-	0x5d, 0xe8, 0x5d, 0xd1, 0xef, 0x82, 0x36, 0x60, 0xf9, 0xa7, 0x7b, 0x06, 0x47, 0xad, 0x3a, 0x95,
-	0xc8, 0x58, 0x11, 0x2e, 0xa0, 0x56, 0xba, 0x54, 0xf3, 0x7e, 0xb7, 0x0e, 0xac, 0x71, 0xe4, 0x0b,
-	0xa0, 0xb7, 0xc3, 0xc8, 0x16, 0xdb, 0xde, 0x91, 0xfd, 0x12, 0x8e, 0xbc, 0x8e, 0x6b, 0x3e, 0x02,
-	0x50, 0x99, 0xef, 0x93, 0x52, 0xab, 0x2c, 0x2c, 0x66, 0xec, 0x33, 0x23, 0xe2, 0xba, 0x30, 0x5e,
-	0x92, 0xce, 0x99, 0x9b, 0x15, 0x38, 0x85, 0xc3, 0xba, 0xa6, 0xc4, 0x9e, 0x00, 0xac, 0x44, 0x48,
-	0x97, 0xfe, 0xf7, 0x2c, 0xbe, 0x2a, 0x6a, 0x47, 0x6c, 0x90, 0x47, 0xde, 0xe6, 0x01, 0xf7, 0x0d,
-	0x8c, 0x3f, 0x66, 0xdb, 0xa9, 0x6b, 0x08, 0x7b, 0x1d, 0xf1, 0x0c, 0x0e, 0x6b, 0xc4, 0x8e, 0xbb,
-	0x3c, 0x81, 0x7b, 0xef, 0x28, 0x24, 0x4d, 0xdb, 0xd7, 0x79, 0x01, 0x68, 0x96, 0x6d, 0x84, 0x0f,
-	0x4c, 0xf8, 0xe2, 0x9f, 0x0d, 0x63, 0x4f, 0xcb, 0x94, 0x7f, 0x23, 0x8f, 0xd2, 0x9f, 0xc2, 0x27,
-	0x3c, 0x87, 0xa1, 0xf1, 0x32, 0xf0, 0xb8, 0xf1, 0xe8, 0xe6, 0xc3, 0x9a, 0x9c, 0x6c, 0xc8, 0x96,
-	0xe3, 0xcf, 0x61, 0xe8, 0x75, 0xb3, 0xbc, 0xad, 0xac, 0x2e, 0xcf, 0x5f, 0x43, 0xbf, 0xf4, 0x0b,
-	0x9d, 0xd6, 0x54, 0x43, 0x97, 0xc9, 0x83, 0x8e, 0xcc, 0x75, 0xff, 0xa9, 0x95, 0x13, 0x4a, 0xf1,
-	0x4d, 0x42, 0xdb, 0x52, 0x93, 0xb0, 0xe6, 0xd4, 0xcc, 0xc2, 0x25, 0x40, 0x23, 0x32, 0x3e, 0x6c,
-	0x4a, 0x6f, 0x38, 0x34, 0x39, 0xee, 0x4e, 0x5e, 0xa3, 0xbe, 0xde, 0x29, 0x7e, 0x6b, 0xcf, 0xff,
-	0x07, 0x00, 0x00, 0xff, 0xff, 0x54, 0xf8, 0xf3, 0x5f, 0xe8, 0x04, 0x00, 0x00,
+var fileDescriptor_metadata_e15e91970f204200 = []byte{
+	// 504 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x94, 0xcb, 0x6e, 0xd3, 0x40,
+	0x14, 0x86, 0xe5, 0xb8, 0x22, 0xcd, 0x49, 0x9a, 0x94, 0xa9, 0x04, 0xae, 0x69, 0x51, 0xb0, 0x00,
+	0x79, 0x15, 0x95, 0x00, 0x5b, 0x04, 0xa2, 0x22, 0x2a, 0x55, 0x25, 0x34, 0x86, 0x05, 0x6c, 0x2a,
+	0x63, 0x9f, 0x88, 0x51, 0x7c, 0x09, 0x9e, 0x31, 0x22, 0x3c, 0x0b, 0x2f, 0xc5, 0x1b, 0xa1, 0x71,
+	0xc7, 0xf1, 0xd8, 0x75, 0xa2, 0x74, 0x37, 0x3e, 0x97, 0xef, 0xdc, 0x7e, 0x19, 0x86, 0x31, 0x0a,
+	0x3f, 0xf4, 0x85, 0x3f, 0x59, 0x66, 0xa9, 0x48, 0xc9, 0x7e, 0xf9, 0xed, 0xfc, 0xed, 0xc0, 0xe0,
+	0x03, 0x8b, 0xf0, 0x4a, 0x19, 0xc8, 0x1b, 0xe8, 0x06, 0x19, 0xfa, 0x02, 0x43, 0xcb, 0x18, 0x1b,
+	0x6e, 0x7f, 0xfa, 0x74, 0xb2, 0x4e, 0xd6, 0x03, 0x27, 0x5f, 0x12, 0xf6, 0xfb, 0x33, 0x8b, 0x91,
+	0x0b, 0x3f, 0x5e, 0xd2, 0x32, 0x89, 0x5c, 0xc0, 0x41, 0xe4, 0x73, 0x71, 0x1d, 0xa7, 0x21, 0x9b,
+	0x33, 0x0c, 0xad, 0xce, 0x1d, 0x28, 0x03, 0x99, 0x7a, 0xa5, 0x32, 0xc9, 0x18, 0xfa, 0x4b, 0xcc,
+	0x62, 0xc6, 0x39, 0x4b, 0x13, 0x6e, 0x99, 0x63, 0xc3, 0xed, 0x51, 0xdd, 0x44, 0x08, 0xec, 0x71,
+	0xf6, 0x07, 0xad, 0xbd, 0xb1, 0xe1, 0x9a, 0xb4, 0x78, 0xdb, 0x97, 0x70, 0x50, 0x83, 0x12, 0x0b,
+	0xba, 0x1c, 0x83, 0x34, 0x09, 0x79, 0x31, 0x91, 0x49, 0xcb, 0x4f, 0x59, 0x20, 0xf1, 0x93, 0xb4,
+	0xf4, 0x76, 0x0a, 0xaf, 0x6e, 0x72, 0x8e, 0xe1, 0xe1, 0x0c, 0xc5, 0x39, 0xcb, 0x30, 0x10, 0x69,
+	0xb6, 0xba, 0xc4, 0x15, 0xa7, 0xf8, 0x33, 0x47, 0x2e, 0x9c, 0x09, 0x58, 0xb7, 0x5d, 0x7c, 0x99,
+	0x26, 0x1c, 0x65, 0x5f, 0x0b, 0x5c, 0xc9, 0x7a, 0xa6, 0xdb, 0xa3, 0xc5, 0xdb, 0x79, 0x0e, 0x64,
+	0x86, 0xa2, 0x1c, 0x5c, 0x51, 0xc8, 0x21, 0x98, 0x0b, 0x5c, 0x15, 0x8d, 0xf5, 0xa8, 0x7c, 0x3a,
+	0x17, 0x70, 0x54, 0x8b, 0x53, 0xc8, 0x29, 0xac, 0x8f, 0xa6, 0x0e, 0xf3, 0xa0, 0x7d, 0xa5, 0xb4,
+	0x3a, 0xee, 0x37, 0x20, 0xde, 0x0e, 0x25, 0x6b, 0xec, 0xce, 0x8e, 0xec, 0xd7, 0x70, 0xe4, 0xb5,
+	0xb4, 0xf9, 0x18, 0x80, 0xe7, 0x41, 0x80, 0x9c, 0xcf, 0xf3, 0xa8, 0xa8, 0xb1, 0x4f, 0x35, 0x8b,
+	0xe3, 0xc0, 0x70, 0x86, 0x42, 0x32, 0x37, 0x6f, 0xe0, 0x0c, 0x46, 0xeb, 0x18, 0x85, 0x3d, 0x05,
+	0x98, 0xb3, 0x08, 0xaf, 0x83, 0x1f, 0x79, 0xb2, 0x28, 0x62, 0x07, 0xb4, 0x27, 0x2d, 0xef, 0xa5,
+	0xc1, 0x79, 0x07, 0xc3, 0x4f, 0xf9, 0x76, 0x6a, 0x03, 0xd1, 0x69, 0x22, 0x5e, 0xc0, 0x68, 0x8d,
+	0xd8, 0x71, 0x96, 0x67, 0x70, 0xff, 0x1c, 0x23, 0x14, 0xb8, 0x7d, 0x9c, 0x57, 0x40, 0xf4, 0xb0,
+	0xdd, 0xe0, 0xd3, 0x7f, 0x26, 0x8c, 0xca, 0xed, 0x7a, 0x98, 0xfd, 0x62, 0x01, 0x92, 0xaf, 0x70,
+	0xd8, 0x94, 0x1c, 0x79, 0x52, 0x5d, 0x6a, 0x83, 0x52, 0x6d, 0x67, 0x5b, 0x88, 0x6a, 0xe7, 0x23,
+	0xf4, 0x35, 0xd5, 0x91, 0x93, 0x5a, 0x4a, 0x43, 0x41, 0xf6, 0xe9, 0x06, 0x6f, 0xc5, 0xf2, 0xda,
+	0x59, 0xde, 0x56, 0x56, 0x9b, 0x9e, 0xde, 0x42, 0x57, 0x69, 0x81, 0x58, 0xb5, 0xaa, 0xda, 0xce,
+	0xed, 0xe3, 0x16, 0xcf, 0x4d, 0xfe, 0x99, 0x21, 0x09, 0xea, 0xb0, 0x3a, 0xa1, 0x2e, 0x17, 0x9d,
+	0xd0, 0x50, 0x81, 0x6b, 0x90, 0x19, 0x40, 0x75, 0x40, 0xf2, 0xa8, 0x0a, 0xbd, 0x75, 0x7d, 0xfb,
+	0xa4, 0xdd, 0x79, 0x83, 0xfa, 0x7e, 0xaf, 0xf8, 0xfb, 0xbe, 0xfc, 0x1f, 0x00, 0x00, 0xff, 0xff,
+	0x24, 0xf7, 0xcb, 0x71, 0x8f, 0x05, 0x00, 0x00,
 }

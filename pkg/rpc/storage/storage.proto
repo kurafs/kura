@@ -38,7 +38,7 @@ message DeleteFileRequest {
 }
 
 message DeleteFileResponse {
-    string successful = 1;
+    bool successful = 1;
 }
 
 service StorageService {
