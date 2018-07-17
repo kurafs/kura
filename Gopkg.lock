@@ -15,6 +15,18 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/google/btree"
+  packages = ["."]
+  revision = "e89373fe6b4a7413d7acd6da1725b83ef713e6e4"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/petar/GoLLRB"
+  packages = ["llrb"]
+  revision = "53be0d36a84c2a886ca057d34b6aa4468df9ccb4"
+
+[[projects]]
+  branch = "master"
   name = "golang.org/x/net"
   packages = [
     "context",
@@ -95,6 +107,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "25f17a69ad42f5113ce27d8b630bff46c5baf9e974e8f14cfc52e25a8b6e87b0"
+  inputs-digest = "b87636bbc3183809c11b3196d1491be14d7b2a0ac89206a064304989229c2dd9"
   solver-name = "gps-cdcl"
   solver-version = 1
