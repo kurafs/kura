@@ -16,12 +16,12 @@ package metadataserver
 
 import (
 	"context"
-	"io"
+	"errors"
 	"time"
 
 	"github.com/kurafs/kura/pkg/log"
-	mpb "github.com/kurafs/kura/pkg/rpc/metadata"
-	spb "github.com/kurafs/kura/pkg/rpc/storage"
+	mpb "github.com/kurafs/kura/pkg/pb/metadata"
+	spb "github.com/kurafs/kura/pkg/pb/storage"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -93,85 +93,44 @@ func (s *Server) SetMetadata(ctx context.Context, req *mpb.SetMetadataRequest) (
 		return nil, err
 	}
 	metadata.Entries[req.Key] = *req.Metadata
-	res, err := client.PutMetadataFile(metadata)
+	_, err = client.PutMetadataFile(metadata)
 	if err != nil {
 		return nil, err
 	}
 
-	return &mpb.SetMetadataResponse{Successful: res}, nil
+	return &mpb.SetMetadataResponse{}, nil
 }
 
-func (s *Server) GetFile(req *mpb.GetFileRequest, stream mpb.MetadataService_GetFileServer) error {
+func (s *Server) GetFile(ctx context.Context, req *mpb.GetFileRequest) (*mpb.GetFileResponse, error) {
 	conn, err := grpc.Dial(s.storageAddress, grpc.WithInsecure())
 	if err != nil {
 		s.logger.Errorf("%v\n", err)
-		return err
+		return nil, err
 	}
 	defer conn.Close()
 	client := s.getNewStorage(conn)
 
 	file, err := client.GetFile(req.Key)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	numChunks := len(file) / chunkSize
-	if len(file)%chunkSize != 0 {
-		numChunks++
-	}
-	for i := 0; i < numChunks; i++ {
-		b := i * chunkSize
-		e := (i + 1) * chunkSize
-		if e >= len(file) {
-			e = len(file) - 1
-		}
-
-		if err := stream.Send(&mpb.GetFileResponse{FileChunk: file[b:e]}); err != nil {
-			return err
-		}
-	}
-
-	return nil
+	return &mpb.GetFileResponse{File: file}, nil
 }
 
-func (s *Server) PutFile(stream mpb.MetadataService_PutFileServer) error {
-	in, err := stream.Recv()
-	if err == io.EOF {
-		// TODO (franz): IDK what the expected behaviour here should be
-		return stream.SendAndClose(&mpb.PutFileResponse{
-			Successful: false,
-		})
-	}
-	if err != nil {
-		s.logger.Error(err)
-		return err
-	}
-	fileBytes := in.FileChunk
-	key := in.Key
+func (s *Server) PutFile(ctx context.Context, req *mpb.PutFileRequest) (*mpb.PutFileResponse, error) {
+	fileBytes := req.File
+	key := req.Key
+
 	if key == "" {
 		st := status.New(codes.InvalidArgument, "Empty Key String")
-		return st.Err()
-	}
-	for {
-		in, err := stream.Recv()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			s.logger.Error(err)
-			return err
-		}
-		if in.Key != key {
-			st := status.New(codes.Internal, "Key string changed while writing file")
-			return st.Err()
-		}
-		fileBytes = append(fileBytes, in.FileChunk...)
+		return nil, st.Err()
 	}
 
 	conn, err := grpc.Dial(s.storageAddress, grpc.WithInsecure())
 	if err != nil {
 		s.logger.Errorf("%v\n", err)
-		return err
+		return nil, err
 	}
 	defer conn.Close()
 	client := s.getNewStorage(conn)
@@ -179,18 +138,18 @@ func (s *Server) PutFile(stream mpb.MetadataService_PutFileServer) error {
 	putServer, err := client.PutFile(key, fileBytes)
 	if err != nil {
 		s.logger.Errorf("%v\n", err)
-		return err
+		return nil, err
 	}
 
 	if !putServer {
-		return stream.SendAndClose(&mpb.PutFileResponse{
-			Successful: false,
-		})
+		err := errors.New("Unable to save file")
+		s.logger.Errorf("%v\n", err)
+		return nil, err
 	}
 
 	metadata, err := client.GetMetadataFile()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if val, ok := metadata.Entries[key]; ok {
@@ -211,15 +170,13 @@ func (s *Server) PutFile(stream mpb.MetadataService_PutFileServer) error {
 		}
 	}
 
-	res, err := client.PutMetadataFile(metadata)
+	_, err = client.PutMetadataFile(metadata)
 	if err != nil {
 		s.logger.Errorf("%v\n", err)
-		return err
+		return nil, err
 	}
 
-	return stream.SendAndClose(&mpb.PutFileResponse{
-		Successful: res,
-	})
+	return &mpb.PutFileResponse{}, nil
 }
 
 func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*mpb.DeleteFileResponse, error) {
@@ -231,7 +188,7 @@ func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*m
 	defer conn.Close()
 	client := s.getNewStorage(conn)
 
-	res, err := client.DeleteFile(req.Key)
+	_, err = client.DeleteFile(req.Key)
 	if err != nil {
 		return nil, err
 	}
@@ -253,5 +210,5 @@ func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*m
 
 	// Do something to sync metadata file with storage if meadata sync fails
 
-	return &mpb.DeleteFileResponse{Successful: res}, nil
+	return &mpb.DeleteFileResponse{}, nil
 }

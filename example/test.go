@@ -7,8 +7,8 @@ import (
 
 	metadataserver "github.com/kurafs/kura/cmd/metadata-server"
 	"github.com/kurafs/kura/pkg/log"
-	mpb "github.com/kurafs/kura/pkg/rpc/metadata"
-	spb "github.com/kurafs/kura/pkg/rpc/storage"
+	mpb "github.com/kurafs/kura/pkg/pb/metadata"
+	spb "github.com/kurafs/kura/pkg/pb/storage"
 	"google.golang.org/grpc"
 )
 
@@ -79,12 +79,15 @@ func main() {
 		fmt.Printf("%v\n", err)
 	}
 	fmt.Println(r)
+	fmt.Println("asd")
 
 	met, err := client.GetMetadataFile()
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}
+	fmt.Println("111")
 	for k, v := range met.Entries {
+		fmt.Println("wo")
 		fmt.Println(k)
 		fmt.Println(v.Created.Seconds)
 		fmt.Println(v.LastModified.Seconds)

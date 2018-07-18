@@ -15,30 +15,21 @@
 package metadataserver
 
 import (
-	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"strconv"
 	"time"
 
 	"golang.org/x/net/context"
 
 	"github.com/kurafs/kura/pkg/log"
-	mpb "github.com/kurafs/kura/pkg/rpc/metadata"
-	spb "github.com/kurafs/kura/pkg/rpc/storage"
+	mpb "github.com/kurafs/kura/pkg/pb/metadata"
+	spb "github.com/kurafs/kura/pkg/pb/storage"
 )
 
 type MetadataFile struct {
 	Entries map[string]mpb.FileMetadata
 }
-
-const chunkSize = 64 * 1024
-
-const (
-	colDelimiter   = byte('\x1e')
-	entryDelimiter = byte('\x1f')
-)
 
 const (
 	Key = iota
@@ -52,64 +43,32 @@ func BytesToMetadataFile(fileBytes []byte) (*MetadataFile, error) {
 	if len(fileBytes) == 0 {
 		return &MetadataFile{Entries: map[string]mpb.FileMetadata{}}, nil
 	}
+
+	var deserialized MetadataFile
+
 	fmt.Println(fileBytes)
-	entryBytes := bytes.Split(fileBytes, []byte{entryDelimiter})
-	entries := make(map[string]mpb.FileMetadata)
-	for _, entry := range entryBytes {
-		// TODO: More expressive errors when parsing
-		cols := bytes.Split(entry, []byte{colDelimiter})
-		fmt.Println(cols)
-		if len(cols) != 5 {
-			return nil, errors.New("Not enough columns")
-		}
-		key := string(cols[Key])
-		fmt.Println(key)
-		// Make these just uint64s for now
-		created, err := strconv.ParseInt(string(cols[Created]), 10, 64)
-		if err != nil {
-			return nil, errors.New("Couldn't parse created")
-		}
-		fmt.Println(created)
-		lastModified, err := strconv.ParseInt(string(cols[LastModified]), 10, 64)
-		if err != nil {
-			return nil, errors.New("Couldn't parse lastModified")
-		}
-		fmt.Println(lastModified)
-		permissions := string(cols[Permissions])
-		fmt.Println(permissions)
-		size, err := strconv.ParseInt(string(cols[Size]), 10, 64)
-		if err != nil {
-			return nil, errors.New("Couldn't parse size")
-		}
-		fmt.Println(size)
-		entries[key] = mpb.FileMetadata{
-			Created:      &mpb.FileMetadata_UnixTimestamp{Seconds: created},
-			LastModified: &mpb.FileMetadata_UnixTimestamp{Seconds: lastModified},
-			Permissions:  permissions,
-			Size:         size,
-		}
+	err := json.Unmarshal(fileBytes, &deserialized)
+
+	if err != nil {
+		return nil, errors.New("Unable to deserialize metadata file")
 	}
-	return &MetadataFile{Entries: entries}, nil
+
+	fmt.Println(deserialized)
+
+	return &deserialized, nil
 }
 
 func MetadataFileToBytes(metadata *MetadataFile) []byte {
-	// TODO: Move this with the other constant into a file in RPC
-	fileBytes := make([]byte, 0, chunkSize)
-	for k, v := range metadata.Entries {
-		// TODO: We probably want to encode the integers in a more efficient format
-		fileBytes = append(fileBytes, []byte(k)...)
-		fileBytes = append(fileBytes, colDelimiter)
-		fileBytes = append(fileBytes, []byte(strconv.FormatInt(v.Created.Seconds, 10))...)
-		fileBytes = append(fileBytes, colDelimiter)
-		fileBytes = append(fileBytes, []byte(strconv.FormatInt(v.LastModified.Seconds, 10))...)
-		fileBytes = append(fileBytes, colDelimiter)
-		fileBytes = append(fileBytes, []byte(v.Permissions)...)
-		fileBytes = append(fileBytes, colDelimiter)
-		fileBytes = append(fileBytes, []byte(strconv.FormatInt(v.Size, 10))...)
-		fileBytes = append(fileBytes, entryDelimiter)
+	serialized, err := json.Marshal(metadata)
+
+	if err != nil {
+		fmt.Println("Unable to serialize metadata file")
+		return nil
 	}
-	fmt.Println(fileBytes)
-	return fileBytes
+
+	fmt.Println(serialized)
+
+	return serialized
 }
 
 const metadataFileKey = "metadata"
@@ -126,22 +85,14 @@ func NewStorageClient(rpcClient spb.StorageServiceClient, logger *log.Logger) *S
 func (s *StorageClient) GetFile(key string) ([]byte, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
 	defer cancel()
-	stream, err := s.rpcClient.GetFile(ctx, &spb.GetFileRequest{Key: key})
+	file, err := s.rpcClient.GetFile(ctx, &spb.GetFileRequest{Key: key})
+
 	if err != nil {
 		s.logger.Errorf("%v.GetFile(_) = _, %v\n", s.rpcClient, err)
 		return nil, err
 	}
-	fileBytes := make([]byte, 0, chunkSize)
-	for {
-		resp, err := stream.Recv()
-		if err == io.EOF {
-			return fileBytes, nil
-		}
-		if err != nil {
-			s.logger.Errorf("%v.GetFile(_) = _, %v\n", s.rpcClient, err)
-		}
-		fileBytes = append(fileBytes, resp.FileChunk...)
-	}
+
+	return file.File, nil
 }
 
 func (s *StorageClient) GetMetadataFile() (*MetadataFile, error) {
@@ -156,37 +107,17 @@ func (s *StorageClient) GetMetadataFile() (*MetadataFile, error) {
 	return metadata, nil
 }
 
-// TODO: Sometimes putting changes the structure of the metadata file... which causes it to parse incorrectly
 func (s *StorageClient) PutFile(key string, file []byte) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 300*time.Second)
 	defer cancel()
-	stream, err := s.rpcClient.PutFile(ctx)
-	if err != nil {
-		s.logger.Errorf("%v.PutFile(_) = _, %v\n", s.rpcClient, err)
-		return false, err
-	}
-	numChunks := len(file) / chunkSize
-	if len(file)%chunkSize != 0 {
-		numChunks++
-	}
-	for i := 0; i < numChunks; i++ {
-		b := i * chunkSize
-		e := (i + 1) * chunkSize
-		if e >= len(file) {
-			e = len(file) - 1
-		}
+	_, err := s.rpcClient.PutFile(ctx, &spb.PutFileRequest{Key: key, File: file})
 
-		if err := stream.Send(&spb.PutFileRequest{Key: key, FileChunk: file[b:e]}); err != nil {
-			return false, err
-		}
-	}
-	reply, err := stream.CloseAndRecv()
 	if err != nil {
 		s.logger.Errorf("%v.PutFile(_) = _, %v\n", s.rpcClient, err)
 		return false, err
 	}
 
-	return reply.Successful, nil
+	return true, nil
 }
 
 func (s *StorageClient) PutMetadataFile(metadata *MetadataFile) (bool, error) {
@@ -201,10 +132,12 @@ func (s *StorageClient) PutMetadataFile(metadata *MetadataFile) (bool, error) {
 func (s *StorageClient) DeleteFile(key string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
-	resp, err := s.rpcClient.DeleteFile(ctx, &spb.DeleteFileRequest{Key: key})
+	_, err := s.rpcClient.DeleteFile(ctx, &spb.DeleteFileRequest{Key: key})
+
 	if err != nil {
 		s.logger.Errorf("%v.DeleteFile(_) = _, %v\n", s.rpcClient, err)
 		return false, err
 	}
-	return resp.Successful, nil
+
+	return true, nil
 }

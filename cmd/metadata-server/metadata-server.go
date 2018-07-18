@@ -22,7 +22,7 @@ import (
 
 	"github.com/kurafs/kura/pkg/cli"
 	"github.com/kurafs/kura/pkg/log"
-	pb "github.com/kurafs/kura/pkg/rpc/metadata"
+	pb "github.com/kurafs/kura/pkg/pb/metadata"
 	"google.golang.org/grpc"
 )
 

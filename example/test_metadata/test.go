@@ -3,71 +3,41 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
 	"time"
 
-	pb "github.com/kurafs/kura/pkg/rpc/metadata"
+	pb "github.com/kurafs/kura/pkg/pb/metadata"
 	"google.golang.org/grpc"
 )
 
 func getFile(c pb.MetadataServiceClient, key string) []byte {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
-	stream, err := c.GetFile(ctx, &pb.GetFileRequest{Key: key})
+	file, err := c.GetFile(ctx, &pb.GetFileRequest{Key: key})
 	if err != nil {
 		panic(err)
 	}
-	fileChunk := make([]byte, 0, 64*1024*1024)
-	for {
-		resp, err := stream.Recv()
-		if err == io.EOF {
-			return fileChunk
-		}
-		if err != nil {
-			panic(err)
-		}
-		fileChunk = append(fileChunk, resp.FileChunk...)
-	}
+
+	return file.File
 }
 
 func putFile(c pb.MetadataServiceClient, file []byte, key string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
-	stream, err := c.PutFile(ctx)
+	_, err := c.PutFile(ctx, &pb.PutFileRequest{Key: key, File: file})
 	if err != nil {
 		panic(err)
 	}
-	chunkSize := 64 * 1024
-	numChunks := len(file) / chunkSize
-	if len(file)%chunkSize != 0 {
-		numChunks++
-	}
-	for i := 0; i < numChunks; i++ {
-		b := i * chunkSize
-		e := (i + 1) * chunkSize
-		if e >= len(file) {
-			e = len(file) - 1
-		}
-
-		if err := stream.Send(&pb.PutFileRequest{Key: key, FileChunk: file[b:e]}); err != nil {
-			panic(err)
-		}
-	}
-	reply, err := stream.CloseAndRecv()
-	if err != nil {
-		panic(err)
-	}
-	return reply.Successful
+	return true
 }
 
 func delFile(c pb.MetadataServiceClient, key string) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
-	res, err := c.DeleteFile(ctx, &pb.DeleteFileRequest{Key: key})
+	_, err := c.DeleteFile(ctx, &pb.DeleteFileRequest{Key: key})
 	if err != nil {
 		panic(err)
 	}
-	return res.Successful
+	return true
 }
 
 func getDirKeys(c pb.MetadataServiceClient) []string {
@@ -93,11 +63,11 @@ func getMetadata(c pb.MetadataServiceClient, key string) *pb.FileMetadata {
 func setMetadata(c pb.MetadataServiceClient, key string, md pb.FileMetadata) bool {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
-	res, err := c.SetMetadata(ctx, &pb.SetMetadataRequest{Key: key, Metadata: &md})
+	_, err := c.SetMetadata(ctx, &pb.SetMetadataRequest{Key: key, Metadata: &md})
 	if err != nil {
 		panic(err)
 	}
-	return res.Successful
+	return true
 }
 
 func main() {
