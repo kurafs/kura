@@ -46,10 +46,6 @@ func newServer(logger *log.Logger) *diskStore {
 			}
 		},
 		InverseTransform: func(pk *diskv.PathKey) string {
-			txt := pk.FileName[len(pk.FileName)-4:]
-			if txt != ".txt" {
-				panic("Invalid file found in storage folder!")
-			}
 			return strings.Join(pk.Path, "/") + pk.FileName
 		},
 	})
@@ -68,7 +64,6 @@ func (d *diskStore) GetFile(ctx context.Context, req *pb.GetFileRequest) (*pb.Ge
 		return nil, err
 	}
 
-	d.logger.Infof("Read %d bytes from file %s\n", len(file), req.Key)
 	return &pb.GetFileResponse{File: file}, nil
 }
 
@@ -95,6 +90,5 @@ func (d *diskStore) DeleteFile(ctx context.Context, req *pb.DeleteFileRequest) (
 		return nil, err
 	}
 
-	d.logger.Info("Deleted %s", req.Key)
 	return &pb.DeleteFileResponse{}, nil
 }

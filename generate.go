@@ -14,5 +14,5 @@
 
 package main
 
-//go:generate protoc -I=pkg/rpc/storage --go_out=plugins=grpc:pkg/rpc/storage pkg/rpc/storage/storage.proto
-//go:generate protoc -I=pkg/rpc/metadata --go_out=plugins=grpc:pkg/rpc/metadata pkg/rpc/metadata/metadata.proto
+//go:generate protoc -I=pkg/pb/storage --go_out=plugins=grpc:pkg/pb/storage pkg/pb/storage/storage.proto
+//go:generate protoc -I=pkg/pb/metadata --go_out=plugins=grpc:pkg/pb/metadata pkg/pb/metadata/metadata.proto

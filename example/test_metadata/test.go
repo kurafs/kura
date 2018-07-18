@@ -71,7 +71,7 @@ func setMetadata(c pb.MetadataServiceClient, key string, md pb.FileMetadata) boo
 }
 
 func main() {
-	conn, err := grpc.Dial("localhost:10001", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:10170", grpc.WithInsecure())
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}
@@ -107,10 +107,8 @@ func main() {
 	}
 
 	readBig := getFile(c, "bigtest")
-	fmt.Println(len(readBig))
-	fmt.Println(len(readBig) == 50*64*1024*1024)
+	fmt.Println(len(readBig) == 1024*1024)
 
 	pmd := getDirKeys(c)
-	fmt.Println(pmd)
-
+	fmt.Println(pmd, len(pmd))
 }

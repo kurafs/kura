@@ -28,6 +28,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
@@ -44,6 +45,8 @@ type Logger struct {
 	flag     Flag      // Flag set determining log headers. See options.go
 	basePath string    // Base path of the consumer's repository, optional
 }
+
+const newline string = "\n"
 
 // configure sets up the default options for the Logger, these include a
 // synchronized os.Stderr writer, an empty basepath (Llongfile will
@@ -79,7 +82,7 @@ func (l *Logger) Info(v ...interface{}) {
 // Infof logs to the INFO log. Arguments are handled in the manner of
 // fmt.Printf; a newline is appended at the end.
 func (l *Logger) Infof(format string, v ...interface{}) {
-	l.log(InfoMode, fmt.Sprintf(format, v...))
+	l.log(InfoMode, fmt.Sprintf(format+newline, v...))
 }
 
 // Warn logs to the WARN log. Arguments are handled in the manner of
@@ -91,7 +94,7 @@ func (l *Logger) Warn(v ...interface{}) {
 // Warnf logs to the WARN log. Arguments are handled in the manner of
 // fmt.Printf; a newline is appended at the end.
 func (l *Logger) Warnf(format string, v ...interface{}) {
-	l.log(WarnMode, fmt.Sprintf(format, v...))
+	l.log(WarnMode, fmt.Sprintf(format+newline, v...))
 }
 
 // Error logs to the ERROR log. Arguments are handled in the manner of
@@ -103,7 +106,7 @@ func (l *Logger) Error(v ...interface{}) {
 // Errorf logs to the ERROR log. Arguments are handled in the manner of
 // fmt.Printf; a newline is appended at the end.
 func (l *Logger) Errorf(format string, v ...interface{}) {
-	l.log(ErrorMode, fmt.Sprintf(format, v...))
+	l.log(ErrorMode, fmt.Sprintf(format+newline, v...))
 }
 
 // Fatal logs to the FATAL log. Arguments are handled in the manner of
@@ -113,6 +116,7 @@ func (l *Logger) Errorf(format string, v ...interface{}) {
 // calls os.Exit(255).
 func (l *Logger) Fatal(v ...interface{}) {
 	l.log(FatalMode, fmt.Sprintln(v...))
+	os.Exit(255)
 }
 
 // Fatalf logs to the FATAL log. Arguments are handled in the manner of
@@ -121,7 +125,8 @@ func (l *Logger) Fatal(v ...interface{}) {
 // TODO(irfansharif): Including a stack trace of all running goroutines, then
 // calls os.Exit(255).
 func (l *Logger) Fatalf(format string, v ...interface{}) {
-	l.log(FatalMode, fmt.Sprintf(format, v...))
+	l.log(FatalMode, fmt.Sprintf(format+newline, v...))
+	os.Exit(255)
 }
 
 // Debug logs to the DEBUG log. Arguments are handled in the manner of
@@ -133,7 +138,7 @@ func (l *Logger) Debug(v ...interface{}) {
 // Debugf logs to the DEBUG log. Arguments are handled in the manner of
 // fmt.Printf; a newline is appended at the end.
 func (l *Logger) Debugf(format string, v ...interface{}) {
-	l.log(DebugMode, fmt.Sprintf(format, v...))
+	l.log(DebugMode, fmt.Sprintf(format+newline, v...))
 }
 
 // Logger.log is only to be called from
