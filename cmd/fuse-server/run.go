@@ -55,7 +55,7 @@ func fuseServerCmdRun(cmd *cli.Command, args []string) error {
 	cmd.FlagSet.BoolVar(&suppressStderrFlag, "suppress-stderr", false,
 		"Suppress standard error logging")
 	cmd.FlagSet.Var(&logModeFlag, "log-mode",
-		"Log mode for logs emitted globally (can be overrode using -log-filter)")
+		"Log mode for logs emitted globally (can be overridden using -log-filter)")
 	cmd.FlagSet.Var(&logFilterFlag, "log-filter",
 		"Comma-separated list of pattern:level settings for file-filtered logging")
 	cmd.FlagSet.Var(&backtracePointFlag, "log-backtrace-at",

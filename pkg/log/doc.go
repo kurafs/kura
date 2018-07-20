@@ -23,7 +23,7 @@
 //       -log-to-stderr
 //             Log to standard error.
 //       -log-level (info|debug|warn|error)
-//             Log level for logs emitted (global, can be overrode using -log-filter).
+//             Log level for logs emitted (global, can be overridden using -log-filter).
 //       -log-filter value
 //             Comma-separated list of pattern:level settings for file-filtered logging.
 //       -log-backtrace-at value

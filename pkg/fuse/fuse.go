@@ -21,7 +21,7 @@ import (
 // visible until after Conn.Ready is closed. See Conn.MountError for
 // possible errors. Incoming requests on Conn must be served to make
 // progress.
-// TODO: COmment. Blocks until mounted.
+// TODO: Comment. Blocks until mounted.
 func Mount(dir string, options ...MountOption) (*Conn, error) {
 	conf := mountConfig{
 		options: make(map[string]string),
