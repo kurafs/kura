@@ -28,7 +28,7 @@ import (
 
 var FuseServerCmd = &cli.Command{
 	Run:       fuseServerCmdRun,
-	UsageLine: "fuse-server [-unmount] [logger flags] <mount-point>",
+	UsageLine: "fuse-server [-metadata-server addr] [-unmount] [logger flags] <mount-point>",
 	Short:     "run the fuse server, mounting kura at specified mount point",
 	Long: `
 Fuse server detailed overview. TODO.
@@ -37,6 +37,7 @@ Fuse server detailed overview. TODO.
 
 func fuseServerCmdRun(cmd *cli.Command, args []string) error {
 	var (
+		metadataServerFlag string
 		unmountFlag        bool
 		logDirFlag         string
 		suppressStderrFlag bool
@@ -45,6 +46,8 @@ func fuseServerCmdRun(cmd *cli.Command, args []string) error {
 		backtracePointFlag backtracePoints
 	)
 
+	cmd.FlagSet.StringVar(&metadataServerFlag, "metadata-server", "localhost:10670",
+		"Address of the metadata server [host:port]")
 	cmd.FlagSet.BoolVar(&unmountFlag, "unmount", false,
 		"Unmount filesystem at specified directory")
 	cmd.FlagSet.StringVar(&logDirFlag, "log-dir", "",
@@ -92,25 +95,44 @@ func fuseServerCmdRun(cmd *cli.Command, args []string) error {
 	logf := log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC | log.Lmode
 	logger := log.New(log.Writer(writer), log.Flags(logf), log.SkipBasePath())
 
-	var err error
 	if unmountFlag {
-		err = unmount(logger, mountPoint)
-	} else {
-		err = mount(logger, mountPoint)
+		if err := unmount(logger, mountPoint); err != nil {
+			logger.Error(err.Error())
+			return err
+		}
+
+		return nil
 	}
 
-	return err
+	conn, err := mount(logger, mountPoint)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	defer conn.Close()
+
+	fuseServer, err := newFUSEServer(logger, metadataServerFlag)
+	if err != nil {
+		return err
+	}
+
+	if err := fs.Serve(conn, fuseServer); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func unmount(logger *log.Logger, mountPoint string) error {
 	if err := fuse.Unmount(mountPoint); err != nil {
-		logger.Error(err.Error())
 		return err
 	}
+	logger.Infof("Unmounted point: %s", mountPoint)
 	return nil
 }
 
-func mount(logger *log.Logger, mountPoint string) error {
+func mount(logger *log.Logger, mountPoint string) (*fuse.Conn, error) {
 	conn, err := fuse.Mount(
 		mountPoint,
 		fuse.FSName("kurafs"),
@@ -118,15 +140,9 @@ func mount(logger *log.Logger, mountPoint string) error {
 		fuse.LocalVolume(),
 	)
 	if err != nil {
-		logger.Error(err.Error())
-		return err
+		return nil, err
 	}
-	defer conn.Close()
 
-	logger.Infof("mounted point: %s\n", mountPoint)
-	if err := fs.Serve(conn, FS{}); err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-	return nil
+	logger.Infof("Mounted point: %s", mountPoint)
+	return conn, nil
 }
