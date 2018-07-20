@@ -71,7 +71,7 @@ func setMetadata(c pb.MetadataServiceClient, key string, md pb.FileMetadata) boo
 }
 
 func main() {
-	conn, err := grpc.Dial("localhost:10170", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:10670", grpc.WithInsecure())
 	if err != nil {
 		fmt.Printf("%v\n", err)
 	}
@@ -88,13 +88,13 @@ func main() {
 	readSuccess1 := getFile(c, "testfile1")
 	fmt.Println(string(readSuccess1))
 
-	deepSuccess := putFile(c, []byte("THIS IS A TEST FILE KEK IN THE SUB DIR"), "subdir/testfile1")
-	if !deepSuccess {
-		panic("deep fek")
-	}
+	// deepSuccess := putFile(c, []byte("THIS IS A TEST FILE KEK IN THE SUB DIR"), "subdir/testfile1")
+	// if !deepSuccess {
+	// 	panic("deep fek")
+	// }
 
-	readDeepSucc := getFile(c, "subdir/testfile1")
-	fmt.Println(string(readDeepSucc))
+	// readDeepSucc := getFile(c, "subdir/testfile1")
+	// fmt.Println(string(readDeepSucc))
 
 	bigPayload := make([]byte, 1024*1024)
 	for i := 0; i < len(bigPayload); i++ {
