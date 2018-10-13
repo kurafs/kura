@@ -25,13 +25,11 @@ import (
 	"github.com/kurafs/kura/pkg/log"
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
 	spb "github.com/kurafs/kura/pkg/pb/storage"
-	"google.golang.org/grpc"
 )
 
 type Server struct {
 	logger        *log.Logger
 	storageClient spb.StorageServiceClient
-	conn          *grpc.ClientConn
 	mu            sync.RWMutex
 }
 
@@ -41,20 +39,11 @@ type MetadataFile struct {
 
 const metadataFileKey = "kura-metadata"
 
-func newMetaDataServer(logger *log.Logger, storageAddr string) (*Server, error) {
-	conn, err := grpc.Dial(storageAddr, grpc.WithInsecure())
-	if err != nil {
-		return nil, err
-	}
-
-	client := spb.NewStorageServiceClient(conn)
-	server := Server{
+func newMetadataServer(logger *log.Logger, storageClient spb.StorageServiceClient) *Server {
+	return &Server{
 		logger:        logger,
-		conn:          conn,
-		storageClient: client,
+		storageClient: storageClient,
 	}
-
-	return &server, nil
 }
 
 func (s *Server) GetFile(ctx context.Context, req *mpb.GetFileRequest) (*mpb.GetFileResponse, error) {
@@ -129,9 +118,6 @@ func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*m
 		return nil, err
 	}
 
-	if _, ok := metadata.Entries[req.Key]; !ok {
-		return nil, errors.New("tried to delete a metadata entry that doesn't exist")
-	}
 	delete(metadata.Entries, req.Key)
 
 	if err := s.setMetadataFile(ctx, metadata); err != nil {

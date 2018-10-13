@@ -11,12 +11,12 @@ import (
 	"github.com/kurafs/kura/pkg/fuse/fs"
 	"github.com/kurafs/kura/pkg/log"
 
-	pb "github.com/kurafs/kura/pkg/pb/metadata"
+	mpb "github.com/kurafs/kura/pkg/pb/metadata"
 )
 
 type fuseServer struct {
 	logger               *log.Logger
-	metadataServerClient pb.MetadataServiceClient
+	metadataServerClient mpb.MetadataServiceClient
 	conn                 *grpc.ClientConn
 	mu                   sync.RWMutex
 
@@ -31,7 +31,7 @@ func newFUSEServer(logger *log.Logger, metadataServerAddr string) (fs.FS, error)
 		return nil, err
 	}
 
-	client := pb.NewMetadataServiceClient(conn)
+	client := mpb.NewMetadataServiceClient(conn)
 	server := fuseServer{
 		logger:               logger,
 		conn:                 conn,
@@ -64,7 +64,7 @@ func (d *Dir) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	d.fuseServer.mu.Lock()
 	defer d.fuseServer.mu.Unlock()
 
-	req := &pb.GetFileRequest{Key: name}
+	req := &mpb.GetFileRequest{Key: name}
 	_, err := d.fuseServer.metadataServerClient.GetFile(ctx, req) // TODO: We're discarding the response.
 	if err != nil {
 		return nil, fuse.ENOENT
@@ -77,7 +77,7 @@ func (d *Dir) Create(ctx context.Context, req *fuse.CreateRequest, res *fuse.Cre
 	d.fuseServer.mu.Lock()
 	defer d.fuseServer.mu.Unlock()
 
-	rq := &pb.PutFileRequest{Key: req.Name, File: []byte{}}
+	rq := &mpb.PutFileRequest{Key: req.Name, File: []byte{}}
 	_, err := d.fuseServer.metadataServerClient.PutFile(ctx, rq)
 	if err != nil {
 		return nil, nil, err // TODO(irfansharif): Propagate appropriate FUSE error.
@@ -94,7 +94,7 @@ func (d *Dir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 	d.fuseServer.mu.Lock()
 	defer d.fuseServer.mu.Unlock()
 
-	req := &pb.GetDirectoryKeysRequest{}
+	req := &mpb.GetDirectoryKeysRequest{}
 	res, err := d.fuseServer.metadataServerClient.GetDirectoryKeys(ctx, req)
 	if err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func (f *File) Attr(ctx context.Context, a *fuse.Attr) error {
 	f.parentDir.fuseServer.mu.Lock()
 	defer f.parentDir.fuseServer.mu.Unlock()
 
-	req := &pb.GetMetadataRequest{Key: f.name}
+	req := &mpb.GetMetadataRequest{Key: f.name}
 	res, err := f.parentDir.fuseServer.metadataServerClient.GetMetadata(ctx, req)
 	if err != nil {
 		return err // TODO(irfansharif): Propagate appropriate FUSE error.
@@ -136,7 +136,7 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 	f.parentDir.fuseServer.mu.Lock()
 	defer f.parentDir.fuseServer.mu.Unlock()
 
-	req := &pb.GetFileRequest{Key: f.name}
+	req := &mpb.GetFileRequest{Key: f.name}
 	res, err := f.parentDir.fuseServer.metadataServerClient.GetFile(ctx, req)
 	if err != nil {
 		return nil, err // TODO(irfansharif): Propagate appropriate FUSE error.
@@ -159,14 +159,14 @@ func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.Wri
 		f.parentDir.fuseServer.logger.Error(err.Error())
 		return err // TODO(irfansharif): Propagate appropriate FUSE error.
 	}
-	rq := &pb.PutFileRequest{Key: f.name, File: []byte(encrypted)}
+	rq := &mpb.PutFileRequest{Key: f.name, File: []byte(encrypted)}
 	_, err = f.parentDir.fuseServer.metadataServerClient.PutFile(ctx, rq)
 
 	if err != nil {
 		return err // TODO(irfansharif): Propagate appropriate FUSE error.
 	}
 
-	mrq := &pb.SetMetadataRequest{Key: f.name, Metadata: &pb.FileMetadata{Size: int64(len(req.Data))}}
+	mrq := &mpb.SetMetadataRequest{Key: f.name, Metadata: &mpb.FileMetadata{Size: int64(len(req.Data))}}
 	_, err = f.parentDir.fuseServer.metadataServerClient.SetMetadata(ctx, mrq)
 	if err != nil {
 		return err // TODO(irfansharif): Propagate appropriate FUSE error.
@@ -180,7 +180,7 @@ func (d *Dir) Remove(ctx context.Context, req *fuse.RemoveRequest) error {
 	d.fuseServer.mu.Lock()
 	defer d.fuseServer.mu.Unlock()
 
-	rq := &pb.DeleteFileRequest{Key: req.Name}
+	rq := &mpb.DeleteFileRequest{Key: req.Name}
 	_, err := d.fuseServer.metadataServerClient.DeleteFile(ctx, rq)
 	if err != nil {
 		return err // TODO(irfansharif): Propagate appropriate FUSE error.

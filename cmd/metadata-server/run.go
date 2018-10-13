@@ -24,7 +24,8 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/kurafs/kura/pkg/cli"
 	"github.com/kurafs/kura/pkg/log"
-	pb "github.com/kurafs/kura/pkg/pb/metadata"
+	mpb "github.com/kurafs/kura/pkg/pb/metadata"
+	spb "github.com/kurafs/kura/pkg/pb/storage"
 	"github.com/soheilhy/cmux"
 	"google.golang.org/grpc"
 )
@@ -59,7 +60,7 @@ func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 		logger.Fatalf("Failed to open TCP port: %v", err)
 	}
 
-	// Create a cmux.
+	// Create a cmux; multiplex grpc and http over the same listener.
 	mux := cmux.New(lis)
 
 	// Match connections in order: First grpc, then everything else for web.
@@ -69,13 +70,18 @@ func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 	grpcL := mux.Match(cmux.HTTP2HeaderField("content-type", "application/grpc"))
 	httpL := mux.Match(cmux.Any())
 
-	server, err := newMetaDataServer(logger, storageAddr)
+	// Setup grpc connection with the storage server.
+	storageConn, err := grpc.Dial(storageAddr, grpc.WithInsecure())
 	if err != nil {
-		logger.Fatalf("Failed to start metadata server: %v", err)
+		return err
 	}
+	defer storageConn.Close()
+
+	storageClient := spb.NewStorageServiceClient(storageConn)
+	metadataServer := newMetadataServer(logger, storageClient)
 
 	grpcServer := grpc.NewServer()
-	pb.RegisterMetadataServiceServer(grpcServer, server)
+	mpb.RegisterMetadataServiceServer(grpcServer, metadataServer)
 
 	httpServer := http.Server{Handler: grpcweb.WrapServer(grpcServer)}
 

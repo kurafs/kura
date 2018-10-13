@@ -21,7 +21,7 @@ import (
 
 	"github.com/kurafs/kura/pkg/diskv"
 	"github.com/kurafs/kura/pkg/log"
-	pb "github.com/kurafs/kura/pkg/pb/storage"
+	spb "github.com/kurafs/kura/pkg/pb/storage"
 	"golang.org/x/net/context"
 )
 
@@ -31,7 +31,7 @@ type diskStore struct {
 	logger *log.Logger
 }
 
-var _ pb.StorageServiceServer = &diskStore{}
+var _ spb.StorageServiceServer = &diskStore{}
 
 func newServer(logger *log.Logger) *diskStore {
 	dv := diskv.New(diskv.Options{
@@ -55,7 +55,7 @@ func newServer(logger *log.Logger) *diskStore {
 	}
 }
 
-func (d *diskStore) GetFile(ctx context.Context, req *pb.GetFileRequest) (*pb.GetFileResponse, error) {
+func (d *diskStore) GetFile(ctx context.Context, req *spb.GetFileRequest) (*spb.GetFileResponse, error) {
 	d.mu.RLock()
 	defer d.mu.RUnlock()
 
@@ -64,10 +64,10 @@ func (d *diskStore) GetFile(ctx context.Context, req *pb.GetFileRequest) (*pb.Ge
 		return nil, err
 	}
 
-	return &pb.GetFileResponse{File: file}, nil
+	return &spb.GetFileResponse{File: file}, nil
 }
 
-func (d *diskStore) PutFile(ctx context.Context, req *pb.PutFileRequest) (*pb.PutFileResponse, error) {
+func (d *diskStore) PutFile(ctx context.Context, req *spb.PutFileRequest) (*spb.PutFileResponse, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
@@ -75,20 +75,20 @@ func (d *diskStore) PutFile(ctx context.Context, req *pb.PutFileRequest) (*pb.Pu
 		return nil, err
 	}
 
-	return &pb.PutFileResponse{}, nil
+	return &spb.PutFileResponse{}, nil
 }
 
-func (d *diskStore) DeleteFile(ctx context.Context, req *pb.DeleteFileRequest) (*pb.DeleteFileResponse, error) {
+func (d *diskStore) DeleteFile(ctx context.Context, req *spb.DeleteFileRequest) (*spb.DeleteFileResponse, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
 	if !d.diskv.Has(req.Key) {
-		return &pb.DeleteFileResponse{}, errors.New("File does not exist")
+		return &spb.DeleteFileResponse{}, errors.New("File does not exist")
 	}
 
 	if err := d.diskv.Erase(req.Key); err != nil {
 		return nil, err
 	}
 
-	return &pb.DeleteFileResponse{}, nil
+	return &spb.DeleteFileResponse{}, nil
 }

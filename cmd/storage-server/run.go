@@ -22,7 +22,7 @@ import (
 
 	"github.com/kurafs/kura/pkg/cli"
 	"github.com/kurafs/kura/pkg/log"
-	pb "github.com/kurafs/kura/pkg/pb/storage"
+	spb "github.com/kurafs/kura/pkg/pb/storage"
 	"google.golang.org/grpc"
 )
 
@@ -53,7 +53,7 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 		return nil
 	}
 	server := grpc.NewServer()
-	pb.RegisterStorageServiceServer(server, newServer(logger))
+	spb.RegisterStorageServiceServer(server, newServer(logger))
 	logger.Infof("Serving on port: %d", port)
 	if err := server.Serve(lis); err != nil {
 		logger.Fatalf("Failed to serve: %v", err)
