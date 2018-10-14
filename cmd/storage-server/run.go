@@ -19,8 +19,10 @@ import (
 	"io/ioutil"
 	"net"
 	"os"
+	"strings"
 
 	"github.com/kurafs/kura/pkg/cli"
+	"github.com/kurafs/kura/pkg/diskv"
 	"github.com/kurafs/kura/pkg/log"
 	spb "github.com/kurafs/kura/pkg/pb/storage"
 	"google.golang.org/grpc"
@@ -47,15 +49,34 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 	logf := log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC | log.Lmode
 	logger := log.New(log.Writer(writer), log.Flags(logf), log.SkipBasePath())
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
+	grpcL, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
 	if err != nil {
 		logger.Fatalf("Failed to open TCP port: %v", err)
 		return nil
 	}
-	server := grpc.NewServer()
-	spb.RegisterStorageServiceServer(server, newServer(logger))
+
+	store := diskv.New(diskv.Options{
+		BasePath:     "kura-store",
+		CacheSizeMax: 1024 * 1024, // 1MB cache size
+		AdvancedTransform: func(s string) *diskv.PathKey {
+			path := strings.Split(s, "/")
+			last := len(path) - 1
+			return &diskv.PathKey{
+				Path:     path[:last],
+				FileName: path[last],
+			}
+		},
+		InverseTransform: func(pk *diskv.PathKey) string {
+			return strings.Join(pk.Path, "/") + pk.FileName
+		},
+	})
+	storageServer := newStorageServer(logger, store)
+
+	grpcServer := grpc.NewServer()
+	spb.RegisterStorageServiceServer(grpcServer, storageServer)
+
 	logger.Infof("Serving on port: %d", port)
-	if err := server.Serve(lis); err != nil {
+	if err := grpcServer.Serve(grpcL); err != nil {
 		logger.Fatalf("Failed to serve: %v", err)
 	}
 	return nil
