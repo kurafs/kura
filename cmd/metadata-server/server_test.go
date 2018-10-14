@@ -19,14 +19,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"testing"
 
+	"github.com/kurafs/kura/pkg/log"
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
 	spb "github.com/kurafs/kura/pkg/pb/storage"
 	"google.golang.org/grpc"
-
-	"github.com/kurafs/kura/pkg/log"
 )
 
 type testStorageServiceClient struct{}
@@ -63,7 +61,7 @@ func (y *testStorageServiceClient) DeleteFile(
 }
 
 func TestGetFile(t *testing.T) {
-	logger := log.New(log.Writer(ioutil.Discard))
+	logger := log.Discarder()
 	ctx := context.Background()
 
 	testStorageClient := &testStorageServiceClient{}
@@ -80,7 +78,7 @@ func TestGetFile(t *testing.T) {
 }
 
 func TestPutFile(t *testing.T) {
-	logger := log.New(log.Writer(ioutil.Discard))
+	logger := log.Discarder()
 	ctx := context.Background()
 
 	testStorageClient := &testStorageServiceClient{}
@@ -93,7 +91,7 @@ func TestPutFile(t *testing.T) {
 }
 
 func TestDeleteFile(t *testing.T) {
-	logger := log.New(log.Writer(ioutil.Discard))
+	logger := log.Discarder()
 	ctx := context.Background()
 
 	testStorageClient := &testStorageServiceClient{}

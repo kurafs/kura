@@ -15,11 +15,13 @@
 package metadataserver
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/kurafs/kura/pkg/cli"
@@ -55,9 +57,26 @@ func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 	logf := log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC | log.Lmode
 	logger := log.New(log.Writer(writer), log.Flags(logf), log.SkipBasePath())
 
+	wait, shutdown, err := Start(logger, port, storageAddr)
+	if err != nil {
+		return err
+	}
+
+	wait()
+	shutdown()
+
+	return nil
+}
+
+// TODO(irfansharif): Maybe use different type for storageAddr, to ensure both
+// host/port.
+func Start(logger *log.Logger, port int, storageAddr string) (wait func(), shutdown func(), err error) {
+	var wg sync.WaitGroup
+
 	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
 	if err != nil {
-		logger.Fatalf("Failed to open TCP port: %v", err)
+		logger.Fatalf("failed to open TCP port: %v", err)
+		return nil, nil, err
 	}
 
 	// Create a cmux; multiplex grpc and http over the same listener.
@@ -71,11 +90,12 @@ func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 	httpL := mux.Match(cmux.Any())
 
 	// Setup grpc connection with the storage server.
+	// TODO(irfansharif): This is currently over an insecure connection, needs
+	// to be secure.
 	storageConn, err := grpc.Dial(storageAddr, grpc.WithInsecure())
 	if err != nil {
-		return err
+		return nil, nil, err
 	}
-	defer storageConn.Close()
 
 	storageClient := spb.NewStorageServiceClient(storageConn)
 	metadataServer := newMetadataServer(logger, storageClient)
@@ -85,20 +105,42 @@ func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 
 	httpServer := http.Server{Handler: grpcweb.WrapServer(grpcServer)}
 
+	wg.Add(1)
 	go func() {
-		logger.Infof("Serving RPC server on port: %d", port)
+		defer wg.Done()
+
+		logger.Infof("serving RPC server on port: %d", port)
 		if err := grpcServer.Serve(grpcL); err != nil {
-			logger.Fatalf("Failed to serve: %v", err)
+			logger.Errorf("grpc server error: %v", err)
 		}
+
 	}()
 
+	wg.Add(1)
 	go func() {
-		logger.Infof("Serving HTTP server on port: %d", port)
+		defer wg.Done()
+
+		logger.Infof("serving HTTP server on port: %d", port)
 		if err := httpServer.Serve(httpL); err != nil {
-			logger.Fatalf("Failed to serve: %v", err)
+			logger.Errorf("http server error: %v", err)
 		}
 	}()
 
-	mux.Serve()
-	return nil
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		if err := mux.Serve(); err != nil {
+			logger.Errorf("cmux server error: %v", err)
+		}
+	}()
+
+	shutdown = func() {
+		storageConn.Close()
+		lis.Close()
+		grpcServer.Stop()
+		httpServer.Shutdown(context.Background())
+	}
+
+	return wg.Wait, shutdown, nil
 }

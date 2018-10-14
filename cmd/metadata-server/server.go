@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -91,7 +92,7 @@ func (s *Server) PutFile(ctx context.Context, req *mpb.PutFileRequest) (*mpb.Put
 		metadata.Entries[req.Key] = mpb.FileMetadata{
 			Created:      &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
 			LastModified: &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
-			Permissions:  "default",
+			Permissions:  0644,
 			Size:         int64(len(req.File)),
 		}
 	}
@@ -172,6 +173,7 @@ func (s *Server) GetDirectoryKeys(ctx context.Context, req *mpb.GetDirectoryKeys
 		keys = append(keys, k)
 	}
 
+	sort.Strings(keys)
 	return &mpb.GetDirectoryKeysResponse{Keys: keys}, nil
 }
 

@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"testing"
 
 	"github.com/kurafs/kura/pkg/log"
@@ -50,7 +49,7 @@ func (t *testStore) Erase(key string) error {
 }
 
 func TestGetFile(t *testing.T) {
-	logger := log.New(log.Writer(ioutil.Discard))
+	logger := log.Discarder()
 	ctx := context.Background()
 
 	testStore := &testStore{}
@@ -67,7 +66,7 @@ func TestGetFile(t *testing.T) {
 }
 
 func TestPutFile(t *testing.T) {
-	logger := log.New(log.Writer(ioutil.Discard))
+	logger := log.Discarder()
 	ctx := context.Background()
 
 	testStore := &testStore{}
@@ -80,7 +79,7 @@ func TestPutFile(t *testing.T) {
 }
 
 func TestDeleteFile(t *testing.T) {
-	logger := log.New(log.Writer(ioutil.Discard))
+	logger := log.Discarder()
 	ctx := context.Background()
 
 	testStore := &testStore{}

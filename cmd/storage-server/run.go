@@ -20,6 +20,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"sync"
 
 	"github.com/kurafs/kura/pkg/cli"
 	"github.com/kurafs/kura/pkg/diskv"
@@ -38,8 +39,12 @@ Storage server detailed overview.
 }
 
 func storageServerCmdRun(cmd *cli.Command, args []string) error {
-	var port int
+	var (
+		port      int
+		storePath string
+	)
 	cmd.FlagSet.IntVar(&port, "port", 10669, "Port which the server will run on")
+	cmd.FlagSet.StringVar(&storePath, "store-path", "kura-store", "The filepath to store storage-server contents")
 	if err := cmd.FlagSet.Parse(args); err != nil {
 		return cli.CmdParseError(err)
 	}
@@ -49,14 +54,30 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 	logf := log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC | log.Lmode
 	logger := log.New(log.Writer(writer), log.Flags(logf), log.SkipBasePath())
 
+	wait, shutdown, err := Start(logger, port, storePath)
+	if err != nil {
+		return err
+	}
+
+	// TODO(irfansharif): Explain this pattern.
+	wait()
+	shutdown()
+
+	return nil
+}
+
+// TODO(irfansharif): Document, why public. What the done channel, teardown is.
+func Start(logger *log.Logger, port int, storePath string) (wait func(), shutdown func(), err error) {
+	var wg sync.WaitGroup
+
 	grpcL, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
 	if err != nil {
-		logger.Fatalf("Failed to open TCP port: %v", err)
-		return nil
+		logger.Errorf("failed to open TCP port: %v", err)
+		return nil, nil, err
 	}
 
 	store := diskv.New(diskv.Options{
-		BasePath:     "kura-store",
+		BasePath:     storePath,
 		CacheSizeMax: 1024 * 1024, // 1MB cache size
 		AdvancedTransform: func(s string) *diskv.PathKey {
 			path := strings.Split(s, "/")
@@ -75,9 +96,20 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 	grpcServer := grpc.NewServer()
 	spb.RegisterStorageServiceServer(grpcServer, storageServer)
 
-	logger.Infof("Serving on port: %d", port)
-	if err := grpcServer.Serve(grpcL); err != nil {
-		logger.Fatalf("Failed to serve: %v", err)
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		logger.Infof("serving on port: %d", port)
+		if err := grpcServer.Serve(grpcL); err != nil {
+			logger.Errorf("grpc server error: %v", err)
+		}
+	}()
+
+	shutdown = func() {
+		grpcL.Close()
+		grpcServer.Stop()
 	}
-	return nil
+
+	return wg.Wait, shutdown, nil
 }
