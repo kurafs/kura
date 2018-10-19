@@ -67,10 +67,10 @@ func fuseServerCmdRun(cmd *cli.Command, args []string) error {
 
 	if cmd.FlagSet.NArg() > 1 {
 		return cli.CmdParseError(
-			errors.New(fmt.Sprintf("Unrecognized arguments: %v", cmd.FlagSet.Args()[1:])))
+			errors.New(fmt.Sprintf("unrecognized arguments: %v", cmd.FlagSet.Args()[1:])))
 	}
 	if cmd.FlagSet.NArg() == 0 {
-		return cli.CmdParseError(errors.New("Unspecified mount-point"))
+		return cli.CmdParseError(errors.New("unspecified mount-point"))
 	}
 	mountPoint := cmd.FlagSet.Arg(0)
 
@@ -128,7 +128,7 @@ func unmount(logger *log.Logger, mountPoint string) error {
 	if err := fuse.Unmount(mountPoint); err != nil {
 		return err
 	}
-	logger.Infof("Unmounted point: %s", mountPoint)
+	logger.Infof("unmounted point: %s", mountPoint)
 	return nil
 }
 
@@ -143,6 +143,6 @@ func mount(logger *log.Logger, mountPoint string) (*fuse.Conn, error) {
 		return nil, err
 	}
 
-	logger.Infof("Mounted point: %s", mountPoint)
+	logger.Infof("mounted point: %s", mountPoint)
 	return conn, nil
 }

@@ -25,7 +25,7 @@ message FileMetadata {
     }
     UnixTimestamp created = 1;
     UnixTimestamp last_modified = 2;
-    string permissions = 3;
+    uint32 permissions = 3;
     int64 size = 4;
 }
 

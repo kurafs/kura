@@ -28,6 +28,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -71,6 +72,11 @@ func New(options ...option) *Logger {
 		option(l)
 	}
 	return l
+}
+
+// Discarder returns a Logger configured to discard all writes.
+func Discarder() *Logger {
+	return New(Writer(ioutil.Discard))
 }
 
 // Info logs to the INFO log. Arguments are handled in the manner of
