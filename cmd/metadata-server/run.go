@@ -100,6 +100,7 @@ func Start(logger *log.Logger, port int, storageAddr string) (wait func(), shutd
 
 	storageClient := spb.NewStorageServiceClient(storageConn)
 	metadataServer := newMetadataServer(logger, storageClient)
+	metadataServer.runGarbageCollection(context.Background())
 
 	grpcServer := grpc.NewServer()
 	mpb.RegisterMetadataServiceServer(grpcServer, metadataServer)
