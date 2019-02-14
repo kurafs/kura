@@ -10,6 +10,7 @@ import (
 	"github.com/kurafs/kura/pkg/fuse"
 	"github.com/kurafs/kura/pkg/fuse/fs"
 	"github.com/kurafs/kura/pkg/log"
+	"github.com/kurafs/kura/pkg/streaming"
 
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
 )
@@ -136,13 +137,31 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 	f.parentDir.fuseServer.mu.Lock()
 	defer f.parentDir.fuseServer.mu.Unlock()
 
-	req := &mpb.GetFileRequest{Key: f.name}
-	res, err := f.parentDir.fuseServer.metadataServerClient.GetFile(ctx, req)
+	// TODO (Dendrimer): Use this as a chance to refresh metadata cache
+	metaReq := &mpb.GetMetadataRequest{Key: f.name}
+	metaResp, err := f.parentDir.fuseServer.metadataServerClient.GetMetadata(ctx, metaReq)
 	if err != nil {
 		return nil, err // TODO(irfansharif): Propagate appropriate FUSE error.
 	}
+	fileSize := metaResp.Metadata.Size
 
-	decrypted, err := decrypt(pkey, string(res.File))
+	var contents string
+	if fileSize < streaming.Threshold {
+		req := &mpb.GetFileRequest{Key: f.name}
+		res, err := f.parentDir.fuseServer.metadataServerClient.GetFile(ctx, req)
+		if err != nil {
+			return nil, err // TODO(irfansharif): Propagate appropriate FUSE error.
+		}
+		contents = string(res.File)
+	} else {
+		req := &mpb.GetFileStreamRequest{Key: f.name}
+		stream, err := f.parentDir.fuseServer.metadataServerClient.GetFileStream(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	decrypted, err := decrypt(pkey, contents)
 	if err != nil {
 		f.parentDir.fuseServer.logger.Error(err.Error())
 		return nil, err // TODO(irfansharif): Propagate appropriate FUSE error.
@@ -159,11 +178,35 @@ func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.Wri
 		f.parentDir.fuseServer.logger.Error(err.Error())
 		return err // TODO(irfansharif): Propagate appropriate FUSE error.
 	}
-	rq := &mpb.PutFileRequest{Key: f.name, File: []byte(encrypted)}
-	_, err = f.parentDir.fuseServer.metadataServerClient.PutFile(ctx, rq)
 
-	if err != nil {
-		return err // TODO(irfansharif): Propagate appropriate FUSE error.
+	encBytes := []byte(encrypted)
+	if len(encBytes) < streaming.Threshold {
+		rq := &mpb.PutFileRequest{Key: f.name, File: encBytes}
+		_, err = f.parentDir.fuseServer.metadataServerClient.PutFile(ctx, rq)
+
+		if err != nil {
+			return err // TODO(irfansharif): Propagate appropriate FUSE error.
+		}
+	} else {
+		stream, err := f.parentDir.fuseServer.metadataServerClient.PutFileStream(ctx)
+		if err != nil {
+			return err // TODO: Propogate appropriate FUSE error
+		}
+		numChunks := len(encBytes) / streaming.ChunkSize
+		if len(encBytes)%streaming.ChunkSize != 0 {
+			numChunks++
+		}
+		for i := 0; i < numChunks; i++ {
+			b := i * streaming.ChunkSize
+			e := (i + 1) * streaming.ChunkSize
+			if e >= len(encBytes) {
+				e = len(encBytes) - 1
+			}
+
+			if err := stream.Send(&mpb.PutFileStreamRequest{Key: f.name, FileChunk: encBytes[b:e]}); err != nil {
+				return err
+			}
+		}
 	}
 
 	mrq := &mpb.SetMetadataRequest{Key: f.name, Metadata: &mpb.FileMetadata{Size: int64(len(req.Data))}}
