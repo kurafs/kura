@@ -11,7 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// +build !linux
 
 package main
 
@@ -22,7 +21,6 @@ import (
 	"github.com/kurafs/kura/pkg/cli"
 
 	cacheserver "github.com/kurafs/kura/cmd/cache-server"
-	fuseserver "github.com/kurafs/kura/cmd/fuse-server"
 	identityserver "github.com/kurafs/kura/cmd/identity-server"
 	metadataserver "github.com/kurafs/kura/cmd/metadata-server"
 	storageserver "github.com/kurafs/kura/cmd/storage-server"
@@ -35,7 +33,6 @@ func main() {
 
 	// We include top level commands for
 	// {cache,storage,metadata,identity}-servers.
-	commands = append(commands, fuseserver.FuseServerCmd)
 	commands = append(commands, cacheserver.CacheServerCmd)
 	commands = append(commands, metadataserver.MetadataServerCmd)
 	commands = append(commands, identityserver.IdentityServerCmd)

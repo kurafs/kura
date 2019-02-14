@@ -2,6 +2,7 @@ package fuseserver
 
 import (
 	"context"
+	"io"
 	"os"
 	"sync"
 
@@ -159,6 +160,20 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
+		// TODO(Denrimer): Is it wise to be allocating huge amounts of memory
+		// up front? If we can decrypt from a stream then we don't have to do this.
+		buf := make([]byte, 0, fileSize)
+		for {
+			in, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return nil, err
+			}
+			buf = append(buf, in.FileChunk...)
+		}
+		contents = string(buf)
 	}
 
 	decrypted, err := decrypt(pkey, contents)
