@@ -14,7 +14,6 @@ import (
 	storageserver "github.com/kurafs/kura/cmd/storage-server"
 	"github.com/kurafs/kura/pkg/log"
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
-	spb "github.com/kurafs/kura/pkg/pb/storage"
 	"google.golang.org/grpc"
 )
 
@@ -277,106 +276,6 @@ func TestDirKeys(t *testing.T) {
 		if dres.Keys[i] != fmt.Sprintf("key-%d", i) {
 			t.Fatalf("expected %s, got %s", fmt.Sprintf("key-%d", i), dres.Keys[i])
 		}
-	}
-
-	shutdownStorage()
-	shutdownMetadata()
-
-	waitStorage()
-	waitMetadata()
-}
-
-func TestGarbageCollection(t *testing.T) {
-	logger := log.Discarder()
-	tdir, err := ioutil.TempDir("/tmp", "TestDirKeys")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(tdir)
-
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	conn, err := grpc.Dial("localhost:10670", grpc.WithInsecure())
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer conn.Close()
-
-	client := mpb.NewMetadataServiceClient(conn)
-
-	for i := 0; i < 10; i++ {
-		key, content := fmt.Sprintf("key-%d", i), bytes.Repeat([]byte("-"), 1024*1024*2)
-		preq := &mpb.PutFileRequest{Key: key, File: content}
-		_, err = client.PutFile(context.Background(), preq)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	dreq := &mpb.GetDirectoryKeysRequest{}
-	dres, err := client.GetDirectoryKeys(context.Background(), dreq)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(dres.Keys) != 10 {
-		t.Fatalf("expected len(dres.Keys)=%d, got %d", 10, len(dres.Keys))
-	}
-	for i := 0; i < 10; i++ {
-		if dres.Keys[i] != fmt.Sprintf("key-%d", i) {
-			t.Fatalf("expected %s, got %s", fmt.Sprintf("key-%d", i), dres.Keys[i])
-		}
-	}
-
-	storageConn, err := grpc.Dial("localhost:10669", grpc.WithInsecure())
-	defer storageConn.Close()
-	storageClient := spb.NewStorageServiceClient(storageConn)
-
-	// there should be 15 files in the storage layer, 5 of which
-	// do not appear recorded in the metadata server (invalid)
-	for i := 11; i < 15; i++ {
-		key, content := fmt.Sprintf("key-%d", i), bytes.Repeat([]byte("-"), 1024*1024*2)
-		sreq := &spb.PutFileRequest{Key: key, File: content}
-		_, err = storageClient.PutFile(context.Background(), sreq)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	sreq := &spb.GetFileKeysRequest{}
-	sres, err := storageClient.GetFileKeys(context.Background(), sreq)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(sres.Keys) != 15 {
-		t.Fatalf("expected len(sres.Keys)=%d, got %d", 15, len(sres.Keys))
-	}
-
-	gcReq := &mpb.ForceGarbageCollectionRequest{}
-	_, err = client.ForceGarbageCollection(context.Background(), gcReq)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	sreq = &spb.GetFileKeysRequest{}
-	sres, err = storageClient.GetFileKeys(context.Background(), sreq)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// the 5 unsynchronized files in the storage layer should be eradicated
-	// total 11 files (10 original that were synchronized + metadata file)
-	if len(sres.Keys) != 11 {
-		t.Fatalf("expected len(sres.Keys)=%d, got %d", 11, len(sres.Keys))
 	}
 
 	shutdownStorage()

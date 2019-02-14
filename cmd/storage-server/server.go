@@ -16,10 +16,12 @@ package storageserver
 
 import (
 	"errors"
+	"io"
 	"sync"
 
 	"github.com/kurafs/kura/pkg/log"
 	spb "github.com/kurafs/kura/pkg/pb/storage"
+	"github.com/kurafs/kura/pkg/streaming"
 	"golang.org/x/net/context"
 )
 
@@ -58,6 +60,33 @@ func (s *storageServer) GetFile(ctx context.Context, req *spb.GetFileRequest) (*
 	return &spb.GetFileResponse{File: file}, nil
 }
 
+func (s *storageServer) GetFileStream(req *spb.GetFileStreamRequest, stream spb.StorageService_GetFileStreamServer) error {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	file, err := s.store.Read(req.Key)
+	if err != nil {
+		return err
+	}
+
+	numChunks := len(file) / streaming.ChunkSize
+	if len(file)%streaming.ChunkSize != 0 {
+		numChunks++
+	}
+	for i := 0; i < numChunks; i++ {
+		b := i * streaming.ChunkSize
+		e := (i + 1) * streaming.ChunkSize
+		if e >= len(file) {
+			e = len(file)
+		}
+
+		if err := stream.Send(&spb.GetFileStreamResponse{FileChunk: file[b:e]}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (s *storageServer) PutFile(ctx context.Context, req *spb.PutFileRequest) (*spb.PutFileResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -67,6 +96,34 @@ func (s *storageServer) PutFile(ctx context.Context, req *spb.PutFileRequest) (*
 	}
 
 	return &spb.PutFileResponse{}, nil
+}
+
+func (s *storageServer) PutFileStream(stream spb.StorageService_PutFileStreamServer) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	in, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+	// First message determines the key, it will be assumed that all subsequent
+	// file keys are the same
+	key := in.Key
+	fileBytes := in.FileChunk
+
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			if err = s.store.Write(key, fileBytes); err != nil {
+				return err
+			}
+			return stream.SendAndClose(&spb.PutFileStreamResponse{})
+		}
+		if err != nil {
+			return err
+		}
+		fileBytes = append(fileBytes, in.FileChunk...)
+	}
 }
 
 func (s *storageServer) DeleteFile(ctx context.Context, req *spb.DeleteFileRequest) (*spb.DeleteFileResponse, error) {

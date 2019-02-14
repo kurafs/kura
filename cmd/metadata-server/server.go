@@ -230,50 +230,19 @@ func (s *Server) runGarbageCollection(ctx context.Context) error {
 		return err
 	}
 
-<<<<<<< HEAD
 	for _, key := range fileKeysRes.Keys {
 		if !keyMap[key] {
 			deleteReq := &mpb.DeleteFileRequest{Key: key}
 			if _, err := s.storageClient.DeleteFile(ctx, &spb.DeleteFileRequest{Key: deleteReq.Key}); err != nil {
 				return err
 			}
-=======
-	for key := range fileKeysRes.Keys {
-		actualKey := fileKeysRes.Keys[key]
-		if !keyMap[actualKey] {
-			deleteReq := &mpb.DeleteFileRequest{Key: actualKey}
-			if _, err := s.storageClient.DeleteFile(ctx, &spb.DeleteFileRequest{Key: deleteReq.Key}); err != nil {
-				return err
-			}
-
-			metadata, err := s.getMetadataFile(ctx)
-			if err != nil {
-				return err
-			}
-
-			delete(metadata.Entries, deleteReq.Key)
-
-			if err := s.setMetadataFile(ctx, metadata); err != nil {
-				return err
-			}
->>>>>>> Enable GC on metadata server which synchronizes storage with it
 		}
 	}
 
 	return nil
 }
 
-<<<<<<< HEAD
 // Used for testing purposes only.
 func TestForceGC(s *Server) error {
 	return s.runGarbageCollection(context.Background())
-=======
-func (s *Server) ForceGarbageCollection(ctx context.Context, req *mpb.ForceGarbageCollectionRequest) (*mpb.ForceGarbageCollectionResponse, error) {
-	err := s.runGarbageCollection(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	return &mpb.ForceGarbageCollectionResponse{}, nil
->>>>>>> Enable GC on metadata server which synchronizes storage with it
 }

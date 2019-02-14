@@ -58,12 +58,27 @@ message GetFileResponse {
     bytes file = 1;
 }
 
+message GetFileStreamRequest {
+    string key = 1;
+}
+
+message GetFileStreamResponse {
+    bytes fileChunk = 1;
+}
+
 message PutFileRequest {
     string key = 1;
     bytes file = 2;
 }
 
 message PutFileResponse { }
+
+message PutFileStreamRequest {
+    string key = 1;
+    bytes fileChunk = 2;
+}
+
+message PutFileStreamResponse { }
 
 message DeleteFileRequest {
     string key = 1;
@@ -77,7 +92,9 @@ message ForceGarbageCollectionResponse { }
 
 service MetadataService { 
     rpc GetFile (GetFileRequest) returns (GetFileResponse);
+    rpc GetFileStream (GetFileStreamRequest) returns (stream GetFileStreamResponse);
     rpc PutFile (PutFileRequest) returns (PutFileResponse);
+    rpc PutFileStream (stream PutFileStreamRequest) returns (PutFileStreamResponse);
     rpc DeleteFile (DeleteFileRequest) returns (DeleteFileResponse);
     rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse);
     rpc SetMetadata (SetMetadataRequest) returns (SetMetadataResponse);
