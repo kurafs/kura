@@ -75,15 +75,18 @@ func (s *Server) GetFileStream(req *mpb.GetFileStreamRequest, stream mpb.Metadat
 		if err != nil {
 			ch <- &chunkMessage{err: err}
 			close(ch)
+			return
 		}
 		for {
 			resp, err := storeStream.Recv()
 			if err == io.EOF {
 				close(ch)
+				return
 			}
 			if err != nil {
 				ch <- &chunkMessage{err: err}
 				close(ch)
+				return
 			}
 			ch <- &chunkMessage{chunk: resp.FileChunk}
 		}
@@ -164,6 +167,9 @@ func (s *Server) PutFileStream(stream mpb.MetadataService_PutFileStreamServer) e
 	for {
 		in, err = stream.Recv()
 		if err == io.EOF {
+			if _, err = storeStream.CloseAndRecv(); err != nil {
+				return err
+			}
 			break
 		}
 		if err != nil {

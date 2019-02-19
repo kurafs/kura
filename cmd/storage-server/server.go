@@ -77,7 +77,7 @@ func (s *storageServer) GetFileStream(req *spb.GetFileStreamRequest, stream spb.
 		b := i * streaming.ChunkSize
 		e := (i + 1) * streaming.ChunkSize
 		if e >= len(file) {
-			e = len(file) - 1
+			e = len(file)
 		}
 
 		if err := stream.Send(&spb.GetFileStreamResponse{FileChunk: file[b:e]}); err != nil {
