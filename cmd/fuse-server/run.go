@@ -39,6 +39,7 @@ func fuseServerCmdRun(cmd *cli.Command, args []string) error {
 	var (
 		metadataServerFlag string
 		unmountFlag        bool
+
 		logDirFlag         string
 		suppressStderrFlag bool
 		logModeFlag        logMode

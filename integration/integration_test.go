@@ -3,16 +3,21 @@ package integration
 import (
 	"bytes"
 	"context"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
+	cryptserver "github.com/kurafs/kura/cmd/crypt-server"
 	metadataserver "github.com/kurafs/kura/cmd/metadata-server"
 	storageserver "github.com/kurafs/kura/cmd/storage-server"
 	"github.com/kurafs/kura/pkg/log"
+	cpb "github.com/kurafs/kura/pkg/pb/crypt"
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
 	"google.golang.org/grpc"
 )
@@ -291,4 +296,168 @@ func TestNestedFilePersistence(t *testing.T) {
 
 func TestLargeFilePersistence(t *testing.T) {
 	t.Skip("TODO(irfansharif): gRPC exhaustion occurs at 4 MiB, add streaming.")
+}
+
+func TestCrypt(t *testing.T) {
+	logger := log.Discarder()
+	tdir, err := ioutil.TempDir("/tmp", "TestCrypt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tdir)
+
+	seed := "figar-bazor-vizob-jituh-bilif-silul-fahur-kabuv"
+	var Xexpected, Yexpected big.Int
+	Xexpected.SetString(
+		"6054DF38F8E7531BE3D68554F8F07B759DAEC1AAEA5C0717E9D2C45921F0EE90", 16)
+	Yexpected.SetString(
+		"4BC16B1DE3F3AF6989B8124F6C8D236AF62E2859DBA455A6B9A3F0CF45624394", 16)
+
+	if err := cryptserver.GenerateAndWriteKeys(logger, seed, tdir); err != nil {
+		t.Fatal(err)
+	}
+
+	waitCrypt, shutdownCrypt, err := cryptserver.Start(logger, 10870, tdir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	conn, err := grpc.Dial("localhost:10870", grpc.WithInsecure())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	client := cpb.NewCryptServiceClient(conn)
+	preq := &cpb.PublicKeyRequest{}
+	pres, err := client.PublicKey(context.Background(), preq)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var X, Y big.Int
+	if err := X.UnmarshalText(pres.X); err != nil {
+		t.Fatal(err)
+	}
+	if err := Y.UnmarshalText(pres.Y); err != nil {
+		t.Fatal(err)
+	}
+
+	if X.Cmp(&Xexpected) != 0 {
+		t.Fatal(fmt.Sprintf("got X = %s, expected %s",
+			X.String(), Xexpected.String()))
+	}
+	if Y.Cmp(&Yexpected) != 0 {
+		t.Fatal(fmt.Sprintf("got Y = %s, expected %s",
+			Y.String(), Yexpected.String()))
+	}
+
+	shutdownCrypt()
+	waitCrypt()
+}
+
+func TestEncryptAES(t *testing.T) {
+	logger := log.Discarder()
+	tdir, err := ioutil.TempDir("/tmp", "TestEncryptAES")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tdir)
+
+	seed := "figar-bazor-vizob-jituh-bilif-silul-fahur-kabuv"
+	if err := cryptserver.GenerateAndWriteKeys(logger, seed, tdir); err != nil {
+		t.Fatal(err)
+	}
+
+	waitCrypt, shutdownCrypt, err := cryptserver.Start(logger, 10870, tdir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	conn, err := grpc.Dial("localhost:10870", grpc.WithInsecure())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	prevRandReader := rand.Reader
+	defer func() {
+		rand.Reader = prevRandReader
+	}()
+	rand.Reader = bytes.NewReader(bytes.Repeat([]byte("="), 16))
+	client := cpb.NewCryptServiceClient(conn)
+	ereq := &cpb.EncryptionRequest{
+		Plaintext: []byte("plaintext"),
+		AesKey:    []byte("aes-key-12345678"),
+	}
+	eres, err := client.Encrypt(context.Background(), ereq)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expectedEncodedCiphertext := "PT09PT09PT09PT09PT09PShTfHeVLm0dzw=="
+	gotEncodedCiphertext := base64.URLEncoding.EncodeToString(eres.Ciphertext)
+
+	if expectedEncodedCiphertext != gotEncodedCiphertext {
+		t.Fatalf("expected ciphertext %s, got %s",
+			expectedEncodedCiphertext, gotEncodedCiphertext)
+	}
+
+	shutdownCrypt()
+	waitCrypt()
+}
+
+func TestDecryptAES(t *testing.T) {
+	logger := log.Discarder()
+	tdir, err := ioutil.TempDir("/tmp", "TestDecryptAES")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tdir)
+
+	seed := "figar-bazor-vizob-jituh-bilif-silul-fahur-kabuv"
+	if err := cryptserver.GenerateAndWriteKeys(logger, seed, tdir); err != nil {
+		t.Fatal(err)
+	}
+
+	waitCrypt, shutdownCrypt, err := cryptserver.Start(logger, 10870, tdir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	conn, err := grpc.Dial("localhost:10870", grpc.WithInsecure())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	prevRandReader := rand.Reader
+	defer func() {
+		rand.Reader = prevRandReader
+	}()
+	rand.Reader = bytes.NewReader(bytes.Repeat([]byte("="), 16))
+
+	encodedCiphertext := "PT09PT09PT09PT09PT09PShTfHeVLm0dzw=="
+	ciphertext, err := base64.URLEncoding.DecodeString(encodedCiphertext)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	client := cpb.NewCryptServiceClient(conn)
+	dreq := &cpb.DecryptionRequest{
+		Ciphertext: ciphertext,
+		AesKey:     []byte("aes-key-12345678"),
+	}
+	dres, err := client.Decrypt(context.Background(), dreq)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if string(dres.Plaintext) != "plaintext" {
+		t.Fatalf("expected plaintext '%s', got %s",
+			"plaintext", string(dres.Plaintext))
+	}
+
+	shutdownCrypt()
+	waitCrypt()
 }

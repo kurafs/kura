@@ -16,3 +16,4 @@ package main
 
 //go:generate protoc -I=pkg/pb/storage --go_out=plugins=grpc:pkg/pb/storage pkg/pb/storage/storage.proto
 //go:generate protoc -I=pkg/pb/metadata --go_out=plugins=grpc:pkg/pb/metadata pkg/pb/metadata/metadata.proto
+//go:generate protoc -I=pkg/pb/crypt --go_out=plugins=grpc:pkg/pb/crypt pkg/pb/crypt/crypt.proto
