@@ -28,7 +28,7 @@ type Store interface {
 	Write(key string, val []byte) error
 	Has(key string) bool
 	Erase(key string) error
-	Keys(cancel <-chan struct{}) <-chan string
+	Keys() []string
 }
 
 type storageServer struct {
@@ -88,11 +88,11 @@ func (s *storageServer) GetFileKeys(ctx context.Context, req *spb.GetFileKeysReq
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	fileKeys := s.store.Keys(nil)
+	fileKeys := s.store.Keys()
 
 	keys := make([]string, 0)
 
-	for key := range fileKeys {
+	for _, key := range fileKeys {
 		keys = append(keys, key)
 	}
 

@@ -99,7 +99,8 @@ func TestStrings(t *testing.T) {
 		}
 	}
 
-	for k := range d.Keys(nil) {
+	skeys := d.Keys()
+	for _, k := range skeys {
 		if _, present := keys[k]; present {
 			t.Logf("got: %s", k)
 			keys[k] = true
@@ -333,7 +334,7 @@ func TestAtomicWrite(t *testing.T) {
 	if d.Has(key) {
 		t.Fatal("Has key, but it shouldn't exist")
 	}
-	if _, ok := <-d.Keys(nil); ok {
+	if len(d.Keys()) != 0 {
 		t.Fatal("Store isn't empty")
 	}
 }

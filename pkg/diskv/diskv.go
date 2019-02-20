@@ -135,7 +135,7 @@ func New(o Options) *Diskv {
 	}
 
 	if d.Index != nil && d.IndexLess != nil {
-		d.Index.Initialize(d.IndexLess, d.Keys(nil))
+		d.Index.Initialize(d.IndexLess, d.KeysPrefix("", nil))
 	}
 
 	return d
@@ -549,11 +549,17 @@ func (d *Diskv) Has(key string) bool {
 	return true
 }
 
-// Keys returns a channel that will yield every key accessible by the store,
-// in undefined order. If a cancel channel is provided, closing it will
-// terminate and close the keys channel.
-func (d *Diskv) Keys(cancel <-chan struct{}) <-chan string {
-	return d.KeysPrefix("", cancel)
+// Keys returns every key accessible by the store in a list in
+// undefined order.
+func (d *Diskv) Keys() []string {
+	keys := d.KeysPrefix("", nil)
+	result := make([]string, 0)
+
+	for key := range keys {
+		result = append(result, key)
+	}
+
+	return result
 }
 
 // KeysPrefix returns a channel that will yield every key accessible by the

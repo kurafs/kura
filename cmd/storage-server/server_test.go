@@ -48,6 +48,10 @@ func (t *testStore) Erase(key string) error {
 	return nil
 }
 
+func (t *testStore) Keys() []string {
+	return nil
+}
+
 func TestGetFile(t *testing.T) {
 	logger := log.Discarder()
 	ctx := context.Background()
@@ -86,6 +90,20 @@ func TestDeleteFile(t *testing.T) {
 	storageServer := newStorageServer(logger, testStore)
 	req := &spb.DeleteFileRequest{Key: deleteFileReqKey}
 	_, err := storageServer.DeleteFile(ctx, req)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestGetFileKeys(t *testing.T) {
+	logger := log.Discarder()
+	ctx := context.Background()
+
+	testStore := &testStore{}
+	storageServer := newStorageServer(logger, testStore)
+	req := &spb.GetFileKeysRequest{}
+	_, err := storageServer.GetFileKeys(ctx, req)
+
 	if err != nil {
 		t.Error(err)
 	}

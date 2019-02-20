@@ -57,7 +57,7 @@ func TestKeysFlat(t *testing.T) {
 		d.Write(k, []byte(v))
 	}
 
-	checkKeys(t, d.Keys(nil), keysTestData)
+	checkKeys(t, d.KeysPrefix("", nil), keysTestData)
 }
 
 func TestKeysNested(t *testing.T) {
@@ -71,7 +71,7 @@ func TestKeysNested(t *testing.T) {
 		d.Write(k, []byte(v))
 	}
 
-	checkKeys(t, d.Keys(nil), keysTestData)
+	checkKeys(t, d.KeysPrefix("", nil), keysTestData)
 }
 
 func TestKeysPrefixFlat(t *testing.T) {
@@ -121,7 +121,7 @@ func TestKeysCancel(t *testing.T) {
 		cancelAfter = len(keysTestData) / 2
 	)
 
-	for key := range d.Keys(cancel) {
+	for key := range d.KeysPrefix("", cancel) {
 		received++
 
 		if received >= cancelAfter {

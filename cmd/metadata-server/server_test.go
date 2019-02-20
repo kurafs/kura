@@ -27,9 +27,13 @@ import (
 	"google.golang.org/grpc"
 )
 
-type testStorageServiceClient struct{}
+type testStorageServiceClient struct {
+	gcWasRun bool
+}
 
 var testGetFileResp []byte = []byte("test-get-file-resp")
+var testGetFileKeysResp = []string{"key1", "key2"}
+var testGetFileKeysAfterGCResp = []string{"key1"}
 
 func (t *testStorageServiceClient) GetFile(
 	ctx context.Context, in *spb.GetFileRequest, opts ...grpc.CallOption,
@@ -58,6 +62,16 @@ func (y *testStorageServiceClient) DeleteFile(
 	ctx context.Context, in *spb.DeleteFileRequest, opts ...grpc.CallOption,
 ) (*spb.DeleteFileResponse, error) {
 	return &spb.DeleteFileResponse{}, nil
+}
+
+func (y *testStorageServiceClient) GetFileKeys(
+	ctx context.Context, in *spb.GetFileKeysRequest, opts ...grpc.CallOption,
+) (*spb.GetFileKeysResponse, error) {
+	if y.gcWasRun {
+		return &spb.GetFileKeysResponse{Keys: testGetFileKeysAfterGCResp}, nil
+	} else {
+		return &spb.GetFileKeysResponse{Keys: testGetFileKeysResp}, nil
+	}
 }
 
 func TestGetFile(t *testing.T) {
@@ -100,5 +114,43 @@ func TestDeleteFile(t *testing.T) {
 	_, err := metadataServer.DeleteFile(ctx, req)
 	if err != nil {
 		t.Error(err)
+	}
+}
+
+func TestGarbageCollection(t *testing.T) {
+	logger := log.Discarder()
+	ctx := context.Background()
+
+	testStorageClient := &testStorageServiceClient{}
+	metadataServer := newMetadataServer(logger, testStorageClient)
+
+	req := &mpb.PutFileRequest{Key: "key1", File: []byte("file")}
+	_, err := metadataServer.PutFile(ctx, req)
+	if err != nil {
+		t.Error(err)
+	}
+
+	sreq := &spb.PutFileRequest{Key: "key2", File: []byte("file2")}
+	_, err = testStorageClient.PutFile(context.Background(), sreq)
+
+	kreq := &spb.GetFileKeysRequest{}
+	kres, err := testStorageClient.GetFileKeys(context.Background(), kreq)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if len(kres.Keys) != 2 {
+		t.Error(fmt.Sprintf("expected = %v keys, got %v", 2, len(kres.Keys)))
+	}
+
+	TestForceGC(metadataServer)
+	testStorageClient.gcWasRun = true
+
+	kreq = &spb.GetFileKeysRequest{}
+	kres, err = testStorageClient.GetFileKeys(context.Background(), kreq)
+
+	if len(kres.Keys) != 1 {
+		t.Error(fmt.Sprintf("expected = %v keys, got %v", 1, len(kres.Keys)))
 	}
 }
