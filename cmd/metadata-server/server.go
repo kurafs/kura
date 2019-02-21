@@ -59,8 +59,6 @@ func (s *Server) GetFile(ctx context.Context, req *mpb.GetFileRequest) (*mpb.Get
 	return &mpb.GetFileResponse{File: resp.File}, nil
 }
 
-// TODO(irfansharif): This should be transactional, we write to two files and
-// they should happen atomically.
 func (s *Server) PutFile(ctx context.Context, req *mpb.PutFileRequest) (*mpb.PutFileResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -104,8 +102,6 @@ func (s *Server) PutFile(ctx context.Context, req *mpb.PutFileRequest) (*mpb.Put
 	return &mpb.PutFileResponse{}, nil
 }
 
-// TODO(irfansharif): This should be transactional, we write to two files and
-// they should happen atomically.
 func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*mpb.DeleteFileResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -124,8 +120,7 @@ func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*m
 	if err := s.setMetadataFile(ctx, metadata); err != nil {
 		return nil, err
 	}
-	// TODO(Franz): Do something to sync metadata file with storage if metadata
-	// sync fails.
+
 	return &mpb.DeleteFileResponse{}, nil
 }
 
@@ -213,4 +208,41 @@ func (s *Server) setMetadataFile(ctx context.Context, metadata *MetadataFile) er
 	}
 
 	return nil
+}
+
+func (s *Server) runGarbageCollection(ctx context.Context) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	metadata, err := s.getMetadataFile(ctx)
+	if err != nil {
+		return nil
+	}
+
+	keyMap := make(map[string]bool)
+	for k := range metadata.Entries {
+		keyMap[k] = true
+	}
+
+	fileKeysReq := &spb.GetFileKeysRequest{}
+	fileKeysRes, err := s.storageClient.GetFileKeys(ctx, fileKeysReq)
+	if err != nil {
+		return err
+	}
+
+	for _, key := range fileKeysRes.Keys {
+		if !keyMap[key] {
+			deleteReq := &mpb.DeleteFileRequest{Key: key}
+			if _, err := s.storageClient.DeleteFile(ctx, &spb.DeleteFileRequest{Key: deleteReq.Key}); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+// Used for testing purposes only.
+func TestForceGC(s *Server) error {
+	return s.runGarbageCollection(context.Background())
 }

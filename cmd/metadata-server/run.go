@@ -22,6 +22,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/kurafs/kura/pkg/cli"
@@ -105,6 +106,13 @@ func Start(logger *log.Logger, port int, storageAddr string) (wait func(), shutd
 
 	httpServer := http.Server{Handler: grpcweb.WrapServer(grpcServer)}
 
+	ticker := time.NewTicker(time.Hour * 24)
+	go func() {
+		for range ticker.C {
+			metadataServer.runGarbageCollection(context.Background())
+		}
+	}()
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
@@ -140,6 +148,7 @@ func Start(logger *log.Logger, port int, storageAddr string) (wait func(), shutd
 		lis.Close()
 		grpcServer.Stop()
 		httpServer.Shutdown(context.Background())
+		ticker.Stop()
 	}
 
 	return wg.Wait, shutdown, nil

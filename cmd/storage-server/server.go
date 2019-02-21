@@ -28,6 +28,7 @@ type Store interface {
 	Write(key string, val []byte) error
 	Has(key string) bool
 	Erase(key string) error
+	Keys() []string
 }
 
 type storageServer struct {
@@ -81,4 +82,19 @@ func (s *storageServer) DeleteFile(ctx context.Context, req *spb.DeleteFileReque
 	}
 
 	return &spb.DeleteFileResponse{}, nil
+}
+
+func (s *storageServer) GetFileKeys(ctx context.Context, req *spb.GetFileKeysRequest) (*spb.GetFileKeysResponse, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	fileKeys := s.store.Keys()
+
+	keys := make([]string, 0)
+
+	for _, key := range fileKeys {
+		keys = append(keys, key)
+	}
+
+	return &spb.GetFileKeysResponse{Keys: keys}, nil
 }
