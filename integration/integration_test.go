@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -14,10 +15,12 @@ import (
 	"time"
 
 	cryptserver "github.com/kurafs/kura/cmd/crypt-server"
+	identityserver "github.com/kurafs/kura/cmd/identity-server"
 	metadataserver "github.com/kurafs/kura/cmd/metadata-server"
 	storageserver "github.com/kurafs/kura/cmd/storage-server"
 	"github.com/kurafs/kura/pkg/log"
 	cpb "github.com/kurafs/kura/pkg/pb/crypt"
+	ipb "github.com/kurafs/kura/pkg/pb/identity"
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
 	"google.golang.org/grpc"
 )
@@ -460,4 +463,119 @@ func TestDecryptAES(t *testing.T) {
 
 	shutdownCrypt()
 	waitCrypt()
+}
+
+func TestIdentityServer(t *testing.T) {
+	logger := log.Discarder()
+	tdir, err := ioutil.TempDir("/tmp", "TestIdentityServer")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tdir)
+
+	wait, shutdown, err := identityserver.Start(logger, 10770, tdir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	conn, err := grpc.Dial("localhost:10770", grpc.WithInsecure())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	client := ipb.NewIdentityServiceClient(conn)
+	preq := &ipb.PutKeyRequest{
+		Email:     "test@email.com",
+		PublicKey: []byte("public-key"),
+	}
+	_, err = client.PutPublicKey(context.Background(), preq)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	greq := &ipb.GetKeyRequest{
+		Email: "test@email.com",
+	}
+	gres, err := client.GetPublicKey(context.Background(), greq)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !bytes.Equal(gres.PublicKey, preq.PublicKey) {
+		t.Fatal(errors.New("got incorrect public key"))
+	}
+
+	shutdown()
+	wait()
+}
+
+func TestIdentityServerMissingUser(t *testing.T) {
+	logger := log.Discarder()
+	tdir, err := ioutil.TempDir("/tmp", "TestIdentityServer")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tdir)
+
+	wait, shutdown, err := identityserver.Start(logger, 10770, tdir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	conn, err := grpc.Dial("localhost:10770", grpc.WithInsecure())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	client := ipb.NewIdentityServiceClient(conn)
+	greq := &ipb.GetKeyRequest{
+		Email: "test@email.com",
+	}
+	_, err = client.GetPublicKey(context.Background(), greq)
+	if err == nil {
+		t.Fatal("expected 'user not found' error")
+	}
+
+	shutdown()
+	wait()
+}
+
+func TestIdentityServerOverwriteRejected(t *testing.T) {
+	logger := log.Discarder()
+	tdir, err := ioutil.TempDir("/tmp", "TestIdentityServer")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tdir)
+
+	wait, shutdown, err := identityserver.Start(logger, 10770, tdir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	conn, err := grpc.Dial("localhost:10770", grpc.WithInsecure())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	client := ipb.NewIdentityServiceClient(conn)
+	preq := &ipb.PutKeyRequest{
+		Email:     "test@email.com",
+		PublicKey: []byte("public-key"),
+	}
+	_, err = client.PutPublicKey(context.Background(), preq)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = client.PutPublicKey(context.Background(), preq)
+	if err == nil {
+		t.Fatal("expected error due to overwrite")
+	}
+
+	shutdown()
+	wait()
 }

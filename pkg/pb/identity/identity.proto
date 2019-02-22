@@ -12,9 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+syntax = "proto3";
 
-//go:generate protoc -I=pkg/pb/storage --go_out=plugins=grpc:pkg/pb/storage pkg/pb/storage/storage.proto
-//go:generate protoc -I=pkg/pb/metadata --go_out=plugins=grpc:pkg/pb/metadata pkg/pb/metadata/metadata.proto
-//go:generate protoc -I=pkg/pb/crypt --go_out=plugins=grpc:pkg/pb/crypt pkg/pb/crypt/crypt.proto
-//go:generate protoc -I=pkg/pb/identity --go_out=plugins=grpc:pkg/pb/identity pkg/pb/identity/identity.proto
+package identity;
+
+message GetKeyRequest {
+  string email = 1;
+}
+
+message GetKeyResponse {
+  bytes public_key = 1;
+}
+
+message PutKeyRequest {
+  string email = 1;
+  bytes public_key = 2;
+}
+
+message PutKeyResponse { }
+
+service IdentityService {
+  rpc GetPublicKey(GetKeyRequest) returns (GetKeyResponse);
+  rpc PutPublicKey(PutKeyRequest) returns (PutKeyResponse);
+}
