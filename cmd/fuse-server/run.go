@@ -28,7 +28,7 @@ import (
 
 var FuseServerCmd = &cli.Command{
 	Run:       fuseServerCmdRun,
-	UsageLine: "fuse-server [-metadata-server addr] [-unmount] [logger flags] <mount-point>",
+	UsageLine: "fuse-server [-metadata-server addr] [-crypt-server addr] [-unmount] [logger flags] <mount-point>",
 	Short:     "run the fuse server, mounting kura at specified mount point",
 	Long: `
 Fuse server detailed overview. TODO.
@@ -38,6 +38,7 @@ Fuse server detailed overview. TODO.
 func fuseServerCmdRun(cmd *cli.Command, args []string) error {
 	var (
 		metadataServerFlag string
+		cryptServerFlag    string
 		unmountFlag        bool
 
 		logDirFlag         string
@@ -48,6 +49,8 @@ func fuseServerCmdRun(cmd *cli.Command, args []string) error {
 	)
 
 	cmd.FlagSet.StringVar(&metadataServerFlag, "metadata-server", "localhost:10670",
+		"Address of the metadata server [host:port]")
+	cmd.FlagSet.StringVar(&cryptServerFlag, "crypt-server", "localhost:10870",
 		"Address of the metadata server [host:port]")
 	cmd.FlagSet.BoolVar(&unmountFlag, "unmount", false,
 		"Unmount filesystem at specified directory")
@@ -113,7 +116,7 @@ func fuseServerCmdRun(cmd *cli.Command, args []string) error {
 
 	defer conn.Close()
 
-	fuseServer, err := newFUSEServer(logger, metadataServerFlag)
+	fuseServer, err := newFUSEServer(logger, metadataServerFlag, cryptServerFlag)
 	if err != nil {
 		return err
 	}

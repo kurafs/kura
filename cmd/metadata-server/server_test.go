@@ -144,7 +144,7 @@ func TestGarbageCollection(t *testing.T) {
 		t.Error(fmt.Sprintf("expected = %v keys, got %v", 2, len(kres.Keys)))
 	}
 
-	TestForceGC(metadataServer)
+	metadataServer.runGarbageCollection(context.Background())
 	testStorageClient.gcWasRun = true
 
 	kreq = &spb.GetFileKeysRequest{}
