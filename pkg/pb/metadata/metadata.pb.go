@@ -26,10 +26,10 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // TODO (Franz): This should be encrypted; move this to the encryption
 // server when its implemented
 type FileMetadata struct {
-	Created              *FileMetadata_UnixTimestamp `protobuf:"bytes,1,opt,name=created" json:"created,omitempty"`
-	LastModified         *FileMetadata_UnixTimestamp `protobuf:"bytes,2,opt,name=last_modified,json=lastModified" json:"last_modified,omitempty"`
-	Permissions          uint32                      `protobuf:"varint,3,opt,name=permissions" json:"permissions,omitempty"`
-	Size                 int64                       `protobuf:"varint,4,opt,name=size" json:"size,omitempty"`
+	Created              *FileMetadata_UnixTimestamp `protobuf:"bytes,1,opt,name=created,proto3" json:"created,omitempty"`
+	LastModified         *FileMetadata_UnixTimestamp `protobuf:"bytes,2,opt,name=last_modified,json=lastModified,proto3" json:"last_modified,omitempty"`
+	Permissions          uint32                      `protobuf:"varint,3,opt,name=permissions,proto3" json:"permissions,omitempty"`
+	Size                 int64                       `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
 	XXX_unrecognized     []byte                      `json:"-"`
 	XXX_sizecache        int32                       `json:"-"`
@@ -88,8 +88,8 @@ func (m *FileMetadata) GetSize() int64 {
 }
 
 type FileMetadata_UnixTimestamp struct {
-	Seconds              int64    `protobuf:"varint,1,opt,name=seconds" json:"seconds,omitempty"`
-	Nanoseconds          int64    `protobuf:"varint,2,opt,name=nanoseconds" json:"nanoseconds,omitempty"`
+	Seconds              int64    `protobuf:"varint,1,opt,name=seconds,proto3" json:"seconds,omitempty"`
+	Nanoseconds          int64    `protobuf:"varint,2,opt,name=nanoseconds,proto3" json:"nanoseconds,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -164,7 +164,7 @@ func (m *GetDirectoryKeysRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_GetDirectoryKeysRequest proto.InternalMessageInfo
 
 type GetDirectoryKeysResponse struct {
-	Keys                 []string `protobuf:"bytes,1,rep,name=keys" json:"keys,omitempty"`
+	Keys                 []string `protobuf:"bytes,1,rep,name=keys,proto3" json:"keys,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -202,7 +202,7 @@ func (m *GetDirectoryKeysResponse) GetKeys() []string {
 }
 
 type GetMetadataRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -240,7 +240,7 @@ func (m *GetMetadataRequest) GetKey() string {
 }
 
 type GetMetadataResponse struct {
-	Metadata             *FileMetadata `protobuf:"bytes,1,opt,name=metadata" json:"metadata,omitempty"`
+	Metadata             *FileMetadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -278,8 +278,8 @@ func (m *GetMetadataResponse) GetMetadata() *FileMetadata {
 }
 
 type SetMetadataRequest struct {
-	Key                  string        `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
-	Metadata             *FileMetadata `protobuf:"bytes,2,opt,name=metadata" json:"metadata,omitempty"`
+	Key                  string        `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Metadata             *FileMetadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
 	XXX_sizecache        int32         `json:"-"`
@@ -354,7 +354,7 @@ func (m *SetMetadataResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_SetMetadataResponse proto.InternalMessageInfo
 
 type GetFileRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -430,7 +430,7 @@ func (m *GetFileResponse) GetFile() []byte {
 }
 
 type PutFileRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	File                 []byte   `protobuf:"bytes,2,opt,name=file,proto3" json:"file,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -506,7 +506,7 @@ func (m *PutFileResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_PutFileResponse proto.InternalMessageInfo
 
 type DeleteFileRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
