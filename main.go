@@ -17,14 +17,14 @@ package main
 import (
 	"os"
 
-	"github.com/kurafs/kura/doc"
-	"github.com/kurafs/kura/pkg/cli"
-
 	cacheserver "github.com/kurafs/kura/cmd/cache-server"
+	cryptserver "github.com/kurafs/kura/cmd/crypt-server"
 	fuseserver "github.com/kurafs/kura/cmd/fuse-server"
 	identityserver "github.com/kurafs/kura/cmd/identity-server"
 	metadataserver "github.com/kurafs/kura/cmd/metadata-server"
 	storageserver "github.com/kurafs/kura/cmd/storage-server"
+	"github.com/kurafs/kura/doc"
+	"github.com/kurafs/kura/pkg/cli"
 )
 
 func main() {
@@ -34,10 +34,11 @@ func main() {
 
 	// We include top level commands for
 	// {cache,storage,metadata,identity}-servers.
-	commands = append(commands, fuseserver.FuseServerCmd)
 	commands = append(commands, cacheserver.CacheServerCmd)
-	commands = append(commands, metadataserver.MetadataServerCmd)
+	commands = append(commands, cryptserver.CryptServerCmd)
+	commands = append(commands, fuseserver.FuseServerCmd)
 	commands = append(commands, identityserver.IdentityServerCmd)
+	commands = append(commands, metadataserver.MetadataServerCmd)
 	commands = append(commands, storageserver.StorageServerCmd)
 
 	// We also include a documentation pseudo-command for Kura's security model
