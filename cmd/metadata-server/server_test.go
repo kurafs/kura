@@ -97,7 +97,12 @@ func TestPutFile(t *testing.T) {
 
 	testStorageClient := &testStorageServiceClient{}
 	metadataServer := newMetadataServer(logger, testStorageClient)
-	req := &mpb.PutFileRequest{Key: "put-file-req", File: []byte("file")}
+	metadata := &mpb.FileMetadata{}
+	req := &mpb.PutFileRequest{
+		Key:      "put-file-req",
+		File:     []byte("file"),
+		Metadata: metadata,
+	}
 	_, err := metadataServer.PutFile(ctx, req)
 	if err != nil {
 		t.Error(err)
@@ -123,8 +128,13 @@ func TestGarbageCollection(t *testing.T) {
 
 	testStorageClient := &testStorageServiceClient{}
 	metadataServer := newMetadataServer(logger, testStorageClient)
+	metadata := &mpb.FileMetadata{}
 
-	req := &mpb.PutFileRequest{Key: "key1", File: []byte("file")}
+	req := &mpb.PutFileRequest{
+		Key:      "key1",
+		File:     []byte("file"),
+		Metadata: metadata,
+	}
 	_, err := metadataServer.PutFile(ctx, req)
 	if err != nil {
 		t.Error(err)
@@ -144,7 +154,7 @@ func TestGarbageCollection(t *testing.T) {
 		t.Error(fmt.Sprintf("expected = %v keys, got %v", 2, len(kres.Keys)))
 	}
 
-	TestForceGC(metadataServer)
+	metadataServer.runGarbageCollection(context.Background())
 	testStorageClient.gcWasRun = true
 
 	kreq = &spb.GetFileKeysRequest{}
