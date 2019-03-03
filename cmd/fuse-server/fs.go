@@ -25,8 +25,6 @@ type fuseServer struct {
 	nodeCounter uint64 // HACK: This is not how we should be generating inode numbers.
 }
 
-var pkey []byte = []byte("LKHlhb899Y09olUi")
-
 func newFUSEServer(logger *log.Logger, metadataServerAddr, cryptServerAddr string) (fs.FS, error) {
 	metadataConn, err := grpc.Dial(metadataServerAddr, grpc.WithInsecure())
 	if err != nil {
@@ -160,19 +158,22 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 		return nil, err // TODO(irfansharif): Propagate appropriate FUSE error.
 	}
 
-	decrypted, err := decrypt(pkey, string(res.File))
+	creq := &cpb.DecryptionRequest{Ciphertext: res.File}
+	cres, err := f.parentDir.fuseServer.cryptServerClient.Decrypt(ctx, creq)
 	if err != nil {
 		f.parentDir.fuseServer.logger.Error(err.Error())
 		return nil, err // TODO(irfansharif): Propagate appropriate FUSE error.
 	}
-	return []byte(decrypted), nil
+
+	return cres.Plaintext, nil
 }
 
 func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.WriteResponse) error {
 	f.parentDir.fuseServer.mu.Lock()
 	defer f.parentDir.fuseServer.mu.Unlock()
 
-	encrypted, err := encrypt(pkey, string(req.Data))
+	creq := &cpb.EncryptionRequest{Plaintext: req.Data}
+	cres, err := f.parentDir.fuseServer.cryptServerClient.Encrypt(ctx, creq)
 	if err != nil {
 		f.parentDir.fuseServer.logger.Error(err.Error())
 		return err // TODO(irfansharif): Propagate appropriate FUSE error.
@@ -184,7 +185,11 @@ func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.Wri
 		LastModified: &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
 	}
 
-	rq := &mpb.PutFileRequest{Key: f.name, File: []byte(encrypted), Metadata: metadata}
+	rq := &mpb.PutFileRequest{
+		Key:      f.name,
+		File:     []byte(cres.Ciphertext),
+		Metadata: metadata,
+	}
 	_, err = f.parentDir.fuseServer.metadataServerClient.PutFile(ctx, rq)
 
 	if err != nil {
