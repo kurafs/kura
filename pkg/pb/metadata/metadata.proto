@@ -27,6 +27,8 @@ message FileMetadata {
     UnixTimestamp last_modified = 2;
     uint32 permissions = 3;
     int64 size = 4;
+    bool is_directory = 5;
+    uint64 parent_directory_id = 6;
 }
 
 message GetDirectoryKeysRequest {}
@@ -73,6 +75,23 @@ message DeleteFileRequest {
 
 message DeleteFileResponse { }
 
+message CreateDirectoryRequest {
+  string key = 1;
+  uint64 directory_id = 2;
+}
+
+message CreateDirectoryResponse { }
+
+message DeleteDirectoryRequest {
+  string key = 1;
+  uint64 directory_id = 2;
+}
+
+message DeleteDirectoryResponse { }
+
+// TODO create rpc to get files in specific folder (modify getDirectoryKeys)
+// TODO create rpc to copy folder
+
 service MetadataService { 
     rpc GetFile (GetFileRequest) returns (GetFileResponse);
     rpc PutFile (PutFileRequest) returns (PutFileResponse);
@@ -80,4 +99,6 @@ service MetadataService {
     rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse);
     rpc SetMetadata (SetMetadataRequest) returns (SetMetadataResponse);
     rpc GetDirectoryKeys (GetDirectoryKeysRequest) returns (GetDirectoryKeysResponse);
+    rpc CreateDirectory (CreateDirectoryRequest) returns (CreateDirectoryResponse);
+    rpc DeleteDirectory (DeleteDirectoryRequest) returns (DeleteDirectoryResponse);
 }

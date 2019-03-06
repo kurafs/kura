@@ -21,6 +21,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/kurafs/kura/pkg/log"
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
@@ -93,6 +94,49 @@ func (s *Server) PutFile(ctx context.Context, req *mpb.PutFileRequest) (*mpb.Put
 	return &mpb.PutFileResponse{}, nil
 }
 
+func (s *Server) CreateDirectory(ctx context.Context, req *mpb.CreateDirectoryRequest) (*mpb.CreateDirectoryResponse, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if req.Key == "" {
+		return nil, errors.New("Empty directory path")
+	}
+
+	metadata, err := s.getMetadataFile(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if val, ok := metadata.Entries[req.Key]; ok {
+		metadata.Entries[req.Key] = mpb.FileMetadata{
+			Created:           val.Created,
+			LastModified:      &mpb.FileMetadata_UnixTimestamp{Seconds: time.Now().Unix()},
+			Permissions:       val.Permissions,
+			Size:              0,
+			IsDirectory:       true,
+			ParentDirectoryId: req.DirectoryId,
+		}
+	} else {
+		// TODO(irfansharif): The PutFile RPC should accept associated metadata
+		// as well.
+		ts := time.Now().Unix()
+		metadata.Entries[req.Key] = mpb.FileMetadata{
+			Created:           &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
+			LastModified:      &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
+			Permissions:       0644,
+			Size:              0,
+			IsDirectory:       true,
+			ParentDirectoryId: req.DirectoryId,
+		}
+	}
+
+	if err := s.setMetadataFile(ctx, metadata); err != nil {
+		return nil, err
+	}
+
+	return &mpb.CreateDirectoryResponse{}, nil
+}
+
 func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*mpb.DeleteFileResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -113,6 +157,34 @@ func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*m
 	}
 
 	return &mpb.DeleteFileResponse{}, nil
+}
+
+func (s *Server) DeleteDirectory(ctx context.Context, req *mpb.DeleteDirectoryRequest) (*mpb.DeleteDirectoryResponse, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	metadata, err := s.getMetadataFile(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for k := range metadata.Entries {
+		if !metadata.Entries[k].IsDirectory && metadata.Entries[k].ParentDirectoryId == req.DirectoryId {
+			delete(metadata.Entries, k)
+		}
+	}
+
+	if _, err := s.storageClient.DeleteFile(ctx, &spb.DeleteFileRequest{Key: req.Key}); err != nil {
+		return nil, err
+	}
+
+	delete(metadata.Entries, req.Key)
+
+	if err := s.setMetadataFile(ctx, metadata); err != nil {
+		return nil, err
+	}
+
+	return &mpb.DeleteDirectoryResponse{}, nil
 }
 
 func (s *Server) GetMetadata(ctx context.Context, req *mpb.GetMetadataRequest) (*mpb.GetMetadataResponse, error) {
