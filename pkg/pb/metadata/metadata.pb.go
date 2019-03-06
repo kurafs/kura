@@ -25,69 +25,77 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 // TODO (Franz): This should be encrypted; move this to the encryption
 // server when its implemented
-type FileMetadata struct {
-	Created              *FileMetadata_UnixTimestamp `protobuf:"bytes,1,opt,name=created,proto3" json:"created,omitempty"`
-	LastModified         *FileMetadata_UnixTimestamp `protobuf:"bytes,2,opt,name=last_modified,json=lastModified,proto3" json:"last_modified,omitempty"`
-	Permissions          uint32                      `protobuf:"varint,3,opt,name=permissions,proto3" json:"permissions,omitempty"`
-	Size                 int64                       `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                    `json:"-"`
-	XXX_unrecognized     []byte                      `json:"-"`
-	XXX_sizecache        int32                       `json:"-"`
+type Metadata struct {
+	Created              *Metadata_UnixTimestamp `protobuf:"bytes,1,opt,name=created,proto3" json:"created,omitempty"`
+	LastModified         *Metadata_UnixTimestamp `protobuf:"bytes,2,opt,name=last_modified,json=lastModified,proto3" json:"last_modified,omitempty"`
+	Permissions          uint32                  `protobuf:"varint,3,opt,name=permissions,proto3" json:"permissions,omitempty"`
+	Size                 int64                   `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
+	IsDirectory          bool                    `protobuf:"varint,5,opt,name=is_directory,json=isDirectory,proto3" json:"is_directory,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
+	XXX_unrecognized     []byte                  `json:"-"`
+	XXX_sizecache        int32                   `json:"-"`
 }
 
-func (m *FileMetadata) Reset()         { *m = FileMetadata{} }
-func (m *FileMetadata) String() string { return proto.CompactTextString(m) }
-func (*FileMetadata) ProtoMessage()    {}
-func (*FileMetadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{0}
+func (m *Metadata) Reset()         { *m = Metadata{} }
+func (m *Metadata) String() string { return proto.CompactTextString(m) }
+func (*Metadata) ProtoMessage()    {}
+func (*Metadata) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{0}
 }
-func (m *FileMetadata) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FileMetadata.Unmarshal(m, b)
+func (m *Metadata) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Metadata.Unmarshal(m, b)
 }
-func (m *FileMetadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FileMetadata.Marshal(b, m, deterministic)
+func (m *Metadata) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Metadata.Marshal(b, m, deterministic)
 }
-func (dst *FileMetadata) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FileMetadata.Merge(dst, src)
+func (dst *Metadata) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Metadata.Merge(dst, src)
 }
-func (m *FileMetadata) XXX_Size() int {
-	return xxx_messageInfo_FileMetadata.Size(m)
+func (m *Metadata) XXX_Size() int {
+	return xxx_messageInfo_Metadata.Size(m)
 }
-func (m *FileMetadata) XXX_DiscardUnknown() {
-	xxx_messageInfo_FileMetadata.DiscardUnknown(m)
+func (m *Metadata) XXX_DiscardUnknown() {
+	xxx_messageInfo_Metadata.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_FileMetadata proto.InternalMessageInfo
+var xxx_messageInfo_Metadata proto.InternalMessageInfo
 
-func (m *FileMetadata) GetCreated() *FileMetadata_UnixTimestamp {
+func (m *Metadata) GetCreated() *Metadata_UnixTimestamp {
 	if m != nil {
 		return m.Created
 	}
 	return nil
 }
 
-func (m *FileMetadata) GetLastModified() *FileMetadata_UnixTimestamp {
+func (m *Metadata) GetLastModified() *Metadata_UnixTimestamp {
 	if m != nil {
 		return m.LastModified
 	}
 	return nil
 }
 
-func (m *FileMetadata) GetPermissions() uint32 {
+func (m *Metadata) GetPermissions() uint32 {
 	if m != nil {
 		return m.Permissions
 	}
 	return 0
 }
 
-func (m *FileMetadata) GetSize() int64 {
+func (m *Metadata) GetSize() int64 {
 	if m != nil {
 		return m.Size
 	}
 	return 0
 }
 
-type FileMetadata_UnixTimestamp struct {
+func (m *Metadata) GetIsDirectory() bool {
+	if m != nil {
+		return m.IsDirectory
+	}
+	return false
+}
+
+type Metadata_UnixTimestamp struct {
 	Seconds              int64    `protobuf:"varint,1,opt,name=seconds,proto3" json:"seconds,omitempty"`
 	Nanoseconds          int64    `protobuf:"varint,2,opt,name=nanoseconds,proto3" json:"nanoseconds,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -95,266 +103,46 @@ type FileMetadata_UnixTimestamp struct {
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *FileMetadata_UnixTimestamp) Reset()         { *m = FileMetadata_UnixTimestamp{} }
-func (m *FileMetadata_UnixTimestamp) String() string { return proto.CompactTextString(m) }
-func (*FileMetadata_UnixTimestamp) ProtoMessage()    {}
-func (*FileMetadata_UnixTimestamp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{0, 0}
+func (m *Metadata_UnixTimestamp) Reset()         { *m = Metadata_UnixTimestamp{} }
+func (m *Metadata_UnixTimestamp) String() string { return proto.CompactTextString(m) }
+func (*Metadata_UnixTimestamp) ProtoMessage()    {}
+func (*Metadata_UnixTimestamp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{0, 0}
 }
-func (m *FileMetadata_UnixTimestamp) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FileMetadata_UnixTimestamp.Unmarshal(m, b)
+func (m *Metadata_UnixTimestamp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Metadata_UnixTimestamp.Unmarshal(m, b)
 }
-func (m *FileMetadata_UnixTimestamp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FileMetadata_UnixTimestamp.Marshal(b, m, deterministic)
+func (m *Metadata_UnixTimestamp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Metadata_UnixTimestamp.Marshal(b, m, deterministic)
 }
-func (dst *FileMetadata_UnixTimestamp) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FileMetadata_UnixTimestamp.Merge(dst, src)
+func (dst *Metadata_UnixTimestamp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Metadata_UnixTimestamp.Merge(dst, src)
 }
-func (m *FileMetadata_UnixTimestamp) XXX_Size() int {
-	return xxx_messageInfo_FileMetadata_UnixTimestamp.Size(m)
+func (m *Metadata_UnixTimestamp) XXX_Size() int {
+	return xxx_messageInfo_Metadata_UnixTimestamp.Size(m)
 }
-func (m *FileMetadata_UnixTimestamp) XXX_DiscardUnknown() {
-	xxx_messageInfo_FileMetadata_UnixTimestamp.DiscardUnknown(m)
+func (m *Metadata_UnixTimestamp) XXX_DiscardUnknown() {
+	xxx_messageInfo_Metadata_UnixTimestamp.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_FileMetadata_UnixTimestamp proto.InternalMessageInfo
+var xxx_messageInfo_Metadata_UnixTimestamp proto.InternalMessageInfo
 
-func (m *FileMetadata_UnixTimestamp) GetSeconds() int64 {
+func (m *Metadata_UnixTimestamp) GetSeconds() int64 {
 	if m != nil {
 		return m.Seconds
 	}
 	return 0
 }
 
-func (m *FileMetadata_UnixTimestamp) GetNanoseconds() int64 {
+func (m *Metadata_UnixTimestamp) GetNanoseconds() int64 {
 	if m != nil {
 		return m.Nanoseconds
 	}
 	return 0
 }
 
-type GetDirectoryKeysRequest struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *GetDirectoryKeysRequest) Reset()         { *m = GetDirectoryKeysRequest{} }
-func (m *GetDirectoryKeysRequest) String() string { return proto.CompactTextString(m) }
-func (*GetDirectoryKeysRequest) ProtoMessage()    {}
-func (*GetDirectoryKeysRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{1}
-}
-func (m *GetDirectoryKeysRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetDirectoryKeysRequest.Unmarshal(m, b)
-}
-func (m *GetDirectoryKeysRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetDirectoryKeysRequest.Marshal(b, m, deterministic)
-}
-func (dst *GetDirectoryKeysRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetDirectoryKeysRequest.Merge(dst, src)
-}
-func (m *GetDirectoryKeysRequest) XXX_Size() int {
-	return xxx_messageInfo_GetDirectoryKeysRequest.Size(m)
-}
-func (m *GetDirectoryKeysRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetDirectoryKeysRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetDirectoryKeysRequest proto.InternalMessageInfo
-
-type GetDirectoryKeysResponse struct {
-	Keys                 []string `protobuf:"bytes,1,rep,name=keys,proto3" json:"keys,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *GetDirectoryKeysResponse) Reset()         { *m = GetDirectoryKeysResponse{} }
-func (m *GetDirectoryKeysResponse) String() string { return proto.CompactTextString(m) }
-func (*GetDirectoryKeysResponse) ProtoMessage()    {}
-func (*GetDirectoryKeysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{2}
-}
-func (m *GetDirectoryKeysResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetDirectoryKeysResponse.Unmarshal(m, b)
-}
-func (m *GetDirectoryKeysResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetDirectoryKeysResponse.Marshal(b, m, deterministic)
-}
-func (dst *GetDirectoryKeysResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetDirectoryKeysResponse.Merge(dst, src)
-}
-func (m *GetDirectoryKeysResponse) XXX_Size() int {
-	return xxx_messageInfo_GetDirectoryKeysResponse.Size(m)
-}
-func (m *GetDirectoryKeysResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetDirectoryKeysResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetDirectoryKeysResponse proto.InternalMessageInfo
-
-func (m *GetDirectoryKeysResponse) GetKeys() []string {
-	if m != nil {
-		return m.Keys
-	}
-	return nil
-}
-
-type GetMetadataRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *GetMetadataRequest) Reset()         { *m = GetMetadataRequest{} }
-func (m *GetMetadataRequest) String() string { return proto.CompactTextString(m) }
-func (*GetMetadataRequest) ProtoMessage()    {}
-func (*GetMetadataRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{3}
-}
-func (m *GetMetadataRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetMetadataRequest.Unmarshal(m, b)
-}
-func (m *GetMetadataRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetMetadataRequest.Marshal(b, m, deterministic)
-}
-func (dst *GetMetadataRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetMetadataRequest.Merge(dst, src)
-}
-func (m *GetMetadataRequest) XXX_Size() int {
-	return xxx_messageInfo_GetMetadataRequest.Size(m)
-}
-func (m *GetMetadataRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetMetadataRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetMetadataRequest proto.InternalMessageInfo
-
-func (m *GetMetadataRequest) GetKey() string {
-	if m != nil {
-		return m.Key
-	}
-	return ""
-}
-
-type GetMetadataResponse struct {
-	Metadata             *FileMetadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
-}
-
-func (m *GetMetadataResponse) Reset()         { *m = GetMetadataResponse{} }
-func (m *GetMetadataResponse) String() string { return proto.CompactTextString(m) }
-func (*GetMetadataResponse) ProtoMessage()    {}
-func (*GetMetadataResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{4}
-}
-func (m *GetMetadataResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_GetMetadataResponse.Unmarshal(m, b)
-}
-func (m *GetMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_GetMetadataResponse.Marshal(b, m, deterministic)
-}
-func (dst *GetMetadataResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_GetMetadataResponse.Merge(dst, src)
-}
-func (m *GetMetadataResponse) XXX_Size() int {
-	return xxx_messageInfo_GetMetadataResponse.Size(m)
-}
-func (m *GetMetadataResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_GetMetadataResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_GetMetadataResponse proto.InternalMessageInfo
-
-func (m *GetMetadataResponse) GetMetadata() *FileMetadata {
-	if m != nil {
-		return m.Metadata
-	}
-	return nil
-}
-
-type SetMetadataRequest struct {
-	Key                  string        `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	Metadata             *FileMetadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
-}
-
-func (m *SetMetadataRequest) Reset()         { *m = SetMetadataRequest{} }
-func (m *SetMetadataRequest) String() string { return proto.CompactTextString(m) }
-func (*SetMetadataRequest) ProtoMessage()    {}
-func (*SetMetadataRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{5}
-}
-func (m *SetMetadataRequest) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SetMetadataRequest.Unmarshal(m, b)
-}
-func (m *SetMetadataRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SetMetadataRequest.Marshal(b, m, deterministic)
-}
-func (dst *SetMetadataRequest) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SetMetadataRequest.Merge(dst, src)
-}
-func (m *SetMetadataRequest) XXX_Size() int {
-	return xxx_messageInfo_SetMetadataRequest.Size(m)
-}
-func (m *SetMetadataRequest) XXX_DiscardUnknown() {
-	xxx_messageInfo_SetMetadataRequest.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SetMetadataRequest proto.InternalMessageInfo
-
-func (m *SetMetadataRequest) GetKey() string {
-	if m != nil {
-		return m.Key
-	}
-	return ""
-}
-
-func (m *SetMetadataRequest) GetMetadata() *FileMetadata {
-	if m != nil {
-		return m.Metadata
-	}
-	return nil
-}
-
-type SetMetadataResponse struct {
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *SetMetadataResponse) Reset()         { *m = SetMetadataResponse{} }
-func (m *SetMetadataResponse) String() string { return proto.CompactTextString(m) }
-func (*SetMetadataResponse) ProtoMessage()    {}
-func (*SetMetadataResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{6}
-}
-func (m *SetMetadataResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SetMetadataResponse.Unmarshal(m, b)
-}
-func (m *SetMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SetMetadataResponse.Marshal(b, m, deterministic)
-}
-func (dst *SetMetadataResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SetMetadataResponse.Merge(dst, src)
-}
-func (m *SetMetadataResponse) XXX_Size() int {
-	return xxx_messageInfo_SetMetadataResponse.Size(m)
-}
-func (m *SetMetadataResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_SetMetadataResponse.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_SetMetadataResponse proto.InternalMessageInfo
-
 type GetFileRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -364,7 +152,7 @@ func (m *GetFileRequest) Reset()         { *m = GetFileRequest{} }
 func (m *GetFileRequest) String() string { return proto.CompactTextString(m) }
 func (*GetFileRequest) ProtoMessage()    {}
 func (*GetFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{7}
+	return fileDescriptor_metadata_42681d185838b055, []int{1}
 }
 func (m *GetFileRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetFileRequest.Unmarshal(m, b)
@@ -384,26 +172,26 @@ func (m *GetFileRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GetFileRequest proto.InternalMessageInfo
 
-func (m *GetFileRequest) GetKey() string {
+func (m *GetFileRequest) GetPath() string {
 	if m != nil {
-		return m.Key
+		return m.Path
 	}
 	return ""
 }
 
 type GetFileResponse struct {
-	File                 []byte        `protobuf:"bytes,1,opt,name=file,proto3" json:"file,omitempty"`
-	Metadata             *FileMetadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	File                 []byte    `protobuf:"bytes,1,opt,name=file,proto3" json:"file,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
 func (m *GetFileResponse) Reset()         { *m = GetFileResponse{} }
 func (m *GetFileResponse) String() string { return proto.CompactTextString(m) }
 func (*GetFileResponse) ProtoMessage()    {}
 func (*GetFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{8}
+	return fileDescriptor_metadata_42681d185838b055, []int{2}
 }
 func (m *GetFileResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetFileResponse.Unmarshal(m, b)
@@ -430,7 +218,7 @@ func (m *GetFileResponse) GetFile() []byte {
 	return nil
 }
 
-func (m *GetFileResponse) GetMetadata() *FileMetadata {
+func (m *GetFileResponse) GetMetadata() *Metadata {
 	if m != nil {
 		return m.Metadata
 	}
@@ -438,19 +226,19 @@ func (m *GetFileResponse) GetMetadata() *FileMetadata {
 }
 
 type PutFileRequest struct {
-	Key                  string        `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
-	File                 []byte        `protobuf:"bytes,2,opt,name=file,proto3" json:"file,omitempty"`
-	Metadata             *FileMetadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	Path                 string    `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	File                 []byte    `protobuf:"bytes,2,opt,name=file,proto3" json:"file,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
 func (m *PutFileRequest) Reset()         { *m = PutFileRequest{} }
 func (m *PutFileRequest) String() string { return proto.CompactTextString(m) }
 func (*PutFileRequest) ProtoMessage()    {}
 func (*PutFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{9}
+	return fileDescriptor_metadata_42681d185838b055, []int{3}
 }
 func (m *PutFileRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutFileRequest.Unmarshal(m, b)
@@ -470,9 +258,9 @@ func (m *PutFileRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PutFileRequest proto.InternalMessageInfo
 
-func (m *PutFileRequest) GetKey() string {
+func (m *PutFileRequest) GetPath() string {
 	if m != nil {
-		return m.Key
+		return m.Path
 	}
 	return ""
 }
@@ -484,7 +272,7 @@ func (m *PutFileRequest) GetFile() []byte {
 	return nil
 }
 
-func (m *PutFileRequest) GetMetadata() *FileMetadata {
+func (m *PutFileRequest) GetMetadata() *Metadata {
 	if m != nil {
 		return m.Metadata
 	}
@@ -501,7 +289,7 @@ func (m *PutFileResponse) Reset()         { *m = PutFileResponse{} }
 func (m *PutFileResponse) String() string { return proto.CompactTextString(m) }
 func (*PutFileResponse) ProtoMessage()    {}
 func (*PutFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{10}
+	return fileDescriptor_metadata_42681d185838b055, []int{4}
 }
 func (m *PutFileResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutFileResponse.Unmarshal(m, b)
@@ -522,7 +310,7 @@ func (m *PutFileResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_PutFileResponse proto.InternalMessageInfo
 
 type DeleteFileRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -532,7 +320,7 @@ func (m *DeleteFileRequest) Reset()         { *m = DeleteFileRequest{} }
 func (m *DeleteFileRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteFileRequest) ProtoMessage()    {}
 func (*DeleteFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{11}
+	return fileDescriptor_metadata_42681d185838b055, []int{5}
 }
 func (m *DeleteFileRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteFileRequest.Unmarshal(m, b)
@@ -552,9 +340,9 @@ func (m *DeleteFileRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeleteFileRequest proto.InternalMessageInfo
 
-func (m *DeleteFileRequest) GetKey() string {
+func (m *DeleteFileRequest) GetPath() string {
 	if m != nil {
-		return m.Key
+		return m.Path
 	}
 	return ""
 }
@@ -569,7 +357,7 @@ func (m *DeleteFileResponse) Reset()         { *m = DeleteFileResponse{} }
 func (m *DeleteFileResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteFileResponse) ProtoMessage()    {}
 func (*DeleteFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_87c2940c9e2f72d2, []int{12}
+	return fileDescriptor_metadata_42681d185838b055, []int{6}
 }
 func (m *DeleteFileResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteFileResponse.Unmarshal(m, b)
@@ -589,21 +377,448 @@ func (m *DeleteFileResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DeleteFileResponse proto.InternalMessageInfo
 
+type GetDirectoryEntriesRequest struct {
+	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetDirectoryEntriesRequest) Reset()         { *m = GetDirectoryEntriesRequest{} }
+func (m *GetDirectoryEntriesRequest) String() string { return proto.CompactTextString(m) }
+func (*GetDirectoryEntriesRequest) ProtoMessage()    {}
+func (*GetDirectoryEntriesRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{7}
+}
+func (m *GetDirectoryEntriesRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetDirectoryEntriesRequest.Unmarshal(m, b)
+}
+func (m *GetDirectoryEntriesRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetDirectoryEntriesRequest.Marshal(b, m, deterministic)
+}
+func (dst *GetDirectoryEntriesRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDirectoryEntriesRequest.Merge(dst, src)
+}
+func (m *GetDirectoryEntriesRequest) XXX_Size() int {
+	return xxx_messageInfo_GetDirectoryEntriesRequest.Size(m)
+}
+func (m *GetDirectoryEntriesRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDirectoryEntriesRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetDirectoryEntriesRequest proto.InternalMessageInfo
+
+func (m *GetDirectoryEntriesRequest) GetPath() string {
+	if m != nil {
+		return m.Path
+	}
+	return ""
+}
+
+type GetDirectoryEntriesResponse struct {
+	Entries              []*GetDirectoryEntriesResponse_DirectoryEntry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}                                      `json:"-"`
+	XXX_unrecognized     []byte                                        `json:"-"`
+	XXX_sizecache        int32                                         `json:"-"`
+}
+
+func (m *GetDirectoryEntriesResponse) Reset()         { *m = GetDirectoryEntriesResponse{} }
+func (m *GetDirectoryEntriesResponse) String() string { return proto.CompactTextString(m) }
+func (*GetDirectoryEntriesResponse) ProtoMessage()    {}
+func (*GetDirectoryEntriesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{8}
+}
+func (m *GetDirectoryEntriesResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetDirectoryEntriesResponse.Unmarshal(m, b)
+}
+func (m *GetDirectoryEntriesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetDirectoryEntriesResponse.Marshal(b, m, deterministic)
+}
+func (dst *GetDirectoryEntriesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDirectoryEntriesResponse.Merge(dst, src)
+}
+func (m *GetDirectoryEntriesResponse) XXX_Size() int {
+	return xxx_messageInfo_GetDirectoryEntriesResponse.Size(m)
+}
+func (m *GetDirectoryEntriesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDirectoryEntriesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetDirectoryEntriesResponse proto.InternalMessageInfo
+
+func (m *GetDirectoryEntriesResponse) GetEntries() []*GetDirectoryEntriesResponse_DirectoryEntry {
+	if m != nil {
+		return m.Entries
+	}
+	return nil
+}
+
+type GetDirectoryEntriesResponse_DirectoryEntry struct {
+	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	IsDirectory          bool     `protobuf:"varint,2,opt,name=is_directory,json=isDirectory,proto3" json:"is_directory,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetDirectoryEntriesResponse_DirectoryEntry) Reset() {
+	*m = GetDirectoryEntriesResponse_DirectoryEntry{}
+}
+func (m *GetDirectoryEntriesResponse_DirectoryEntry) String() string {
+	return proto.CompactTextString(m)
+}
+func (*GetDirectoryEntriesResponse_DirectoryEntry) ProtoMessage() {}
+func (*GetDirectoryEntriesResponse_DirectoryEntry) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{8, 0}
+}
+func (m *GetDirectoryEntriesResponse_DirectoryEntry) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetDirectoryEntriesResponse_DirectoryEntry.Unmarshal(m, b)
+}
+func (m *GetDirectoryEntriesResponse_DirectoryEntry) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetDirectoryEntriesResponse_DirectoryEntry.Marshal(b, m, deterministic)
+}
+func (dst *GetDirectoryEntriesResponse_DirectoryEntry) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetDirectoryEntriesResponse_DirectoryEntry.Merge(dst, src)
+}
+func (m *GetDirectoryEntriesResponse_DirectoryEntry) XXX_Size() int {
+	return xxx_messageInfo_GetDirectoryEntriesResponse_DirectoryEntry.Size(m)
+}
+func (m *GetDirectoryEntriesResponse_DirectoryEntry) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetDirectoryEntriesResponse_DirectoryEntry.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetDirectoryEntriesResponse_DirectoryEntry proto.InternalMessageInfo
+
+func (m *GetDirectoryEntriesResponse_DirectoryEntry) GetPath() string {
+	if m != nil {
+		return m.Path
+	}
+	return ""
+}
+
+func (m *GetDirectoryEntriesResponse_DirectoryEntry) GetIsDirectory() bool {
+	if m != nil {
+		return m.IsDirectory
+	}
+	return false
+}
+
+type CreateDirectoryRequest struct {
+	Path                 string    `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *CreateDirectoryRequest) Reset()         { *m = CreateDirectoryRequest{} }
+func (m *CreateDirectoryRequest) String() string { return proto.CompactTextString(m) }
+func (*CreateDirectoryRequest) ProtoMessage()    {}
+func (*CreateDirectoryRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{9}
+}
+func (m *CreateDirectoryRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateDirectoryRequest.Unmarshal(m, b)
+}
+func (m *CreateDirectoryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateDirectoryRequest.Marshal(b, m, deterministic)
+}
+func (dst *CreateDirectoryRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateDirectoryRequest.Merge(dst, src)
+}
+func (m *CreateDirectoryRequest) XXX_Size() int {
+	return xxx_messageInfo_CreateDirectoryRequest.Size(m)
+}
+func (m *CreateDirectoryRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateDirectoryRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateDirectoryRequest proto.InternalMessageInfo
+
+func (m *CreateDirectoryRequest) GetPath() string {
+	if m != nil {
+		return m.Path
+	}
+	return ""
+}
+
+func (m *CreateDirectoryRequest) GetMetadata() *Metadata {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+type CreateDirectoryResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *CreateDirectoryResponse) Reset()         { *m = CreateDirectoryResponse{} }
+func (m *CreateDirectoryResponse) String() string { return proto.CompactTextString(m) }
+func (*CreateDirectoryResponse) ProtoMessage()    {}
+func (*CreateDirectoryResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{10}
+}
+func (m *CreateDirectoryResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_CreateDirectoryResponse.Unmarshal(m, b)
+}
+func (m *CreateDirectoryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_CreateDirectoryResponse.Marshal(b, m, deterministic)
+}
+func (dst *CreateDirectoryResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_CreateDirectoryResponse.Merge(dst, src)
+}
+func (m *CreateDirectoryResponse) XXX_Size() int {
+	return xxx_messageInfo_CreateDirectoryResponse.Size(m)
+}
+func (m *CreateDirectoryResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_CreateDirectoryResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_CreateDirectoryResponse proto.InternalMessageInfo
+
+type DeleteDirectoryRequest struct {
+	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteDirectoryRequest) Reset()         { *m = DeleteDirectoryRequest{} }
+func (m *DeleteDirectoryRequest) String() string { return proto.CompactTextString(m) }
+func (*DeleteDirectoryRequest) ProtoMessage()    {}
+func (*DeleteDirectoryRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{11}
+}
+func (m *DeleteDirectoryRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteDirectoryRequest.Unmarshal(m, b)
+}
+func (m *DeleteDirectoryRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteDirectoryRequest.Marshal(b, m, deterministic)
+}
+func (dst *DeleteDirectoryRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteDirectoryRequest.Merge(dst, src)
+}
+func (m *DeleteDirectoryRequest) XXX_Size() int {
+	return xxx_messageInfo_DeleteDirectoryRequest.Size(m)
+}
+func (m *DeleteDirectoryRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteDirectoryRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteDirectoryRequest proto.InternalMessageInfo
+
+func (m *DeleteDirectoryRequest) GetPath() string {
+	if m != nil {
+		return m.Path
+	}
+	return ""
+}
+
+type DeleteDirectoryResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeleteDirectoryResponse) Reset()         { *m = DeleteDirectoryResponse{} }
+func (m *DeleteDirectoryResponse) String() string { return proto.CompactTextString(m) }
+func (*DeleteDirectoryResponse) ProtoMessage()    {}
+func (*DeleteDirectoryResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{12}
+}
+func (m *DeleteDirectoryResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeleteDirectoryResponse.Unmarshal(m, b)
+}
+func (m *DeleteDirectoryResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeleteDirectoryResponse.Marshal(b, m, deterministic)
+}
+func (dst *DeleteDirectoryResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeleteDirectoryResponse.Merge(dst, src)
+}
+func (m *DeleteDirectoryResponse) XXX_Size() int {
+	return xxx_messageInfo_DeleteDirectoryResponse.Size(m)
+}
+func (m *DeleteDirectoryResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeleteDirectoryResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeleteDirectoryResponse proto.InternalMessageInfo
+
+type GetMetadataRequest struct {
+	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetMetadataRequest) Reset()         { *m = GetMetadataRequest{} }
+func (m *GetMetadataRequest) String() string { return proto.CompactTextString(m) }
+func (*GetMetadataRequest) ProtoMessage()    {}
+func (*GetMetadataRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{13}
+}
+func (m *GetMetadataRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetMetadataRequest.Unmarshal(m, b)
+}
+func (m *GetMetadataRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetMetadataRequest.Marshal(b, m, deterministic)
+}
+func (dst *GetMetadataRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetMetadataRequest.Merge(dst, src)
+}
+func (m *GetMetadataRequest) XXX_Size() int {
+	return xxx_messageInfo_GetMetadataRequest.Size(m)
+}
+func (m *GetMetadataRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetMetadataRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetMetadataRequest proto.InternalMessageInfo
+
+func (m *GetMetadataRequest) GetPath() string {
+	if m != nil {
+		return m.Path
+	}
+	return ""
+}
+
+type GetMetadataResponse struct {
+	Metadata             *Metadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *GetMetadataResponse) Reset()         { *m = GetMetadataResponse{} }
+func (m *GetMetadataResponse) String() string { return proto.CompactTextString(m) }
+func (*GetMetadataResponse) ProtoMessage()    {}
+func (*GetMetadataResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{14}
+}
+func (m *GetMetadataResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetMetadataResponse.Unmarshal(m, b)
+}
+func (m *GetMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetMetadataResponse.Marshal(b, m, deterministic)
+}
+func (dst *GetMetadataResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetMetadataResponse.Merge(dst, src)
+}
+func (m *GetMetadataResponse) XXX_Size() int {
+	return xxx_messageInfo_GetMetadataResponse.Size(m)
+}
+func (m *GetMetadataResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetMetadataResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetMetadataResponse proto.InternalMessageInfo
+
+func (m *GetMetadataResponse) GetMetadata() *Metadata {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+type SetMetadataRequest struct {
+	Path                 string    `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *SetMetadataRequest) Reset()         { *m = SetMetadataRequest{} }
+func (m *SetMetadataRequest) String() string { return proto.CompactTextString(m) }
+func (*SetMetadataRequest) ProtoMessage()    {}
+func (*SetMetadataRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{15}
+}
+func (m *SetMetadataRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SetMetadataRequest.Unmarshal(m, b)
+}
+func (m *SetMetadataRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SetMetadataRequest.Marshal(b, m, deterministic)
+}
+func (dst *SetMetadataRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SetMetadataRequest.Merge(dst, src)
+}
+func (m *SetMetadataRequest) XXX_Size() int {
+	return xxx_messageInfo_SetMetadataRequest.Size(m)
+}
+func (m *SetMetadataRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_SetMetadataRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SetMetadataRequest proto.InternalMessageInfo
+
+func (m *SetMetadataRequest) GetPath() string {
+	if m != nil {
+		return m.Path
+	}
+	return ""
+}
+
+func (m *SetMetadataRequest) GetMetadata() *Metadata {
+	if m != nil {
+		return m.Metadata
+	}
+	return nil
+}
+
+type SetMetadataResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *SetMetadataResponse) Reset()         { *m = SetMetadataResponse{} }
+func (m *SetMetadataResponse) String() string { return proto.CompactTextString(m) }
+func (*SetMetadataResponse) ProtoMessage()    {}
+func (*SetMetadataResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_metadata_42681d185838b055, []int{16}
+}
+func (m *SetMetadataResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SetMetadataResponse.Unmarshal(m, b)
+}
+func (m *SetMetadataResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SetMetadataResponse.Marshal(b, m, deterministic)
+}
+func (dst *SetMetadataResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SetMetadataResponse.Merge(dst, src)
+}
+func (m *SetMetadataResponse) XXX_Size() int {
+	return xxx_messageInfo_SetMetadataResponse.Size(m)
+}
+func (m *SetMetadataResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_SetMetadataResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_SetMetadataResponse proto.InternalMessageInfo
+
 func init() {
-	proto.RegisterType((*FileMetadata)(nil), "metadata.FileMetadata")
-	proto.RegisterType((*FileMetadata_UnixTimestamp)(nil), "metadata.FileMetadata.UnixTimestamp")
-	proto.RegisterType((*GetDirectoryKeysRequest)(nil), "metadata.GetDirectoryKeysRequest")
-	proto.RegisterType((*GetDirectoryKeysResponse)(nil), "metadata.GetDirectoryKeysResponse")
-	proto.RegisterType((*GetMetadataRequest)(nil), "metadata.GetMetadataRequest")
-	proto.RegisterType((*GetMetadataResponse)(nil), "metadata.GetMetadataResponse")
-	proto.RegisterType((*SetMetadataRequest)(nil), "metadata.SetMetadataRequest")
-	proto.RegisterType((*SetMetadataResponse)(nil), "metadata.SetMetadataResponse")
+	proto.RegisterType((*Metadata)(nil), "metadata.Metadata")
+	proto.RegisterType((*Metadata_UnixTimestamp)(nil), "metadata.Metadata.UnixTimestamp")
 	proto.RegisterType((*GetFileRequest)(nil), "metadata.GetFileRequest")
 	proto.RegisterType((*GetFileResponse)(nil), "metadata.GetFileResponse")
 	proto.RegisterType((*PutFileRequest)(nil), "metadata.PutFileRequest")
 	proto.RegisterType((*PutFileResponse)(nil), "metadata.PutFileResponse")
 	proto.RegisterType((*DeleteFileRequest)(nil), "metadata.DeleteFileRequest")
 	proto.RegisterType((*DeleteFileResponse)(nil), "metadata.DeleteFileResponse")
+	proto.RegisterType((*GetDirectoryEntriesRequest)(nil), "metadata.GetDirectoryEntriesRequest")
+	proto.RegisterType((*GetDirectoryEntriesResponse)(nil), "metadata.GetDirectoryEntriesResponse")
+	proto.RegisterType((*GetDirectoryEntriesResponse_DirectoryEntry)(nil), "metadata.GetDirectoryEntriesResponse.DirectoryEntry")
+	proto.RegisterType((*CreateDirectoryRequest)(nil), "metadata.CreateDirectoryRequest")
+	proto.RegisterType((*CreateDirectoryResponse)(nil), "metadata.CreateDirectoryResponse")
+	proto.RegisterType((*DeleteDirectoryRequest)(nil), "metadata.DeleteDirectoryRequest")
+	proto.RegisterType((*DeleteDirectoryResponse)(nil), "metadata.DeleteDirectoryResponse")
+	proto.RegisterType((*GetMetadataRequest)(nil), "metadata.GetMetadataRequest")
+	proto.RegisterType((*GetMetadataResponse)(nil), "metadata.GetMetadataResponse")
+	proto.RegisterType((*SetMetadataRequest)(nil), "metadata.SetMetadataRequest")
+	proto.RegisterType((*SetMetadataResponse)(nil), "metadata.SetMetadataResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -621,9 +836,11 @@ type MetadataServiceClient interface {
 	GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (*GetFileResponse, error)
 	PutFile(ctx context.Context, in *PutFileRequest, opts ...grpc.CallOption) (*PutFileResponse, error)
 	DeleteFile(ctx context.Context, in *DeleteFileRequest, opts ...grpc.CallOption) (*DeleteFileResponse, error)
+	CreateDirectory(ctx context.Context, in *CreateDirectoryRequest, opts ...grpc.CallOption) (*CreateDirectoryResponse, error)
+	DeleteDirectory(ctx context.Context, in *DeleteDirectoryRequest, opts ...grpc.CallOption) (*DeleteDirectoryResponse, error)
+	GetDirectoryEntries(ctx context.Context, in *GetDirectoryEntriesRequest, opts ...grpc.CallOption) (*GetDirectoryEntriesResponse, error)
 	GetMetadata(ctx context.Context, in *GetMetadataRequest, opts ...grpc.CallOption) (*GetMetadataResponse, error)
 	SetMetadata(ctx context.Context, in *SetMetadataRequest, opts ...grpc.CallOption) (*SetMetadataResponse, error)
-	GetDirectoryKeys(ctx context.Context, in *GetDirectoryKeysRequest, opts ...grpc.CallOption) (*GetDirectoryKeysResponse, error)
 }
 
 type metadataServiceClient struct {
@@ -661,6 +878,33 @@ func (c *metadataServiceClient) DeleteFile(ctx context.Context, in *DeleteFileRe
 	return out, nil
 }
 
+func (c *metadataServiceClient) CreateDirectory(ctx context.Context, in *CreateDirectoryRequest, opts ...grpc.CallOption) (*CreateDirectoryResponse, error) {
+	out := new(CreateDirectoryResponse)
+	err := c.cc.Invoke(ctx, "/metadata.MetadataService/CreateDirectory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *metadataServiceClient) DeleteDirectory(ctx context.Context, in *DeleteDirectoryRequest, opts ...grpc.CallOption) (*DeleteDirectoryResponse, error) {
+	out := new(DeleteDirectoryResponse)
+	err := c.cc.Invoke(ctx, "/metadata.MetadataService/DeleteDirectory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *metadataServiceClient) GetDirectoryEntries(ctx context.Context, in *GetDirectoryEntriesRequest, opts ...grpc.CallOption) (*GetDirectoryEntriesResponse, error) {
+	out := new(GetDirectoryEntriesResponse)
+	err := c.cc.Invoke(ctx, "/metadata.MetadataService/GetDirectoryEntries", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *metadataServiceClient) GetMetadata(ctx context.Context, in *GetMetadataRequest, opts ...grpc.CallOption) (*GetMetadataResponse, error) {
 	out := new(GetMetadataResponse)
 	err := c.cc.Invoke(ctx, "/metadata.MetadataService/GetMetadata", in, out, opts...)
@@ -679,23 +923,16 @@ func (c *metadataServiceClient) SetMetadata(ctx context.Context, in *SetMetadata
 	return out, nil
 }
 
-func (c *metadataServiceClient) GetDirectoryKeys(ctx context.Context, in *GetDirectoryKeysRequest, opts ...grpc.CallOption) (*GetDirectoryKeysResponse, error) {
-	out := new(GetDirectoryKeysResponse)
-	err := c.cc.Invoke(ctx, "/metadata.MetadataService/GetDirectoryKeys", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // MetadataServiceServer is the server API for MetadataService service.
 type MetadataServiceServer interface {
 	GetFile(context.Context, *GetFileRequest) (*GetFileResponse, error)
 	PutFile(context.Context, *PutFileRequest) (*PutFileResponse, error)
 	DeleteFile(context.Context, *DeleteFileRequest) (*DeleteFileResponse, error)
+	CreateDirectory(context.Context, *CreateDirectoryRequest) (*CreateDirectoryResponse, error)
+	DeleteDirectory(context.Context, *DeleteDirectoryRequest) (*DeleteDirectoryResponse, error)
+	GetDirectoryEntries(context.Context, *GetDirectoryEntriesRequest) (*GetDirectoryEntriesResponse, error)
 	GetMetadata(context.Context, *GetMetadataRequest) (*GetMetadataResponse, error)
 	SetMetadata(context.Context, *SetMetadataRequest) (*SetMetadataResponse, error)
-	GetDirectoryKeys(context.Context, *GetDirectoryKeysRequest) (*GetDirectoryKeysResponse, error)
 }
 
 func RegisterMetadataServiceServer(s *grpc.Server, srv MetadataServiceServer) {
@@ -756,6 +993,60 @@ func _MetadataService_DeleteFile_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MetadataService_CreateDirectory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDirectoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetadataServiceServer).CreateDirectory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/metadata.MetadataService/CreateDirectory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetadataServiceServer).CreateDirectory(ctx, req.(*CreateDirectoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MetadataService_DeleteDirectory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteDirectoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetadataServiceServer).DeleteDirectory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/metadata.MetadataService/DeleteDirectory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetadataServiceServer).DeleteDirectory(ctx, req.(*DeleteDirectoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MetadataService_GetDirectoryEntries_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDirectoryEntriesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MetadataServiceServer).GetDirectoryEntries(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/metadata.MetadataService/GetDirectoryEntries",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MetadataServiceServer).GetDirectoryEntries(ctx, req.(*GetDirectoryEntriesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MetadataService_GetMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetMetadataRequest)
 	if err := dec(in); err != nil {
@@ -792,24 +1083,6 @@ func _MetadataService_SetMetadata_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _MetadataService_GetDirectoryKeys_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetDirectoryKeysRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MetadataServiceServer).GetDirectoryKeys(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/metadata.MetadataService/GetDirectoryKeys",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MetadataServiceServer).GetDirectoryKeys(ctx, req.(*GetDirectoryKeysRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 var _MetadataService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "metadata.MetadataService",
 	HandlerType: (*MetadataServiceServer)(nil),
@@ -827,6 +1100,18 @@ var _MetadataService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _MetadataService_DeleteFile_Handler,
 		},
 		{
+			MethodName: "CreateDirectory",
+			Handler:    _MetadataService_CreateDirectory_Handler,
+		},
+		{
+			MethodName: "DeleteDirectory",
+			Handler:    _MetadataService_DeleteDirectory_Handler,
+		},
+		{
+			MethodName: "GetDirectoryEntries",
+			Handler:    _MetadataService_GetDirectoryEntries_Handler,
+		},
+		{
 			MethodName: "GetMetadata",
 			Handler:    _MetadataService_GetMetadata_Handler,
 		},
@@ -834,47 +1119,50 @@ var _MetadataService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "SetMetadata",
 			Handler:    _MetadataService_SetMetadata_Handler,
 		},
-		{
-			MethodName: "GetDirectoryKeys",
-			Handler:    _MetadataService_GetDirectoryKeys_Handler,
-		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "metadata.proto",
 }
 
-func init() { proto.RegisterFile("metadata.proto", fileDescriptor_metadata_87c2940c9e2f72d2) }
+func init() { proto.RegisterFile("metadata.proto", fileDescriptor_metadata_42681d185838b055) }
 
-var fileDescriptor_metadata_87c2940c9e2f72d2 = []byte{
-	// 478 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x54, 0x5b, 0x6f, 0xd3, 0x30,
-	0x14, 0x56, 0x93, 0x89, 0xb2, 0xd3, 0xdb, 0x76, 0xc6, 0x25, 0x0b, 0x43, 0x2a, 0x16, 0xa0, 0x3e,
-	0xf5, 0xa1, 0xbc, 0xef, 0x69, 0xa2, 0x1a, 0xd3, 0x24, 0xe4, 0xc0, 0xc3, 0x78, 0x41, 0xa1, 0x39,
-	0x93, 0xcc, 0x9a, 0xb8, 0xc4, 0x1e, 0xa2, 0xfc, 0x16, 0xfe, 0x12, 0xff, 0x09, 0xc5, 0x75, 0x6e,
-	0x6d, 0x5a, 0x95, 0xbd, 0x39, 0x3e, 0xe7, 0xbb, 0x9c, 0xcf, 0x76, 0xa0, 0x1f, 0x93, 0x0e, 0xa3,
-	0x50, 0x87, 0xe3, 0x45, 0x2a, 0xb5, 0xc4, 0xc7, 0xf9, 0x37, 0xfb, 0xe3, 0x40, 0xf7, 0xbd, 0x98,
-	0xd3, 0xb5, 0xdd, 0xc0, 0x73, 0x68, 0xcf, 0x52, 0x0a, 0x35, 0x45, 0x5e, 0x6b, 0xd8, 0x1a, 0x75,
-	0x26, 0xaf, 0xc7, 0x05, 0xb8, 0xda, 0x38, 0xfe, 0x9c, 0x88, 0x5f, 0x9f, 0x44, 0x4c, 0x4a, 0x87,
-	0xf1, 0x82, 0xe7, 0x20, 0xbc, 0x84, 0xde, 0x3c, 0x54, 0xfa, 0x6b, 0x2c, 0x23, 0x71, 0x2b, 0x28,
-	0xf2, 0x9c, 0xff, 0x60, 0xe9, 0x66, 0xd0, 0x6b, 0x8b, 0xc4, 0x21, 0x74, 0x16, 0x94, 0xc6, 0x42,
-	0x29, 0x21, 0x13, 0xe5, 0xb9, 0xc3, 0xd6, 0xa8, 0xc7, 0xab, 0x5b, 0x88, 0x70, 0xa0, 0xc4, 0x6f,
-	0xf2, 0x0e, 0x86, 0xad, 0x91, 0xcb, 0xcd, 0xda, 0xbf, 0x82, 0x5e, 0x8d, 0x14, 0x3d, 0x68, 0x2b,
-	0x9a, 0xc9, 0x24, 0x52, 0x66, 0x22, 0x97, 0xe7, 0x9f, 0x99, 0x40, 0x12, 0x26, 0x32, 0xaf, 0x3a,
-	0xa6, 0x5a, 0xdd, 0x62, 0xa7, 0xf0, 0x7c, 0x4a, 0xfa, 0x42, 0xa4, 0x34, 0xd3, 0x32, 0x5d, 0x5e,
-	0xd1, 0x52, 0x71, 0xfa, 0x71, 0x4f, 0x4a, 0xb3, 0x31, 0x78, 0x9b, 0x25, 0xb5, 0x90, 0x89, 0xa2,
-	0xcc, 0xd7, 0x1d, 0x2d, 0x33, 0x3d, 0x77, 0x74, 0xc8, 0xcd, 0x9a, 0xbd, 0x05, 0x9c, 0x92, 0xce,
-	0x07, 0xb7, 0x2c, 0x78, 0x04, 0xee, 0x1d, 0x2d, 0x8d, 0xb1, 0x43, 0x9e, 0x2d, 0xd9, 0x25, 0x9c,
-	0xd4, 0xfa, 0x2c, 0xe5, 0x04, 0x8a, 0x43, 0xb3, 0x07, 0xf3, 0xac, 0x39, 0x52, 0x5e, 0x1e, 0xee,
-	0x17, 0xc0, 0x60, 0x0f, 0xc9, 0x1a, 0xb7, 0xb3, 0x27, 0xf7, 0x53, 0x38, 0x09, 0x36, 0x6d, 0x32,
-	0x06, 0xfd, 0x29, 0xe9, 0x0c, 0xb3, 0x7d, 0xc2, 0x1b, 0x18, 0x14, 0x3d, 0x65, 0x60, 0xb7, 0x62,
-	0x4e, 0xa6, 0xab, 0xcb, 0xcd, 0xfa, 0x41, 0xae, 0xbe, 0x43, 0xff, 0xe3, 0xfd, 0x6e, 0xf9, 0x42,
-	0xcb, 0xd9, 0xa2, 0xe5, 0xee, 0xa9, 0x75, 0x0c, 0x83, 0x42, 0xcb, 0x4e, 0xff, 0x06, 0x8e, 0x2f,
-	0x68, 0x4e, 0x9a, 0x76, 0x07, 0xf0, 0x04, 0xb0, 0xda, 0xb6, 0x02, 0x4f, 0xfe, 0xba, 0x30, 0xc8,
-	0x65, 0x02, 0x4a, 0x7f, 0x8a, 0x19, 0x65, 0xaf, 0xd1, 0x46, 0x85, 0x5e, 0x69, 0xa8, 0x9e, 0xb0,
-	0x7f, 0xda, 0x50, 0xb1, 0xb9, 0x9e, 0x43, 0xdb, 0x7a, 0xac, 0xe2, 0xeb, 0x11, 0x55, 0xf1, 0x6b,
-	0x03, 0xe1, 0x14, 0xa0, 0x74, 0x8a, 0x2f, 0xca, 0xc6, 0x8d, 0x31, 0xfd, 0xb3, 0xe6, 0xa2, 0x25,
-	0xfa, 0x00, 0x9d, 0xca, 0xad, 0xc6, 0xb3, 0x9a, 0xe5, 0xb5, 0x1b, 0xea, 0xbf, 0xdc, 0x52, 0x2d,
-	0xb9, 0x82, 0x66, 0xae, 0x60, 0x27, 0x57, 0xc3, 0x7d, 0xc5, 0x1b, 0x38, 0x5a, 0x7f, 0xc5, 0xf8,
-	0xaa, 0x26, 0xdf, 0xf4, 0xf8, 0x7d, 0xb6, 0xab, 0x65, 0x45, 0xfd, 0xed, 0x91, 0xf9, 0xd7, 0xbe,
-	0xfb, 0x17, 0x00, 0x00, 0xff, 0xff, 0x82, 0x12, 0xba, 0x3c, 0x7d, 0x05, 0x00, 0x00,
+var fileDescriptor_metadata_42681d185838b055 = []byte{
+	// 590 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x55, 0xdd, 0x6e, 0xd3, 0x4c,
+	0x10, 0x95, 0x93, 0xf6, 0x4b, 0xbe, 0xc9, 0x9f, 0x3a, 0x85, 0xe2, 0xba, 0x45, 0x72, 0xa3, 0x22,
+	0x7c, 0x81, 0x22, 0x14, 0xb8, 0xe2, 0xa2, 0x37, 0x34, 0x44, 0x02, 0x15, 0x21, 0x87, 0x22, 0x2e,
+	0x90, 0x2a, 0x37, 0x9e, 0xaa, 0x2b, 0x25, 0x76, 0xf0, 0x6e, 0x11, 0xe5, 0x01, 0x78, 0x21, 0x24,
+	0x9e, 0x0f, 0xd9, 0x59, 0xdb, 0xeb, 0x9f, 0x38, 0xee, 0x9d, 0x77, 0x66, 0xce, 0x99, 0x9d, 0xd9,
+	0x73, 0x12, 0xe8, 0x2f, 0x49, 0x38, 0xae, 0x23, 0x9c, 0xd1, 0x2a, 0xf0, 0x85, 0x8f, 0xed, 0xf8,
+	0x3c, 0xfc, 0xd3, 0x80, 0xf6, 0x85, 0x3c, 0xe0, 0x1b, 0x68, 0xcd, 0x03, 0x72, 0x04, 0xb9, 0xba,
+	0x66, 0x6a, 0x56, 0x67, 0x6c, 0x8e, 0x12, 0x60, 0x5c, 0x34, 0xba, 0xf4, 0xd8, 0xcf, 0xcf, 0x6c,
+	0x49, 0x5c, 0x38, 0xcb, 0x95, 0x1d, 0x03, 0x70, 0x02, 0xbd, 0x85, 0xc3, 0xc5, 0xd5, 0xd2, 0x77,
+	0xd9, 0x0d, 0x23, 0x57, 0x6f, 0xd4, 0x64, 0xe8, 0x86, 0xb0, 0x0b, 0x89, 0x42, 0x13, 0x3a, 0x2b,
+	0x0a, 0x96, 0x8c, 0x73, 0xe6, 0x7b, 0x5c, 0x6f, 0x9a, 0x9a, 0xd5, 0xb3, 0xd5, 0x10, 0x22, 0xec,
+	0x70, 0xf6, 0x8b, 0xf4, 0x1d, 0x53, 0xb3, 0x9a, 0x76, 0xf4, 0x8d, 0x27, 0xd0, 0x65, 0xfc, 0xca,
+	0x65, 0x01, 0xcd, 0x85, 0x1f, 0xdc, 0xeb, 0xbb, 0xa6, 0x66, 0xb5, 0xed, 0x0e, 0xe3, 0xe7, 0x71,
+	0xc8, 0xf8, 0x00, 0xbd, 0x4c, 0x5f, 0xd4, 0xa1, 0xc5, 0x69, 0xee, 0x7b, 0x2e, 0x8f, 0x86, 0x6d,
+	0xda, 0xf1, 0x31, 0xbc, 0x83, 0xe7, 0x78, 0x7e, 0x9c, 0x6d, 0x44, 0x59, 0x35, 0x34, 0x3c, 0x85,
+	0xfe, 0x94, 0xc4, 0x3b, 0xb6, 0x20, 0x9b, 0xbe, 0xdf, 0x11, 0x17, 0xe1, 0xad, 0x56, 0x8e, 0xb8,
+	0x8d, 0xa8, 0xfe, 0xb7, 0xa3, 0xef, 0xe1, 0x25, 0x0c, 0x92, 0x2a, 0xbe, 0xf2, 0x3d, 0x4e, 0x61,
+	0xd9, 0x0d, 0x5b, 0x50, 0x54, 0xd6, 0xb5, 0xa3, 0x6f, 0x1c, 0x41, 0xf2, 0x1c, 0x72, 0x69, 0x58,
+	0x5c, 0x9a, 0x9d, 0x3e, 0xd9, 0x2d, 0xf4, 0x3f, 0xdd, 0x6d, 0x6b, 0x9e, 0x74, 0x6a, 0x6c, 0xe8,
+	0xd4, 0xac, 0xd1, 0x69, 0x0f, 0x06, 0x49, 0xa7, 0xf5, 0x00, 0xc3, 0xe7, 0xb0, 0x77, 0x4e, 0x0b,
+	0x12, 0xb4, 0x6d, 0xf8, 0x47, 0x80, 0x6a, 0xa1, 0x84, 0xbf, 0x04, 0x63, 0x4a, 0x22, 0x79, 0x95,
+	0x89, 0x27, 0x02, 0x46, 0xbc, 0x8a, 0xe7, 0xaf, 0x06, 0x47, 0xa5, 0x10, 0xb9, 0xd1, 0x8f, 0xd0,
+	0xa2, 0x75, 0x48, 0xd7, 0xcc, 0xa6, 0xd5, 0x19, 0xbf, 0x4e, 0x47, 0xaa, 0xc0, 0x8d, 0x32, 0x89,
+	0x7b, 0x3b, 0x26, 0x31, 0xa6, 0xd0, 0xcf, 0xa6, 0x4a, 0xb7, 0x9b, 0x17, 0x5c, 0xa3, 0x20, 0xb8,
+	0xe1, 0x37, 0x38, 0x78, 0x1b, 0x79, 0x23, 0x09, 0x55, 0x3d, 0xd7, 0x43, 0x45, 0x70, 0x08, 0x4f,
+	0x0a, 0xec, 0x72, 0xc7, 0x2f, 0xe0, 0x60, 0xbd, 0xf9, 0x3a, 0x8d, 0x43, 0xa2, 0x42, 0xb5, 0x24,
+	0xb2, 0x00, 0xa7, 0x24, 0x92, 0xe6, 0x15, 0x24, 0x13, 0xd8, 0xcf, 0x54, 0xca, 0xb7, 0x51, 0x87,
+	0xd2, 0x6a, 0x0c, 0xf5, 0x15, 0x70, 0x56, 0xab, 0xe1, 0x83, 0xd7, 0xf5, 0x18, 0xf6, 0x67, 0xc5,
+	0x0b, 0x8e, 0x7f, 0xef, 0xc2, 0x20, 0x0e, 0xce, 0x28, 0xf8, 0xc1, 0xe6, 0x84, 0x67, 0xd0, 0x92,
+	0xae, 0x45, 0x3d, 0x23, 0x25, 0x45, 0xf1, 0xc6, 0x61, 0x49, 0x46, 0x0e, 0x7d, 0x06, 0x2d, 0x69,
+	0x1a, 0x15, 0x9f, 0x75, 0xac, 0x8a, 0xcf, 0x39, 0x0c, 0xa7, 0x00, 0xa9, 0x71, 0xf0, 0x28, 0x2d,
+	0x2c, 0xf8, 0xce, 0x38, 0x2e, 0x4f, 0x4a, 0xa2, 0x2f, 0x30, 0xc8, 0x49, 0x04, 0x95, 0x5f, 0xe3,
+	0x72, 0x6d, 0x1a, 0x27, 0x15, 0x15, 0x29, 0x6f, 0x4e, 0x31, 0x2a, 0x6f, 0xb9, 0xf4, 0x54, 0xde,
+	0x0d, 0x72, 0xc3, 0xeb, 0x48, 0x44, 0x79, 0xc3, 0xe2, 0xe9, 0x16, 0x3f, 0xaf, 0xf9, 0x9f, 0xd5,
+	0x72, 0x3d, 0xbe, 0x87, 0x8e, 0x22, 0x54, 0x3c, 0xce, 0xa0, 0x72, 0xc2, 0x33, 0x9e, 0x6e, 0xc8,
+	0xa6, 0x5c, 0xb3, 0x72, 0xae, 0x59, 0x25, 0x57, 0x89, 0x10, 0xaf, 0xff, 0x8b, 0xfe, 0x97, 0x5f,
+	0xfd, 0x0b, 0x00, 0x00, 0xff, 0xff, 0x23, 0x55, 0x17, 0x91, 0xa9, 0x07, 0x00, 0x00,
 }

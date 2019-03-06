@@ -18,7 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"sort"
+	"path"
 	"strings"
 	"sync"
 
@@ -34,7 +34,7 @@ type Server struct {
 }
 
 type MetadataFile struct {
-	Entries map[string]mpb.FileMetadata
+	Entries map[string]mpb.Metadata
 }
 
 const metadataFileKey = "kura-metadata"
@@ -50,7 +50,7 @@ func (s *Server) GetFile(ctx context.Context, req *mpb.GetFileRequest) (*mpb.Get
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	resp, err := s.storageClient.GetFile(ctx, &spb.GetFileRequest{Key: req.Key})
+	resp, err := s.storageClient.GetBlob(ctx, &spb.GetBlobRequest{Key: req.Path})
 	if err != nil {
 		return nil, err
 	}
@@ -60,19 +60,19 @@ func (s *Server) GetFile(ctx context.Context, req *mpb.GetFileRequest) (*mpb.Get
 		return nil, err
 	}
 
-	entry := metadata.Entries[req.Key]
-	return &mpb.GetFileResponse{File: resp.File, Metadata: &entry}, nil
+	entry := metadata.Entries[req.Path]
+	return &mpb.GetFileResponse{File: resp.Data, Metadata: &entry}, nil
 }
 
 func (s *Server) PutFile(ctx context.Context, req *mpb.PutFileRequest) (*mpb.PutFileResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if req.Key == "" {
+	if req.Path == "" {
 		return nil, errors.New("Empty file name")
 	}
 
-	if _, err := s.storageClient.PutFile(ctx, &spb.PutFileRequest{Key: req.Key, File: req.File}); err != nil {
+	if _, err := s.storageClient.PutBlob(ctx, &spb.PutBlobRequest{Key: req.Path, Data: req.File}); err != nil {
 		return nil, err
 	}
 
@@ -85,7 +85,7 @@ func (s *Server) PutFile(ctx context.Context, req *mpb.PutFileRequest) (*mpb.Put
 	if entry == nil {
 		return nil, errors.New("empty metadata")
 	}
-	metadata.Entries[req.Key] = *entry
+	metadata.Entries[req.Path] = *entry
 	if err := s.setMetadataFile(ctx, metadata); err != nil {
 		return nil, err
 	}
@@ -97,7 +97,7 @@ func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*m
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if _, err := s.storageClient.DeleteFile(ctx, &spb.DeleteFileRequest{Key: req.Key}); err != nil {
+	if _, err := s.storageClient.DeleteBlob(ctx, &spb.DeleteBlobRequest{Key: req.Path}); err != nil {
 		return nil, err
 	}
 
@@ -106,13 +106,100 @@ func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*m
 		return nil, err
 	}
 
-	delete(metadata.Entries, req.Key)
+	delete(metadata.Entries, req.Path)
 
 	if err := s.setMetadataFile(ctx, metadata); err != nil {
 		return nil, err
 	}
 
 	return &mpb.DeleteFileResponse{}, nil
+}
+
+func (s *Server) CreateDirectory(ctx context.Context, req *mpb.CreateDirectoryRequest) (*mpb.CreateDirectoryResponse, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if req.Path == "" {
+		return nil, errors.New("dir name required")
+	}
+
+	if !req.Metadata.IsDirectory {
+		return nil, errors.New("malformed metadata, IsDirectory is false despite being a dir")
+	}
+
+	metadata, err := s.getMetadataFile(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	metadata.Entries[req.Path] = *req.Metadata
+	if err := s.setMetadataFile(ctx, metadata); err != nil {
+		return nil, err
+	}
+
+	return &mpb.CreateDirectoryResponse{}, nil
+}
+
+func (s *Server) DeleteDirectory(ctx context.Context, req *mpb.DeleteDirectoryRequest) (*mpb.DeleteDirectoryResponse, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	metadata, err := s.getMetadataFile(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	for path, entry := range metadata.Entries {
+		if !strings.HasPrefix(path, req.Path+"/") {
+			continue
+		}
+
+		delete(metadata.Entries, path)
+		if entry.IsDirectory {
+			continue
+		}
+
+		if _, err := s.storageClient.DeleteBlob(ctx, &spb.DeleteBlobRequest{Key: path}); err != nil {
+			return nil, err
+		}
+	}
+
+	delete(metadata.Entries, req.Path)
+	if err := s.setMetadataFile(ctx, metadata); err != nil {
+		return nil, err
+	}
+
+	return &mpb.DeleteDirectoryResponse{}, nil
+}
+
+func (s *Server) GetDirectoryEntries(ctx context.Context, req *mpb.GetDirectoryEntriesRequest) (*mpb.GetDirectoryEntriesResponse, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	metadata, err := s.getMetadataFile(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	entries := []*mpb.GetDirectoryEntriesResponse_DirectoryEntry{}
+	for fpath, entry := range metadata.Entries {
+		if !strings.HasPrefix(fpath, req.Path+"/") {
+			continue
+		}
+
+		suffix := fpath[len(req.Path+"/"):]
+		if strings.ContainsAny(suffix, "/") {
+			continue
+		}
+
+		entry := mpb.GetDirectoryEntriesResponse_DirectoryEntry{
+			Path:        path.Join(req.Path, suffix),
+			IsDirectory: entry.IsDirectory,
+		}
+		entries = append(entries, &entry)
+	}
+
+	return &mpb.GetDirectoryEntriesResponse{Entries: entries}, nil
 }
 
 func (s *Server) GetMetadata(ctx context.Context, req *mpb.GetMetadataRequest) (*mpb.GetMetadataResponse, error) {
@@ -124,7 +211,7 @@ func (s *Server) GetMetadata(ctx context.Context, req *mpb.GetMetadataRequest) (
 		return nil, err
 	}
 
-	value := metadata.Entries[req.Key]
+	value := metadata.Entries[req.Path]
 	return &mpb.GetMetadataResponse{Metadata: &value}, nil
 }
 
@@ -136,7 +223,7 @@ func (s *Server) SetMetadata(ctx context.Context, req *mpb.SetMetadataRequest) (
 	if err != nil {
 		return nil, err
 	}
-	metadata.Entries[req.Key] = *req.Metadata
+	metadata.Entries[req.Path] = *req.Metadata
 
 	if err := s.setMetadataFile(ctx, metadata); err != nil {
 		return nil, err
@@ -145,28 +232,10 @@ func (s *Server) SetMetadata(ctx context.Context, req *mpb.SetMetadataRequest) (
 	return &mpb.SetMetadataResponse{}, nil
 }
 
-func (s *Server) GetDirectoryKeys(ctx context.Context, req *mpb.GetDirectoryKeysRequest) (*mpb.GetDirectoryKeysResponse, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	metadata, err := s.getMetadataFile(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	keys := make([]string, 0, len(metadata.Entries))
-	for k := range metadata.Entries {
-		keys = append(keys, k)
-	}
-
-	sort.Strings(keys)
-	return &mpb.GetDirectoryKeysResponse{Keys: keys}, nil
-}
-
 func (s *Server) getMetadataFile(ctx context.Context) (*MetadataFile, error) {
 	var metadata MetadataFile
 
-	resp, err := s.storageClient.GetFile(ctx, &spb.GetFileRequest{Key: metadataFileKey})
+	resp, err := s.storageClient.GetBlob(ctx, &spb.GetBlobRequest{Key: metadataFileKey})
 	if err != nil {
 		if strings.HasSuffix(err.Error(), "no such file or directory") {
 			// We deal with the case where the storage server is a fresh one,
@@ -174,14 +243,14 @@ func (s *Server) getMetadataFile(ctx context.Context) (*MetadataFile, error) {
 			//
 			// TODO: Explicitly initialize storage server when connecting?
 			metadata = MetadataFile{
-				Entries: make(map[string]mpb.FileMetadata),
+				Entries: make(map[string]mpb.Metadata),
 			}
 			return &metadata, nil
 		}
 		return nil, err
 	}
 
-	if err := json.Unmarshal(resp.File, &metadata); err != nil {
+	if err := json.Unmarshal(resp.Data, &metadata); err != nil {
 		return nil, errors.New("Unable to deserialize metadata file")
 	}
 
@@ -194,7 +263,7 @@ func (s *Server) setMetadataFile(ctx context.Context, metadata *MetadataFile) er
 		return err
 	}
 
-	if _, err := s.storageClient.PutFile(ctx, &spb.PutFileRequest{Key: metadataFileKey, File: reserialized}); err != nil {
+	if _, err := s.storageClient.PutBlob(ctx, &spb.PutBlobRequest{Key: metadataFileKey, Data: reserialized}); err != nil {
 		return err
 	}
 
@@ -215,17 +284,17 @@ func (s *Server) runGarbageCollection(ctx context.Context) error {
 		keyMap[k] = true
 	}
 
-	fileKeysReq := &spb.GetFileKeysRequest{}
-	fileKeysRes, err := s.storageClient.GetFileKeys(ctx, fileKeysReq)
+	fileKeysReq := &spb.GetBlobKeysRequest{}
+	fileKeysRes, err := s.storageClient.GetBlobKeys(ctx, fileKeysReq)
 	if err != nil {
 		return err
 	}
 
 	for _, key := range fileKeysRes.Keys {
 		if !keyMap[key] {
-			deleteReq := &mpb.DeleteFileRequest{Key: key}
-			if _, err := s.storageClient.DeleteFile(ctx,
-				&spb.DeleteFileRequest{Key: deleteReq.Key}); err != nil {
+			deleteReq := &mpb.DeleteFileRequest{Path: key}
+			if _, err := s.storageClient.DeleteBlob(ctx,
+				&spb.DeleteBlobRequest{Key: deleteReq.Path}); err != nil {
 				return err
 			}
 		}

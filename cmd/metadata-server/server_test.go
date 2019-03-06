@@ -35,42 +35,42 @@ var testGetFileResp []byte = []byte("test-get-file-resp")
 var testGetFileKeysResp = []string{"key1", "key2"}
 var testGetFileKeysAfterGCResp = []string{"key1"}
 
-func (t *testStorageServiceClient) GetFile(
-	ctx context.Context, in *spb.GetFileRequest, opts ...grpc.CallOption,
-) (*spb.GetFileResponse, error) {
+func (t *testStorageServiceClient) GetBlob(
+	ctx context.Context, in *spb.GetBlobRequest, opts ...grpc.CallOption,
+) (*spb.GetBlobResponse, error) {
 	if in.Key != metadataFileKey {
-		return &spb.GetFileResponse{File: testGetFileResp}, nil
+		return &spb.GetBlobResponse{Data: testGetFileResp}, nil
 	}
 
 	metadata := &MetadataFile{
-		Entries: make(map[string]mpb.FileMetadata),
+		Entries: make(map[string]mpb.Metadata),
 	}
 	serialized, err := json.Marshal(metadata)
 	if err != nil {
 		return nil, err
 	}
-	return &spb.GetFileResponse{File: serialized}, nil
+	return &spb.GetBlobResponse{Data: serialized}, nil
 }
 
-func (y *testStorageServiceClient) PutFile(
-	ctx context.Context, in *spb.PutFileRequest, opts ...grpc.CallOption,
-) (*spb.PutFileResponse, error) {
-	return &spb.PutFileResponse{}, nil
+func (y *testStorageServiceClient) PutBlob(
+	ctx context.Context, in *spb.PutBlobRequest, opts ...grpc.CallOption,
+) (*spb.PutBlobResponse, error) {
+	return &spb.PutBlobResponse{}, nil
 }
 
-func (y *testStorageServiceClient) DeleteFile(
-	ctx context.Context, in *spb.DeleteFileRequest, opts ...grpc.CallOption,
-) (*spb.DeleteFileResponse, error) {
-	return &spb.DeleteFileResponse{}, nil
+func (y *testStorageServiceClient) DeleteBlob(
+	ctx context.Context, in *spb.DeleteBlobRequest, opts ...grpc.CallOption,
+) (*spb.DeleteBlobResponse, error) {
+	return &spb.DeleteBlobResponse{}, nil
 }
 
-func (y *testStorageServiceClient) GetFileKeys(
-	ctx context.Context, in *spb.GetFileKeysRequest, opts ...grpc.CallOption,
-) (*spb.GetFileKeysResponse, error) {
+func (y *testStorageServiceClient) GetBlobKeys(
+	ctx context.Context, in *spb.GetBlobKeysRequest, opts ...grpc.CallOption,
+) (*spb.GetBlobKeysResponse, error) {
 	if y.gcWasRun {
-		return &spb.GetFileKeysResponse{Keys: testGetFileKeysAfterGCResp}, nil
+		return &spb.GetBlobKeysResponse{Keys: testGetFileKeysAfterGCResp}, nil
 	} else {
-		return &spb.GetFileKeysResponse{Keys: testGetFileKeysResp}, nil
+		return &spb.GetBlobKeysResponse{Keys: testGetFileKeysResp}, nil
 	}
 }
 
@@ -80,7 +80,7 @@ func TestGetFile(t *testing.T) {
 
 	testStorageClient := &testStorageServiceClient{}
 	metadataServer := newMetadataServer(logger, testStorageClient)
-	req := &mpb.GetFileRequest{Key: "get-file-req"}
+	req := &mpb.GetFileRequest{Path: "get-file-req"}
 	res, err := metadataServer.GetFile(ctx, req)
 	if err != nil {
 		t.Error(err)
@@ -97,9 +97,9 @@ func TestPutFile(t *testing.T) {
 
 	testStorageClient := &testStorageServiceClient{}
 	metadataServer := newMetadataServer(logger, testStorageClient)
-	metadata := &mpb.FileMetadata{}
+	metadata := &mpb.Metadata{}
 	req := &mpb.PutFileRequest{
-		Key:      "put-file-req",
+		Path:     "put-file-req",
 		File:     []byte("file"),
 		Metadata: metadata,
 	}
@@ -115,7 +115,7 @@ func TestDeleteFile(t *testing.T) {
 
 	testStorageClient := &testStorageServiceClient{}
 	metadataServer := newMetadataServer(logger, testStorageClient)
-	req := &mpb.DeleteFileRequest{Key: "delete-file-req"}
+	req := &mpb.DeleteFileRequest{Path: "delete-file-req"}
 	_, err := metadataServer.DeleteFile(ctx, req)
 	if err != nil {
 		t.Error(err)
@@ -128,10 +128,9 @@ func TestGarbageCollection(t *testing.T) {
 
 	testStorageClient := &testStorageServiceClient{}
 	metadataServer := newMetadataServer(logger, testStorageClient)
-	metadata := &mpb.FileMetadata{}
-
+	metadata := &mpb.Metadata{}
 	req := &mpb.PutFileRequest{
-		Key:      "key1",
+		Path:     "key1",
 		File:     []byte("file"),
 		Metadata: metadata,
 	}
@@ -140,11 +139,11 @@ func TestGarbageCollection(t *testing.T) {
 		t.Error(err)
 	}
 
-	sreq := &spb.PutFileRequest{Key: "key2", File: []byte("file2")}
-	_, err = testStorageClient.PutFile(context.Background(), sreq)
+	sreq := &spb.PutBlobRequest{Key: "key2", Data: []byte("file2")}
+	_, err = testStorageClient.PutBlob(context.Background(), sreq)
 
-	kreq := &spb.GetFileKeysRequest{}
-	kres, err := testStorageClient.GetFileKeys(context.Background(), kreq)
+	kreq := &spb.GetBlobKeysRequest{}
+	kres, err := testStorageClient.GetBlobKeys(context.Background(), kreq)
 
 	if err != nil {
 		t.Error(err)
@@ -157,8 +156,8 @@ func TestGarbageCollection(t *testing.T) {
 	metadataServer.runGarbageCollection(context.Background())
 	testStorageClient.gcWasRun = true
 
-	kreq = &spb.GetFileKeysRequest{}
-	kres, err = testStorageClient.GetFileKeys(context.Background(), kreq)
+	kreq = &spb.GetBlobKeysRequest{}
+	kres, err = testStorageClient.GetBlobKeys(context.Background(), kreq)
 
 	if len(kres.Keys) != 1 {
 		t.Error(fmt.Sprintf("expected = %v keys, got %v", 1, len(kres.Keys)))
