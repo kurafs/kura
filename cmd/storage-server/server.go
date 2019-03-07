@@ -114,16 +114,18 @@ func (s *storageServer) PutFileStream(stream spb.StorageService_PutFileStreamSer
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
-			if err = s.store.Write(key, fileBytes); err != nil {
-				return err
-			}
-			return stream.SendAndClose(&spb.PutFileStreamResponse{})
+			break
 		}
 		if err != nil {
 			return err
 		}
 		fileBytes = append(fileBytes, in.FileChunk...)
 	}
+
+	if err = s.store.Write(key, fileBytes); err != nil {
+		return err
+	}
+	return stream.SendAndClose(&spb.PutFileStreamResponse{})
 }
 
 func (s *storageServer) DeleteFile(ctx context.Context, req *spb.DeleteFileRequest) (*spb.DeleteFileResponse, error) {

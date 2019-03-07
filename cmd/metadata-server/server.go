@@ -147,11 +147,15 @@ func (s *Server) PutFileStream(stream mpb.MetadataService_PutFileStreamServer) e
 	if err != nil {
 		return err
 	}
-	// First message determines the key, it will be assumed that all subsequent
+	// First message determines the key and metadata, it will be assumed that all subsequent
 	// file keys are the same
 	key := in.Key
 	if err = storeStream.Send(&spb.PutFileStreamRequest{Key: key, FileChunk: in.FileChunk}); err != nil {
 		return err
+	}
+	entry := in.Metadata
+	if entry == nil {
+		return errors.New("empty metadata")
 	}
 	fileSize := len(in.FileChunk)
 
@@ -177,28 +181,11 @@ func (s *Server) PutFileStream(stream mpb.MetadataService_PutFileStreamServer) e
 		return err
 	}
 
-	if val, ok := metadata.Entries[key]; ok {
-		metadata.Entries[key] = mpb.FileMetadata{
-			Created:      val.Created,
-			LastModified: &mpb.FileMetadata_UnixTimestamp{Seconds: time.Now().Unix()},
-			Permissions:  val.Permissions,
-			Size:         int64(fileSize),
-		}
-	} else {
-		// TODO(irfansharif): The PutFile RPC should accept associated metadata
-		// as well.
-		ts := time.Now().Unix()
-		metadata.Entries[key] = mpb.FileMetadata{
-			Created:      &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
-			LastModified: &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
-			Permissions:  0644,
-			Size:         int64(fileSize),
-		}
-	}
-
+	metadata.Entries[key] = *entry
 	if err := s.setMetadataFile(ctx, metadata); err != nil {
 		return err
 	}
+
 	return stream.SendAndClose(&mpb.PutFileStreamResponse{})
 }
 
