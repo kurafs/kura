@@ -56,6 +56,7 @@ message GetFileRequest {
 
 message GetFileResponse {
     bytes file = 1;
+    FileMetadata metadata = 2;
 }
 
 message GetFileStreamRequest {
@@ -69,6 +70,7 @@ message GetFileStreamResponse {
 message PutFileRequest {
     string key = 1;
     bytes file = 2;
+    FileMetadata metadata = 3;
 }
 
 message PutFileResponse { }

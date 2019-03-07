@@ -5,39 +5,50 @@ import (
 	"io"
 	"os"
 	"sync"
-
-	"google.golang.org/grpc"
+	"time"
 
 	"github.com/kurafs/kura/pkg/fuse"
 	"github.com/kurafs/kura/pkg/fuse/fs"
 	"github.com/kurafs/kura/pkg/log"
+<<<<<<< HEAD
 	"github.com/kurafs/kura/pkg/streaming"
 
+=======
+	cpb "github.com/kurafs/kura/pkg/pb/crypt"
+>>>>>>> master
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
+	"google.golang.org/grpc"
 )
 
 type fuseServer struct {
 	logger               *log.Logger
 	metadataServerClient mpb.MetadataServiceClient
-	conn                 *grpc.ClientConn
+	metadataConn         *grpc.ClientConn
+	cryptServerClient    cpb.CryptServiceClient
+	cryptConn            *grpc.ClientConn
 	mu                   sync.RWMutex
 
 	nodeCounter uint64 // HACK: This is not how we should be generating inode numbers.
 }
 
-var pkey []byte = []byte("LKHlhb899Y09olUi")
-
-func newFUSEServer(logger *log.Logger, metadataServerAddr string) (fs.FS, error) {
-	conn, err := grpc.Dial(metadataServerAddr, grpc.WithInsecure())
+func newFUSEServer(logger *log.Logger, metadataServerAddr, cryptServerAddr string) (fs.FS, error) {
+	metadataConn, err := grpc.Dial(metadataServerAddr, grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
+	metadataClient := mpb.NewMetadataServiceClient(metadataConn)
 
-	client := mpb.NewMetadataServiceClient(conn)
+	cryptConn, err := grpc.Dial(cryptServerAddr, grpc.WithInsecure())
+	if err != nil {
+		return nil, err
+	}
+	cryptClient := cpb.NewCryptServiceClient(cryptConn)
 	server := fuseServer{
 		logger:               logger,
-		conn:                 conn,
-		metadataServerClient: client,
+		metadataConn:         metadataConn,
+		metadataServerClient: metadataClient,
+		cryptConn:            cryptConn,
+		cryptServerClient:    cryptClient,
 	}
 
 	return &server, nil
@@ -79,7 +90,15 @@ func (d *Dir) Create(ctx context.Context, req *fuse.CreateRequest, res *fuse.Cre
 	d.fuseServer.mu.Lock()
 	defer d.fuseServer.mu.Unlock()
 
-	rq := &mpb.PutFileRequest{Key: req.Name, File: []byte{}}
+	ts := time.Now().Unix()
+	metadata := &mpb.FileMetadata{
+		Created:      &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
+		LastModified: &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
+		Permissions:  0644,
+		Size:         int64(0),
+	}
+
+	rq := &mpb.PutFileRequest{Key: req.Name, File: []byte{}, Metadata: metadata}
 	_, err := d.fuseServer.metadataServerClient.PutFile(ctx, rq)
 	if err != nil {
 		return nil, nil, err // TODO(irfansharif): Propagate appropriate FUSE error.
@@ -105,7 +124,8 @@ func (d *Dir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 	dirents := make([]fuse.Dirent, 0)
 	for i, key := range res.Keys {
 		// TODO: Ensure unique inode numbers.
-		dirents = append(dirents, fuse.Dirent{Inode: uint64(i + 42), Name: key, Type: fuse.DT_File})
+		dirents = append(dirents,
+			fuse.Dirent{Inode: uint64(i + 42), Name: key, Type: fuse.DT_File})
 	}
 
 	return dirents, nil
@@ -176,24 +196,32 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 		contents = string(buf)
 	}
 
+<<<<<<< HEAD
 	decrypted, err := decrypt(pkey, contents)
+=======
+	creq := &cpb.DecryptionRequest{Ciphertext: res.File}
+	cres, err := f.parentDir.fuseServer.cryptServerClient.Decrypt(ctx, creq)
+>>>>>>> master
 	if err != nil {
 		f.parentDir.fuseServer.logger.Error(err.Error())
 		return nil, err // TODO(irfansharif): Propagate appropriate FUSE error.
 	}
-	return []byte(decrypted), nil
+
+	return cres.Plaintext, nil
 }
 
 func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.WriteResponse) error {
 	f.parentDir.fuseServer.mu.Lock()
 	defer f.parentDir.fuseServer.mu.Unlock()
 
-	encrypted, err := encrypt(pkey, string(req.Data))
+	creq := &cpb.EncryptionRequest{Plaintext: req.Data}
+	cres, err := f.parentDir.fuseServer.cryptServerClient.Encrypt(ctx, creq)
 	if err != nil {
 		f.parentDir.fuseServer.logger.Error(err.Error())
 		return err // TODO(irfansharif): Propagate appropriate FUSE error.
 	}
 
+<<<<<<< HEAD
 	encBytes := []byte(encrypted)
 	if len(encBytes) < streaming.Threshold {
 		rq := &mpb.PutFileRequest{Key: f.name, File: encBytes}
@@ -222,10 +250,21 @@ func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.Wri
 				return err
 			}
 		}
+=======
+	ts := time.Now().Unix()
+	metadata := &mpb.FileMetadata{
+		Size:         int64(len(req.Data)),
+		LastModified: &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
 	}
 
-	mrq := &mpb.SetMetadataRequest{Key: f.name, Metadata: &mpb.FileMetadata{Size: int64(len(req.Data))}}
-	_, err = f.parentDir.fuseServer.metadataServerClient.SetMetadata(ctx, mrq)
+	rq := &mpb.PutFileRequest{
+		Key:      f.name,
+		File:     []byte(cres.Ciphertext),
+		Metadata: metadata,
+>>>>>>> master
+	}
+	_, err = f.parentDir.fuseServer.metadataServerClient.PutFile(ctx, rq)
+
 	if err != nil {
 		return err // TODO(irfansharif): Propagate appropriate FUSE error.
 	}

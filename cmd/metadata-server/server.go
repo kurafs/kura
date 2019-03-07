@@ -22,7 +22,6 @@ import (
 	"sort"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/kurafs/kura/pkg/log"
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
@@ -57,7 +56,13 @@ func (s *Server) GetFile(ctx context.Context, req *mpb.GetFileRequest) (*mpb.Get
 		return nil, err
 	}
 
-	return &mpb.GetFileResponse{File: resp.File}, nil
+	metadata, err := s.getMetadataFile(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	entry := metadata.Entries[req.Key]
+	return &mpb.GetFileResponse{File: resp.File, Metadata: &entry}, nil
 }
 
 type chunkMessage struct {
@@ -116,25 +121,11 @@ func (s *Server) PutFile(ctx context.Context, req *mpb.PutFileRequest) (*mpb.Put
 		return nil, err
 	}
 
-	if val, ok := metadata.Entries[req.Key]; ok {
-		metadata.Entries[req.Key] = mpb.FileMetadata{
-			Created:      val.Created,
-			LastModified: &mpb.FileMetadata_UnixTimestamp{Seconds: time.Now().Unix()},
-			Permissions:  val.Permissions,
-			Size:         int64(len(req.File)),
-		}
-	} else {
-		// TODO(irfansharif): The PutFile RPC should accept associated metadata
-		// as well.
-		ts := time.Now().Unix()
-		metadata.Entries[req.Key] = mpb.FileMetadata{
-			Created:      &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
-			LastModified: &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
-			Permissions:  0644,
-			Size:         int64(len(req.File)),
-		}
+	entry := req.Metadata
+	if entry == nil {
+		return nil, errors.New("empty metadata")
 	}
-
+	metadata.Entries[req.Key] = *entry
 	if err := s.setMetadataFile(ctx, metadata); err != nil {
 		return nil, err
 	}
@@ -342,16 +333,12 @@ func (s *Server) runGarbageCollection(ctx context.Context) error {
 	for _, key := range fileKeysRes.Keys {
 		if !keyMap[key] {
 			deleteReq := &mpb.DeleteFileRequest{Key: key}
-			if _, err := s.storageClient.DeleteFile(ctx, &spb.DeleteFileRequest{Key: deleteReq.Key}); err != nil {
+			if _, err := s.storageClient.DeleteFile(ctx,
+				&spb.DeleteFileRequest{Key: deleteReq.Key}); err != nil {
 				return err
 			}
 		}
 	}
 
 	return nil
-}
-
-// Used for testing purposes only.
-func TestForceGC(s *Server) error {
-	return s.runGarbageCollection(context.Background())
 }

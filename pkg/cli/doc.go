@@ -60,8 +60,8 @@
 //
 //      Additional help topics:
 //
-//              security-model         Security model overview
-//              architecture           Kura system architecture overview
+//              security-model         security model overview
+//              architecture           kura system architecture overview
 //
 //      Use "kura help [topic]" for more information about that topic.
 //
@@ -75,7 +75,7 @@
 // Doing the same for an additional help topic, we get the following:
 //
 //      $ kura help architecture
-//      Topic: Kura system architecture overview
+//      Topic: kura system architecture overview
 //
 //      Detailed description about the system architecture for Kura.
 //
