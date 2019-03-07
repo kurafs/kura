@@ -28,13 +28,20 @@ message FileMetadata {
     uint32 permissions = 3;
     int64 size = 4;
     bool is_directory = 5;
-    uint64 parent_directory_id = 6;
+    string parent_directory = 6;
 }
 
-message GetDirectoryKeysRequest {}
+message DirEntry {
+  string name = 1;
+  bool is_directory = 2;
+}
+
+message GetDirectoryKeysRequest {
+    string directory = 1;
+}
 
 message GetDirectoryKeysResponse {
-    repeated string keys = 1;
+    repeated DirEntry entries = 1;
 }
 
 message GetMetadataRequest {
@@ -77,14 +84,12 @@ message DeleteFileResponse { }
 
 message CreateDirectoryRequest {
   string key = 1;
-  uint64 directory_id = 2;
 }
 
 message CreateDirectoryResponse { }
 
 message DeleteDirectoryRequest {
   string key = 1;
-  uint64 directory_id = 2;
 }
 
 message DeleteDirectoryResponse { }

@@ -18,7 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"sort"
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -109,24 +109,24 @@ func (s *Server) CreateDirectory(ctx context.Context, req *mpb.CreateDirectoryRe
 
 	if val, ok := metadata.Entries[req.Key]; ok {
 		metadata.Entries[req.Key] = mpb.FileMetadata{
-			Created:           val.Created,
-			LastModified:      &mpb.FileMetadata_UnixTimestamp{Seconds: time.Now().Unix()},
-			Permissions:       val.Permissions,
-			Size:              0,
-			IsDirectory:       true,
-			ParentDirectoryId: req.DirectoryId,
+			Created:         val.Created,
+			LastModified:    &mpb.FileMetadata_UnixTimestamp{Seconds: time.Now().Unix()},
+			Permissions:     val.Permissions,
+			Size:            0,
+			IsDirectory:     true,
+			ParentDirectory: req.Key,
 		}
 	} else {
 		// TODO(irfansharif): The PutFile RPC should accept associated metadata
 		// as well.
 		ts := time.Now().Unix()
 		metadata.Entries[req.Key] = mpb.FileMetadata{
-			Created:           &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
-			LastModified:      &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
-			Permissions:       0644,
-			Size:              0,
-			IsDirectory:       true,
-			ParentDirectoryId: req.DirectoryId,
+			Created:         &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
+			LastModified:    &mpb.FileMetadata_UnixTimestamp{Seconds: ts},
+			Permissions:     0644,
+			Size:            0,
+			IsDirectory:     true,
+			ParentDirectory: req.Key,
 		}
 	}
 
@@ -169,7 +169,7 @@ func (s *Server) DeleteDirectory(ctx context.Context, req *mpb.DeleteDirectoryRe
 	}
 
 	for k := range metadata.Entries {
-		if !metadata.Entries[k].IsDirectory && metadata.Entries[k].ParentDirectoryId == req.DirectoryId {
+		if !metadata.Entries[k].IsDirectory && metadata.Entries[k].ParentDirectory == req.Key {
 			delete(metadata.Entries, k)
 		}
 	}
@@ -226,13 +226,30 @@ func (s *Server) GetDirectoryKeys(ctx context.Context, req *mpb.GetDirectoryKeys
 		return nil, err
 	}
 
-	keys := make([]string, 0, len(metadata.Entries))
+	entries := []*mpb.DirEntry{}
+	//entries := make([]mpb.DirEntry, 0)
 	for k := range metadata.Entries {
-		keys = append(keys, k)
+		isDirectory := false
+
+		if metadata.Entries[k].IsDirectory {
+			isDirectory = true
+		}
+		fmt.Println(k)
+		if len(req.Directory) > 0 {
+			fmt.Println("dir: ", req.Directory)
+			if metadata.Entries[k].ParentDirectory == req.Directory {
+				fmt.Println("got file: ", k)
+				entry := &mpb.DirEntry{Name: k, IsDirectory: isDirectory}
+				entries = append(entries, entry)
+			}
+		} else {
+			fmt.Println("got file: ", k)
+			entry := &mpb.DirEntry{Name: k, IsDirectory: isDirectory}
+			entries = append(entries, entry)
+		}
 	}
 
-	sort.Strings(keys)
-	return &mpb.GetDirectoryKeysResponse{Keys: keys}, nil
+	return &mpb.GetDirectoryKeysResponse{Entries: entries}, nil
 }
 
 func (s *Server) getMetadataFile(ctx context.Context) (*MetadataFile, error) {
