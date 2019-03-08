@@ -39,6 +39,17 @@ message GetFileResponse {
   Metadata metadata = 2;
 }
 
+message GetFileStreamRequest {
+    string path = 1;
+}
+
+message GetFileStreamResponse {
+    bytes chunk = 1;
+
+    // Only set on the first message
+    Metadata metadata = 2;
+}
+
 message PutFileRequest {
   string path = 1;
   bytes file = 2;
@@ -46,6 +57,15 @@ message PutFileRequest {
 }
 
 message PutFileResponse { }
+
+message PutFileStreamRequest {
+    // path and metadata should only be set on the first request
+    string path = 1;
+    bytes chunk = 2;
+    Metadata metadata = 3;
+}
+
+message PutFileStreamResponse { }
 
 message DeleteFileRequest {
   string path = 1;
@@ -97,7 +117,9 @@ message SetMetadataResponse { }
 
 service MetadataService { 
     rpc GetFile (GetFileRequest) returns (GetFileResponse);
+    rpc GetFileStream (GetFileStreamRequest) returns (stream GetFileStreamResponse);
     rpc PutFile (PutFileRequest) returns (PutFileResponse);
+    rpc PutFileStream (stream PutFileStreamRequest) returns (PutFileStreamResponse);
     rpc DeleteFile (DeleteFileRequest) returns (DeleteFileResponse);
     rpc CreateDirectory (CreateDirectoryRequest) returns (CreateDirectoryResponse);
     rpc DeleteDirectory (DeleteDirectoryRequest) returns (DeleteDirectoryResponse);

@@ -16,10 +16,12 @@ package storageserver
 
 import (
 	"errors"
+	"io"
 	"sync"
 
 	"github.com/kurafs/kura/pkg/log"
 	spb "github.com/kurafs/kura/pkg/pb/storage"
+	"github.com/kurafs/kura/pkg/streaming"
 	"golang.org/x/net/context"
 )
 
@@ -58,6 +60,25 @@ func (s *storageServer) GetBlob(ctx context.Context, req *spb.GetBlobRequest) (*
 	return &spb.GetBlobResponse{Data: blob}, nil
 }
 
+func (s *storageServer) GetBlobStream(req *spb.GetBlobStreamRequest, stream spb.StorageService_GetBlobStreamServer) error {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	file, err := s.store.Read(req.Key)
+	if err != nil {
+		return err
+	}
+
+	chunker := streaming.NewChunker(file)
+	for chunker.Next() {
+		if err := stream.Send(&spb.GetBlobStreamResponse{Chunk: chunker.Value()}); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (s *storageServer) PutBlob(ctx context.Context, req *spb.PutBlobRequest) (*spb.PutBlobResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -67,6 +88,36 @@ func (s *storageServer) PutBlob(ctx context.Context, req *spb.PutBlobRequest) (*
 	}
 
 	return &spb.PutBlobResponse{}, nil
+}
+
+func (s *storageServer) PutBlobStream(stream spb.StorageService_PutBlobStreamServer) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	in, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+	// First message determines the key, it will be assumed that all subsequent
+	// file keys are the same
+	key := in.Key
+	fileBytes := in.Chunk
+
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		fileBytes = append(fileBytes, in.Chunk...)
+	}
+
+	if err = s.store.Write(key, fileBytes); err != nil {
+		return err
+	}
+	return stream.SendAndClose(&spb.PutBlobStreamResponse{})
 }
 
 func (s *storageServer) DeleteBlob(ctx context.Context, req *spb.DeleteBlobRequest) (*spb.DeleteBlobResponse, error) {

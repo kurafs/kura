@@ -7,12 +7,15 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/big"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/kurafs/kura/pkg/streaming"
 
 	cryptserver "github.com/kurafs/kura/cmd/crypt-server"
 	identityserver "github.com/kurafs/kura/cmd/identity-server"
@@ -337,7 +340,96 @@ func TestNestedFilePersistence(t *testing.T) {
 }
 
 func TestLargeFilePersistence(t *testing.T) {
-	t.Skip("TODO(irfansharif): gRPC exhaustion occurs at 4 MiB, add streaming.")
+	logger := log.Discarder()
+	tdir, err := ioutil.TempDir("/tmp", "TestLargeFilePersistence")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tdir)
+
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	conn, err := grpc.Dial("localhost:10670", grpc.WithInsecure())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer conn.Close()
+
+	client := mpb.NewMetadataServiceClient(conn)
+
+	testContent := bytes.Repeat([]byte("abcd"), (streaming.Threshold/4)+1)
+
+	for i := 0; i < 5; i++ {
+		key := fmt.Sprintf("key-%d", i)
+		metadata := &mpb.Metadata{
+			Size: int64(len(testContent)),
+		}
+		chunker := streaming.NewChunker(testContent)
+		stream, err := client.PutFileStream(context.Background())
+		if err != nil {
+			t.Fatal(err)
+		}
+		chunker.Next()
+		first := chunker.Value()
+		if err = stream.Send(&mpb.PutFileStreamRequest{Path: key, Chunk: first, Metadata: metadata}); err != nil {
+			t.Fatal(err)
+		}
+		for chunker.Next() {
+			preq := &mpb.PutFileStreamRequest{Chunk: chunker.Value()}
+			err = stream.Send(preq)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		if _, err = stream.CloseAndRecv(); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	for i := 0; i < 5; i++ {
+		key := fmt.Sprintf("key-%d", i)
+		stream, err := client.GetFileStream(context.Background(), &mpb.GetFileStreamRequest{Path: key})
+		if err != nil {
+			t.Fatal(err)
+		}
+		first, err := stream.Recv()
+		if err != nil {
+			t.Fatal(err)
+		}
+		buff := make([]byte, 0, len(testContent))
+		if first.Metadata == nil {
+			t.Fatal("First message had no metadata")
+		}
+		buff = append(buff, first.Chunk...)
+		for {
+			in, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				t.Fatal(err)
+			}
+			buff = append(buff, in.Chunk...)
+		}
+		t.Log(len(buff), len(testContent))
+		if !bytes.Equal(buff, testContent) {
+			t.Fatal("Did not retrieve correct data")
+		}
+	}
+
+	shutdownStorage()
+	shutdownMetadata()
+
+	waitStorage()
+	waitMetadata()
 }
 
 func TestCrypt(t *testing.T) {

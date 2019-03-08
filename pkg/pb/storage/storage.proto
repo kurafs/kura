@@ -24,12 +24,27 @@ message GetBlobResponse {
     bytes data = 1;
 }
 
+message GetBlobStreamRequest {
+    string key = 1;
+}
+
+message GetBlobStreamResponse {
+    bytes chunk = 1;
+}
+
 message PutBlobRequest {
     string key = 1;
     bytes data = 2;
 }
 
 message PutBlobResponse { }
+
+message PutBlobStreamRequest {
+    string key = 1;
+    bytes chunk = 2;
+}
+
+message PutBlobStreamResponse { }
 
 message DeleteBlobRequest {
     string key = 1;
@@ -45,7 +60,9 @@ message GetBlobKeysResponse {
 
 service StorageService {
     rpc GetBlob (GetBlobRequest) returns (GetBlobResponse);
+    rpc GetBlobStream (GetBlobStreamRequest) returns (stream GetBlobStreamResponse);
     rpc PutBlob (PutBlobRequest) returns (PutBlobResponse);
+    rpc PutBlobStream (stream PutBlobStreamRequest) returns (PutBlobStreamResponse);
     rpc DeleteBlob (DeleteBlobRequest) returns (DeleteBlobResponse);
     rpc GetBlobKeys (GetBlobKeysRequest) returns (GetBlobKeysResponse);
 }

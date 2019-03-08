@@ -34,7 +34,7 @@ func (m *GetBlobRequest) Reset()         { *m = GetBlobRequest{} }
 func (m *GetBlobRequest) String() string { return proto.CompactTextString(m) }
 func (*GetBlobRequest) ProtoMessage()    {}
 func (*GetBlobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_761b0d99bd4e86bf, []int{0}
+	return fileDescriptor_storage_d44917d2bed057f8, []int{0}
 }
 func (m *GetBlobRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobRequest.Unmarshal(m, b)
@@ -72,7 +72,7 @@ func (m *GetBlobResponse) Reset()         { *m = GetBlobResponse{} }
 func (m *GetBlobResponse) String() string { return proto.CompactTextString(m) }
 func (*GetBlobResponse) ProtoMessage()    {}
 func (*GetBlobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_761b0d99bd4e86bf, []int{1}
+	return fileDescriptor_storage_d44917d2bed057f8, []int{1}
 }
 func (m *GetBlobResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobResponse.Unmarshal(m, b)
@@ -99,6 +99,82 @@ func (m *GetBlobResponse) GetData() []byte {
 	return nil
 }
 
+type GetBlobStreamRequest struct {
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetBlobStreamRequest) Reset()         { *m = GetBlobStreamRequest{} }
+func (m *GetBlobStreamRequest) String() string { return proto.CompactTextString(m) }
+func (*GetBlobStreamRequest) ProtoMessage()    {}
+func (*GetBlobStreamRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_storage_d44917d2bed057f8, []int{2}
+}
+func (m *GetBlobStreamRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetBlobStreamRequest.Unmarshal(m, b)
+}
+func (m *GetBlobStreamRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetBlobStreamRequest.Marshal(b, m, deterministic)
+}
+func (dst *GetBlobStreamRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetBlobStreamRequest.Merge(dst, src)
+}
+func (m *GetBlobStreamRequest) XXX_Size() int {
+	return xxx_messageInfo_GetBlobStreamRequest.Size(m)
+}
+func (m *GetBlobStreamRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetBlobStreamRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetBlobStreamRequest proto.InternalMessageInfo
+
+func (m *GetBlobStreamRequest) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+type GetBlobStreamResponse struct {
+	Chunk                []byte   `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *GetBlobStreamResponse) Reset()         { *m = GetBlobStreamResponse{} }
+func (m *GetBlobStreamResponse) String() string { return proto.CompactTextString(m) }
+func (*GetBlobStreamResponse) ProtoMessage()    {}
+func (*GetBlobStreamResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_storage_d44917d2bed057f8, []int{3}
+}
+func (m *GetBlobStreamResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetBlobStreamResponse.Unmarshal(m, b)
+}
+func (m *GetBlobStreamResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetBlobStreamResponse.Marshal(b, m, deterministic)
+}
+func (dst *GetBlobStreamResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetBlobStreamResponse.Merge(dst, src)
+}
+func (m *GetBlobStreamResponse) XXX_Size() int {
+	return xxx_messageInfo_GetBlobStreamResponse.Size(m)
+}
+func (m *GetBlobStreamResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetBlobStreamResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GetBlobStreamResponse proto.InternalMessageInfo
+
+func (m *GetBlobStreamResponse) GetChunk() []byte {
+	if m != nil {
+		return m.Chunk
+	}
+	return nil
+}
+
 type PutBlobRequest struct {
 	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	Data                 []byte   `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
@@ -111,7 +187,7 @@ func (m *PutBlobRequest) Reset()         { *m = PutBlobRequest{} }
 func (m *PutBlobRequest) String() string { return proto.CompactTextString(m) }
 func (*PutBlobRequest) ProtoMessage()    {}
 func (*PutBlobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_761b0d99bd4e86bf, []int{2}
+	return fileDescriptor_storage_d44917d2bed057f8, []int{4}
 }
 func (m *PutBlobRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutBlobRequest.Unmarshal(m, b)
@@ -155,7 +231,7 @@ func (m *PutBlobResponse) Reset()         { *m = PutBlobResponse{} }
 func (m *PutBlobResponse) String() string { return proto.CompactTextString(m) }
 func (*PutBlobResponse) ProtoMessage()    {}
 func (*PutBlobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_761b0d99bd4e86bf, []int{3}
+	return fileDescriptor_storage_d44917d2bed057f8, []int{5}
 }
 func (m *PutBlobResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutBlobResponse.Unmarshal(m, b)
@@ -175,6 +251,82 @@ func (m *PutBlobResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PutBlobResponse proto.InternalMessageInfo
 
+type PutBlobStreamRequest struct {
+	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Chunk                []byte   `protobuf:"bytes,2,opt,name=chunk,proto3" json:"chunk,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PutBlobStreamRequest) Reset()         { *m = PutBlobStreamRequest{} }
+func (m *PutBlobStreamRequest) String() string { return proto.CompactTextString(m) }
+func (*PutBlobStreamRequest) ProtoMessage()    {}
+func (*PutBlobStreamRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_storage_d44917d2bed057f8, []int{6}
+}
+func (m *PutBlobStreamRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PutBlobStreamRequest.Unmarshal(m, b)
+}
+func (m *PutBlobStreamRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PutBlobStreamRequest.Marshal(b, m, deterministic)
+}
+func (dst *PutBlobStreamRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PutBlobStreamRequest.Merge(dst, src)
+}
+func (m *PutBlobStreamRequest) XXX_Size() int {
+	return xxx_messageInfo_PutBlobStreamRequest.Size(m)
+}
+func (m *PutBlobStreamRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_PutBlobStreamRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PutBlobStreamRequest proto.InternalMessageInfo
+
+func (m *PutBlobStreamRequest) GetKey() string {
+	if m != nil {
+		return m.Key
+	}
+	return ""
+}
+
+func (m *PutBlobStreamRequest) GetChunk() []byte {
+	if m != nil {
+		return m.Chunk
+	}
+	return nil
+}
+
+type PutBlobStreamResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PutBlobStreamResponse) Reset()         { *m = PutBlobStreamResponse{} }
+func (m *PutBlobStreamResponse) String() string { return proto.CompactTextString(m) }
+func (*PutBlobStreamResponse) ProtoMessage()    {}
+func (*PutBlobStreamResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_storage_d44917d2bed057f8, []int{7}
+}
+func (m *PutBlobStreamResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PutBlobStreamResponse.Unmarshal(m, b)
+}
+func (m *PutBlobStreamResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PutBlobStreamResponse.Marshal(b, m, deterministic)
+}
+func (dst *PutBlobStreamResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PutBlobStreamResponse.Merge(dst, src)
+}
+func (m *PutBlobStreamResponse) XXX_Size() int {
+	return xxx_messageInfo_PutBlobStreamResponse.Size(m)
+}
+func (m *PutBlobStreamResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_PutBlobStreamResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PutBlobStreamResponse proto.InternalMessageInfo
+
 type DeleteBlobRequest struct {
 	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -186,7 +338,7 @@ func (m *DeleteBlobRequest) Reset()         { *m = DeleteBlobRequest{} }
 func (m *DeleteBlobRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteBlobRequest) ProtoMessage()    {}
 func (*DeleteBlobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_761b0d99bd4e86bf, []int{4}
+	return fileDescriptor_storage_d44917d2bed057f8, []int{8}
 }
 func (m *DeleteBlobRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteBlobRequest.Unmarshal(m, b)
@@ -223,7 +375,7 @@ func (m *DeleteBlobResponse) Reset()         { *m = DeleteBlobResponse{} }
 func (m *DeleteBlobResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteBlobResponse) ProtoMessage()    {}
 func (*DeleteBlobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_761b0d99bd4e86bf, []int{5}
+	return fileDescriptor_storage_d44917d2bed057f8, []int{9}
 }
 func (m *DeleteBlobResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteBlobResponse.Unmarshal(m, b)
@@ -253,7 +405,7 @@ func (m *GetBlobKeysRequest) Reset()         { *m = GetBlobKeysRequest{} }
 func (m *GetBlobKeysRequest) String() string { return proto.CompactTextString(m) }
 func (*GetBlobKeysRequest) ProtoMessage()    {}
 func (*GetBlobKeysRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_761b0d99bd4e86bf, []int{6}
+	return fileDescriptor_storage_d44917d2bed057f8, []int{10}
 }
 func (m *GetBlobKeysRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobKeysRequest.Unmarshal(m, b)
@@ -284,7 +436,7 @@ func (m *GetBlobKeysResponse) Reset()         { *m = GetBlobKeysResponse{} }
 func (m *GetBlobKeysResponse) String() string { return proto.CompactTextString(m) }
 func (*GetBlobKeysResponse) ProtoMessage()    {}
 func (*GetBlobKeysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_761b0d99bd4e86bf, []int{7}
+	return fileDescriptor_storage_d44917d2bed057f8, []int{11}
 }
 func (m *GetBlobKeysResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobKeysResponse.Unmarshal(m, b)
@@ -314,8 +466,12 @@ func (m *GetBlobKeysResponse) GetKeys() []string {
 func init() {
 	proto.RegisterType((*GetBlobRequest)(nil), "storage.GetBlobRequest")
 	proto.RegisterType((*GetBlobResponse)(nil), "storage.GetBlobResponse")
+	proto.RegisterType((*GetBlobStreamRequest)(nil), "storage.GetBlobStreamRequest")
+	proto.RegisterType((*GetBlobStreamResponse)(nil), "storage.GetBlobStreamResponse")
 	proto.RegisterType((*PutBlobRequest)(nil), "storage.PutBlobRequest")
 	proto.RegisterType((*PutBlobResponse)(nil), "storage.PutBlobResponse")
+	proto.RegisterType((*PutBlobStreamRequest)(nil), "storage.PutBlobStreamRequest")
+	proto.RegisterType((*PutBlobStreamResponse)(nil), "storage.PutBlobStreamResponse")
 	proto.RegisterType((*DeleteBlobRequest)(nil), "storage.DeleteBlobRequest")
 	proto.RegisterType((*DeleteBlobResponse)(nil), "storage.DeleteBlobResponse")
 	proto.RegisterType((*GetBlobKeysRequest)(nil), "storage.GetBlobKeysRequest")
@@ -335,7 +491,9 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type StorageServiceClient interface {
 	GetBlob(ctx context.Context, in *GetBlobRequest, opts ...grpc.CallOption) (*GetBlobResponse, error)
+	GetBlobStream(ctx context.Context, in *GetBlobStreamRequest, opts ...grpc.CallOption) (StorageService_GetBlobStreamClient, error)
 	PutBlob(ctx context.Context, in *PutBlobRequest, opts ...grpc.CallOption) (*PutBlobResponse, error)
+	PutBlobStream(ctx context.Context, opts ...grpc.CallOption) (StorageService_PutBlobStreamClient, error)
 	DeleteBlob(ctx context.Context, in *DeleteBlobRequest, opts ...grpc.CallOption) (*DeleteBlobResponse, error)
 	GetBlobKeys(ctx context.Context, in *GetBlobKeysRequest, opts ...grpc.CallOption) (*GetBlobKeysResponse, error)
 }
@@ -357,6 +515,38 @@ func (c *storageServiceClient) GetBlob(ctx context.Context, in *GetBlobRequest, 
 	return out, nil
 }
 
+func (c *storageServiceClient) GetBlobStream(ctx context.Context, in *GetBlobStreamRequest, opts ...grpc.CallOption) (StorageService_GetBlobStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_StorageService_serviceDesc.Streams[0], "/storage.StorageService/GetBlobStream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &storageServiceGetBlobStreamClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type StorageService_GetBlobStreamClient interface {
+	Recv() (*GetBlobStreamResponse, error)
+	grpc.ClientStream
+}
+
+type storageServiceGetBlobStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *storageServiceGetBlobStreamClient) Recv() (*GetBlobStreamResponse, error) {
+	m := new(GetBlobStreamResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 func (c *storageServiceClient) PutBlob(ctx context.Context, in *PutBlobRequest, opts ...grpc.CallOption) (*PutBlobResponse, error) {
 	out := new(PutBlobResponse)
 	err := c.cc.Invoke(ctx, "/storage.StorageService/PutBlob", in, out, opts...)
@@ -364,6 +554,40 @@ func (c *storageServiceClient) PutBlob(ctx context.Context, in *PutBlobRequest, 
 		return nil, err
 	}
 	return out, nil
+}
+
+func (c *storageServiceClient) PutBlobStream(ctx context.Context, opts ...grpc.CallOption) (StorageService_PutBlobStreamClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_StorageService_serviceDesc.Streams[1], "/storage.StorageService/PutBlobStream", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &storageServicePutBlobStreamClient{stream}
+	return x, nil
+}
+
+type StorageService_PutBlobStreamClient interface {
+	Send(*PutBlobStreamRequest) error
+	CloseAndRecv() (*PutBlobStreamResponse, error)
+	grpc.ClientStream
+}
+
+type storageServicePutBlobStreamClient struct {
+	grpc.ClientStream
+}
+
+func (x *storageServicePutBlobStreamClient) Send(m *PutBlobStreamRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *storageServicePutBlobStreamClient) CloseAndRecv() (*PutBlobStreamResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(PutBlobStreamResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *storageServiceClient) DeleteBlob(ctx context.Context, in *DeleteBlobRequest, opts ...grpc.CallOption) (*DeleteBlobResponse, error) {
@@ -387,7 +611,9 @@ func (c *storageServiceClient) GetBlobKeys(ctx context.Context, in *GetBlobKeysR
 // StorageServiceServer is the server API for StorageService service.
 type StorageServiceServer interface {
 	GetBlob(context.Context, *GetBlobRequest) (*GetBlobResponse, error)
+	GetBlobStream(*GetBlobStreamRequest, StorageService_GetBlobStreamServer) error
 	PutBlob(context.Context, *PutBlobRequest) (*PutBlobResponse, error)
+	PutBlobStream(StorageService_PutBlobStreamServer) error
 	DeleteBlob(context.Context, *DeleteBlobRequest) (*DeleteBlobResponse, error)
 	GetBlobKeys(context.Context, *GetBlobKeysRequest) (*GetBlobKeysResponse, error)
 }
@@ -414,6 +640,27 @@ func _StorageService_GetBlob_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StorageService_GetBlobStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetBlobStreamRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(StorageServiceServer).GetBlobStream(m, &storageServiceGetBlobStreamServer{stream})
+}
+
+type StorageService_GetBlobStreamServer interface {
+	Send(*GetBlobStreamResponse) error
+	grpc.ServerStream
+}
+
+type storageServiceGetBlobStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *storageServiceGetBlobStreamServer) Send(m *GetBlobStreamResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 func _StorageService_PutBlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(PutBlobRequest)
 	if err := dec(in); err != nil {
@@ -430,6 +677,32 @@ func _StorageService_PutBlob_Handler(srv interface{}, ctx context.Context, dec f
 		return srv.(StorageServiceServer).PutBlob(ctx, req.(*PutBlobRequest))
 	}
 	return interceptor(ctx, in, info, handler)
+}
+
+func _StorageService_PutBlobStream_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(StorageServiceServer).PutBlobStream(&storageServicePutBlobStreamServer{stream})
+}
+
+type StorageService_PutBlobStreamServer interface {
+	SendAndClose(*PutBlobStreamResponse) error
+	Recv() (*PutBlobStreamRequest, error)
+	grpc.ServerStream
+}
+
+type storageServicePutBlobStreamServer struct {
+	grpc.ServerStream
+}
+
+func (x *storageServicePutBlobStreamServer) SendAndClose(m *PutBlobStreamResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *storageServicePutBlobStreamServer) Recv() (*PutBlobStreamRequest, error) {
+	m := new(PutBlobStreamRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func _StorageService_DeleteBlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -489,29 +762,45 @@ var _StorageService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _StorageService_GetBlobKeys_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetBlobStream",
+			Handler:       _StorageService_GetBlobStream_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "PutBlobStream",
+			Handler:       _StorageService_PutBlobStream_Handler,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "storage.proto",
 }
 
-func init() { proto.RegisterFile("storage.proto", fileDescriptor_storage_761b0d99bd4e86bf) }
+func init() { proto.RegisterFile("storage.proto", fileDescriptor_storage_d44917d2bed057f8) }
 
-var fileDescriptor_storage_761b0d99bd4e86bf = []byte{
-	// 267 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x92, 0xc1, 0x4a, 0xc3, 0x40,
-	0x10, 0x86, 0x49, 0x2b, 0x86, 0xfe, 0x6a, 0x6a, 0xc7, 0x82, 0x21, 0xf5, 0x50, 0x16, 0x0a, 0xf5,
-	0xd2, 0x83, 0x82, 0xa7, 0x9e, 0x44, 0x51, 0xf0, 0x22, 0xe9, 0x13, 0xa4, 0x3a, 0x88, 0xb4, 0xb8,
-	0x35, 0xbb, 0x15, 0xf2, 0x30, 0xbe, 0xab, 0x98, 0x4c, 0xb7, 0x9b, 0xb6, 0xe4, 0x36, 0xc9, 0xcc,
-	0xf7, 0x67, 0xe6, 0x23, 0x38, 0x33, 0x56, 0xe7, 0xd9, 0x07, 0x4f, 0x56, 0xb9, 0xb6, 0x9a, 0x42,
-	0x79, 0x54, 0x0a, 0xd1, 0x13, 0xdb, 0xfb, 0xa5, 0x9e, 0xa7, 0xfc, 0xbd, 0x66, 0x63, 0xe9, 0x1c,
-	0xed, 0x05, 0x17, 0x71, 0x30, 0x0c, 0xc6, 0x9d, 0xf4, 0xbf, 0x54, 0x23, 0x74, 0xdd, 0x8c, 0x59,
-	0xe9, 0x2f, 0xc3, 0x44, 0x38, 0x7a, 0xcf, 0x6c, 0x56, 0x4e, 0x9d, 0xa6, 0x65, 0xad, 0xee, 0x10,
-	0xbd, 0xae, 0x9b, 0xa3, 0x1c, 0xd7, 0xf2, 0xb8, 0x1e, 0xba, 0x8e, 0xab, 0xe2, 0xd5, 0x08, 0xbd,
-	0x07, 0x5e, 0xb2, 0xe5, 0xe6, 0xc5, 0xfa, 0x20, 0x7f, 0x4c, 0xe0, 0x3e, 0x48, 0xd6, 0x7d, 0xe1,
-	0xc2, 0x08, 0xad, 0xae, 0x71, 0x51, 0x7b, 0xbb, 0x3d, 0x64, 0xc1, 0x85, 0x89, 0x83, 0x61, 0x7b,
-	0xdc, 0x49, 0xcb, 0xfa, 0xe6, 0xb7, 0x85, 0x68, 0x56, 0xf9, 0x99, 0x71, 0xfe, 0xf3, 0xf9, 0xc6,
-	0x34, 0x45, 0x28, 0x34, 0x5d, 0x4e, 0x36, 0x2a, 0xeb, 0xe2, 0x92, 0x78, 0xbf, 0x21, 0x1f, 0x99,
-	0x22, 0x94, 0x0b, 0x3d, 0xba, 0xee, 0xca, 0xa3, 0x77, 0x64, 0xd0, 0x23, 0xb0, 0xbd, 0x92, 0x12,
-	0x37, 0xb7, 0x67, 0x28, 0x19, 0x1c, 0xec, 0x49, 0xcc, 0x33, 0x4e, 0x3c, 0x01, 0x34, 0xd8, 0xdd,
-	0xd6, 0x93, 0x95, 0x5c, 0x1d, 0x6e, 0x56, 0x49, 0xf3, 0xe3, 0xf2, 0x1f, 0xba, 0xfd, 0x0b, 0x00,
-	0x00, 0xff, 0xff, 0xf4, 0xc8, 0x88, 0x08, 0x54, 0x02, 0x00, 0x00,
+var fileDescriptor_storage_d44917d2bed057f8 = []byte{
+	// 348 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x93, 0xd1, 0x4e, 0xf2, 0x40,
+	0x10, 0x85, 0x53, 0xf8, 0x7f, 0x09, 0xa3, 0x80, 0x8c, 0x25, 0x90, 0xa2, 0x86, 0x6c, 0x42, 0x52,
+	0x2f, 0x24, 0x46, 0x13, 0xaf, 0x8c, 0x17, 0x46, 0xa3, 0x89, 0x37, 0xa4, 0x3c, 0x41, 0xc1, 0x89,
+	0x1a, 0x90, 0x62, 0x77, 0x31, 0xe9, 0xe3, 0xf9, 0x66, 0xa6, 0xed, 0xd8, 0xee, 0x96, 0x82, 0x77,
+	0xdb, 0x9d, 0x33, 0x67, 0xbf, 0x9c, 0x93, 0x42, 0x43, 0xaa, 0x20, 0xf4, 0x5f, 0x69, 0xb4, 0x0a,
+	0x03, 0x15, 0x60, 0x8d, 0x3f, 0x85, 0x80, 0xe6, 0x23, 0xa9, 0xbb, 0x45, 0x30, 0xf5, 0xe8, 0x73,
+	0x4d, 0x52, 0xe1, 0x21, 0x54, 0xe7, 0x14, 0xf5, 0xac, 0x81, 0xe5, 0xd6, 0xbd, 0xf8, 0x28, 0x86,
+	0xd0, 0xca, 0x34, 0x72, 0x15, 0x2c, 0x25, 0x21, 0xc2, 0xbf, 0x17, 0x5f, 0xf9, 0x89, 0xea, 0xc0,
+	0x4b, 0xce, 0xc2, 0x05, 0x9b, 0x65, 0x13, 0x15, 0x92, 0xff, 0xb1, 0xdd, 0xf0, 0x1c, 0x3a, 0x05,
+	0x25, 0xdb, 0xda, 0xf0, 0x7f, 0xf6, 0xb6, 0x5e, 0xce, 0xd9, 0x37, 0xfd, 0x10, 0xd7, 0xd0, 0x1c,
+	0xaf, 0x77, 0x33, 0x66, 0x40, 0x15, 0x0d, 0xa8, 0x0d, 0xad, 0x6c, 0x2f, 0x7d, 0x40, 0xdc, 0x82,
+	0xcd, 0x57, 0x7f, 0x30, 0xe6, 0x28, 0x15, 0x1d, 0xa5, 0x0b, 0x9d, 0xc2, 0x3e, 0x1b, 0x0f, 0xa1,
+	0x7d, 0x4f, 0x0b, 0x52, 0xb4, 0x3b, 0x4a, 0x1b, 0x50, 0x97, 0xf1, 0xb2, 0x0d, 0xc8, 0x79, 0x3c,
+	0x53, 0x24, 0x79, 0x5b, 0x9c, 0xc1, 0x91, 0x71, 0x9b, 0x47, 0x3f, 0xa7, 0x48, 0xf6, 0xac, 0x41,
+	0xd5, 0xad, 0x7b, 0xc9, 0xf9, 0xf2, 0xbb, 0x0a, 0xcd, 0x49, 0xda, 0xe8, 0x84, 0xc2, 0xaf, 0xf7,
+	0x19, 0xe1, 0x0d, 0xd4, 0x78, 0x1b, 0xbb, 0xa3, 0xdf, 0xf2, 0xcd, 0xaa, 0x9d, 0xde, 0xe6, 0x80,
+	0x1f, 0x19, 0x43, 0xc3, 0x68, 0x08, 0x4f, 0x8a, 0x52, 0x23, 0x3f, 0xe7, 0x74, 0xdb, 0x38, 0xf5,
+	0xbb, 0xb0, 0x62, 0x1e, 0x4e, 0x4e, 0xe3, 0x31, 0x6b, 0xd5, 0x78, 0x0a, 0xbd, 0xc5, 0x3c, 0x46,
+	0xee, 0x1a, 0x4f, 0x59, 0x9f, 0x1a, 0x4f, 0x69, 0x5d, 0xae, 0x85, 0x0f, 0x00, 0x79, 0x13, 0xe8,
+	0x64, 0xfa, 0x8d, 0x16, 0x9d, 0x7e, 0xe9, 0x8c, 0xc1, 0x9e, 0x60, 0x5f, 0x2b, 0x09, 0xfb, 0xc5,
+	0x1c, 0xb4, 0x42, 0x9d, 0xe3, 0xf2, 0x61, 0xea, 0x34, 0xdd, 0x4b, 0xfe, 0xcc, 0xab, 0x9f, 0x00,
+	0x00, 0x00, 0xff, 0xff, 0xf6, 0x89, 0x9d, 0x12, 0xaa, 0x03, 0x00, 0x00,
 }
