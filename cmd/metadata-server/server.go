@@ -69,7 +69,7 @@ func (s *Server) GetFileStream(req *mpb.GetFileStreamRequest, stream mpb.Metadat
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	storeStream, err := s.storageClient.GetBlobStream(stream.Context(), &spb.GetBlobStreamRequest{Key: req.Key})
+	storeStream, err := s.storageClient.GetBlobStream(stream.Context(), &spb.GetBlobStreamRequest{Key: req.Path})
 	if err != nil {
 		return err
 	}
@@ -78,9 +78,9 @@ func (s *Server) GetFileStream(req *mpb.GetFileStreamRequest, stream mpb.Metadat
 	if err != nil {
 		return err
 	}
-	entry := metadata.Entries[req.Key]
+	entry := metadata.Entries[req.Path]
 	first, err := storeStream.Recv()
-	if err = stream.Send(&mpb.GetFileStreamResponse{FileChunk: first.FileChunk, Metadata: &entry}); err != nil {
+	if err = stream.Send(&mpb.GetFileStreamResponse{Chunk: first.Chunk, Metadata: &entry}); err != nil {
 		return err
 	}
 
@@ -92,7 +92,7 @@ func (s *Server) GetFileStream(req *mpb.GetFileStreamRequest, stream mpb.Metadat
 		if err != nil {
 			return err
 		}
-		if err = stream.Send(&mpb.GetFileStreamResponse{FileChunk: resp.FileChunk}); err != nil {
+		if err = stream.Send(&mpb.GetFileStreamResponse{Chunk: resp.Chunk}); err != nil {
 			return err
 		}
 	}
@@ -143,15 +143,14 @@ func (s *Server) PutFileStream(stream mpb.MetadataService_PutFileStreamServer) e
 	}
 	// First message determines the key and metadata, it will be assumed that all subsequent
 	// file keys are the same
-	key := in.Key
-	if err = storeStream.Send(&spb.PutBlobStreamRequest{Key: key, FileChunk: in.FileChunk}); err != nil {
+	key := in.Path
+	if err = storeStream.Send(&spb.PutBlobStreamRequest{Key: key, Chunk: in.Chunk}); err != nil {
 		return err
 	}
 	entry := in.Metadata
 	if entry == nil {
 		return errors.New("empty metadata")
 	}
-	fileSize := len(in.FileChunk)
 
 	for {
 		in, err = stream.Recv()
@@ -164,10 +163,9 @@ func (s *Server) PutFileStream(stream mpb.MetadataService_PutFileStreamServer) e
 		if err != nil {
 			return err
 		}
-		if err = storeStream.Send(&spb.PutBlobStreamRequest{Key: key, FileChunk: in.FileChunk}); err != nil {
+		if err = storeStream.Send(&spb.PutBlobStreamRequest{Key: key, Chunk: in.Chunk}); err != nil {
 			return err
 		}
-		fileSize += len(in.FileChunk)
 	}
 
 	metadata, err := s.getMetadataFile(ctx)

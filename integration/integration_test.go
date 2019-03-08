@@ -379,11 +379,11 @@ func TestLargeFilePersistence(t *testing.T) {
 		}
 		chunker.Next()
 		first := chunker.Value()
-		if err = stream.Send(&mpb.PutFileStreamRequest{Key: key, FileChunk: first, Metadata: metadata}); err != nil {
+		if err = stream.Send(&mpb.PutFileStreamRequest{Path: key, Chunk: first, Metadata: metadata}); err != nil {
 			t.Fatal(err)
 		}
 		for chunker.Next() {
-			preq := &mpb.PutFileStreamRequest{FileChunk: chunker.Value()}
+			preq := &mpb.PutFileStreamRequest{Chunk: chunker.Value()}
 			err = stream.Send(preq)
 			if err != nil {
 				t.Fatal(err)
@@ -396,7 +396,7 @@ func TestLargeFilePersistence(t *testing.T) {
 
 	for i := 0; i < 5; i++ {
 		key := fmt.Sprintf("key-%d", i)
-		stream, err := client.GetFileStream(context.Background(), &mpb.GetFileStreamRequest{Key: key})
+		stream, err := client.GetFileStream(context.Background(), &mpb.GetFileStreamRequest{Path: key})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -408,7 +408,7 @@ func TestLargeFilePersistence(t *testing.T) {
 		if first.Metadata == nil {
 			t.Fatal("First message had no metadata")
 		}
-		buff = append(buff, first.FileChunk...)
+		buff = append(buff, first.Chunk...)
 		for {
 			in, err := stream.Recv()
 			if err == io.EOF {
@@ -417,7 +417,7 @@ func TestLargeFilePersistence(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			buff = append(buff, in.FileChunk...)
+			buff = append(buff, in.Chunk...)
 		}
 		t.Log(len(buff), len(testContent))
 		if !bytes.Equal(buff, testContent) {

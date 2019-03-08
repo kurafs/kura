@@ -71,7 +71,7 @@ func (s *storageServer) GetBlobStream(req *spb.GetBlobStreamRequest, stream spb.
 
 	chunker := streaming.NewChunker(file)
 	for chunker.Next() {
-		if err := stream.Send(&spb.GetBlobStreamResponse{FileChunk: chunker.Value()}); err != nil {
+		if err := stream.Send(&spb.GetBlobStreamResponse{Chunk: chunker.Value()}); err != nil {
 			return err
 		}
 	}
@@ -101,7 +101,7 @@ func (s *storageServer) PutBlobStream(stream spb.StorageService_PutBlobStreamSer
 	// First message determines the key, it will be assumed that all subsequent
 	// file keys are the same
 	key := in.Key
-	fileBytes := in.FileChunk
+	fileBytes := in.Chunk
 
 	for {
 		in, err := stream.Recv()
@@ -111,7 +111,7 @@ func (s *storageServer) PutBlobStream(stream spb.StorageService_PutBlobStreamSer
 		if err != nil {
 			return err
 		}
-		fileBytes = append(fileBytes, in.FileChunk...)
+		fileBytes = append(fileBytes, in.Chunk...)
 	}
 
 	if err = s.store.Write(key, fileBytes); err != nil {

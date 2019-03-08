@@ -40,11 +40,11 @@ message GetFileResponse {
 }
 
 message GetFileStreamRequest {
-    string key = 1;
+    string path = 1;
 }
 
 message GetFileStreamResponse {
-    bytes fileChunk = 1;
+    bytes chunk = 1;
 
     // Only set on the first message
     Metadata metadata = 2;
@@ -59,9 +59,9 @@ message PutFileRequest {
 message PutFileResponse { }
 
 message PutFileStreamRequest {
-    // key and metadata should only be set on the first request
-    string key = 1;
-    bytes fileChunk = 2;
+    // path and metadata should only be set on the first request
+    string path = 1;
+    bytes chunk = 2;
     Metadata metadata = 3;
 }
 

@@ -29,7 +29,7 @@ message GetBlobStreamRequest {
 }
 
 message GetBlobStreamResponse {
-    bytes fileChunk = 1;
+    bytes chunk = 1;
 }
 
 message PutBlobRequest {
@@ -41,7 +41,7 @@ message PutBlobResponse { }
 
 message PutBlobStreamRequest {
     string key = 1;
-    bytes fileChunk = 2;
+    bytes chunk = 2;
 }
 
 message PutBlobStreamResponse { }
