@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"io"
 	"path"
 	"strings"
 	"sync"
@@ -64,6 +65,39 @@ func (s *Server) GetFile(ctx context.Context, req *mpb.GetFileRequest) (*mpb.Get
 	return &mpb.GetFileResponse{File: resp.Data, Metadata: &entry}, nil
 }
 
+func (s *Server) GetFileStream(req *mpb.GetFileStreamRequest, stream mpb.MetadataService_GetFileStreamServer) error {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	storeStream, err := s.storageClient.GetBlobStream(stream.Context(), &spb.GetBlobStreamRequest{Key: req.Key})
+	if err != nil {
+		return err
+	}
+
+	metadata, err := s.getMetadataFile(stream.Context())
+	if err != nil {
+		return err
+	}
+	entry := metadata.Entries[req.Key]
+	first, err := storeStream.Recv()
+	if err = stream.Send(&mpb.GetFileStreamResponse{FileChunk: first.FileChunk, Metadata: &entry}); err != nil {
+		return err
+	}
+
+	for {
+		resp, err := storeStream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if err = stream.Send(&mpb.GetFileStreamResponse{FileChunk: resp.FileChunk}); err != nil {
+			return err
+		}
+	}
+}
+
 func (s *Server) PutFile(ctx context.Context, req *mpb.PutFileRequest) (*mpb.PutFileResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -91,6 +125,62 @@ func (s *Server) PutFile(ctx context.Context, req *mpb.PutFileRequest) (*mpb.Put
 	}
 
 	return &mpb.PutFileResponse{}, nil
+}
+
+func (s *Server) PutFileStream(stream mpb.MetadataService_PutFileStreamServer) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	ctx := stream.Context()
+	storeStream, err := s.storageClient.PutBlobStream(ctx)
+	if err != nil {
+		return err
+	}
+
+	in, err := stream.Recv()
+	if err != nil {
+		return err
+	}
+	// First message determines the key and metadata, it will be assumed that all subsequent
+	// file keys are the same
+	key := in.Key
+	if err = storeStream.Send(&spb.PutBlobStreamRequest{Key: key, FileChunk: in.FileChunk}); err != nil {
+		return err
+	}
+	entry := in.Metadata
+	if entry == nil {
+		return errors.New("empty metadata")
+	}
+	fileSize := len(in.FileChunk)
+
+	for {
+		in, err = stream.Recv()
+		if err == io.EOF {
+			if _, err = storeStream.CloseAndRecv(); err != nil {
+				return err
+			}
+			break
+		}
+		if err != nil {
+			return err
+		}
+		if err = storeStream.Send(&spb.PutBlobStreamRequest{Key: key, FileChunk: in.FileChunk}); err != nil {
+			return err
+		}
+		fileSize += len(in.FileChunk)
+	}
+
+	metadata, err := s.getMetadataFile(ctx)
+	if err != nil {
+		return err
+	}
+
+	metadata.Entries[key] = *entry
+	if err := s.setMetadataFile(ctx, metadata); err != nil {
+		return err
+	}
+
+	return stream.SendAndClose(&mpb.PutFileStreamResponse{})
 }
 
 func (s *Server) DeleteFile(ctx context.Context, req *mpb.DeleteFileRequest) (*mpb.DeleteFileResponse, error) {

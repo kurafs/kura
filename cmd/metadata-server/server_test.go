@@ -74,6 +74,18 @@ func (y *testStorageServiceClient) GetBlobKeys(
 	}
 }
 
+func (y *testStorageServiceClient) GetBlobStream(
+	ctx context.Context, in *spb.GetBlobStreamRequest, opts ...grpc.CallOption,
+) (spb.StorageService_GetBlobStreamClient, error) {
+	return nil, nil
+}
+
+func (y *testStorageServiceClient) PutBlobStream(
+	ctx context.Context, opts ...grpc.CallOption,
+) (spb.StorageService_PutBlobStreamClient, error) {
+	return nil, nil
+}
+
 func TestGetFile(t *testing.T) {
 	logger := log.Discarder()
 	ctx := context.Background()
