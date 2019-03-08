@@ -904,7 +904,7 @@ func (c *Server) serve(r fuse.Request) {
 }
 
 // handleRequest will either a) call done(s) and r.Respond(s) OR b) return an error.
-func (c *Server) handleRequest(ctx context.Context, node Node, snode *serveNode, r fuse.Request, done func(resp interface{})) error {
+func (c *Server) handleRequest(ctx context.Context, node Node, snode *serveNode, r fuse.Request, done func(resp interface{})) (ERROR error) {
 	switch r := r.(type) {
 	default:
 		// Note: To FUSE, ENOSYS means "this server never implements this request."

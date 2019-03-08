@@ -52,57 +52,57 @@ func (t *testStore) Keys() []string {
 	return nil
 }
 
-func TestGetFile(t *testing.T) {
+func TestGetBlob(t *testing.T) {
 	logger := log.Discarder()
 	ctx := context.Background()
 
 	testStore := &testStore{}
 	storageServer := newStorageServer(logger, testStore)
-	req := &spb.GetFileRequest{Key: "get-file-req"}
-	res, err := storageServer.GetFile(ctx, req)
+	req := &spb.GetBlobRequest{Key: "get-blob-req"}
+	res, err := storageServer.GetBlob(ctx, req)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if !bytes.Equal(res.File, testGetFileResp) {
-		t.Error(fmt.Sprintf("expected res.File = %v, got %v", testGetFileResp, res.File))
+	if !bytes.Equal(res.Data, testGetFileResp) {
+		t.Error(fmt.Sprintf("expected res.Data = %v, got %v", testGetFileResp, res.Data))
 	}
 }
 
-func TestPutFile(t *testing.T) {
+func TestPutData(t *testing.T) {
 	logger := log.Discarder()
 	ctx := context.Background()
 
 	testStore := &testStore{}
 	storageServer := newStorageServer(logger, testStore)
-	req := &spb.PutFileRequest{Key: "put-file-req", File: []byte("file")}
-	_, err := storageServer.PutFile(ctx, req)
-	if err != nil {
-		t.Error(err)
-	}
-}
-
-func TestDeleteFile(t *testing.T) {
-	logger := log.Discarder()
-	ctx := context.Background()
-
-	testStore := &testStore{}
-	storageServer := newStorageServer(logger, testStore)
-	req := &spb.DeleteFileRequest{Key: deleteFileReqKey}
-	_, err := storageServer.DeleteFile(ctx, req)
+	req := &spb.PutBlobRequest{Key: "put-data-req", Data: []byte("data")}
+	_, err := storageServer.PutBlob(ctx, req)
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func TestGetFileKeys(t *testing.T) {
+func TestDeleteBlob(t *testing.T) {
 	logger := log.Discarder()
 	ctx := context.Background()
 
 	testStore := &testStore{}
 	storageServer := newStorageServer(logger, testStore)
-	req := &spb.GetFileKeysRequest{}
-	_, err := storageServer.GetFileKeys(ctx, req)
+	req := &spb.DeleteBlobRequest{Key: deleteFileReqKey}
+	_, err := storageServer.DeleteBlob(ctx, req)
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestGetBlobKeys(t *testing.T) {
+	logger := log.Discarder()
+	ctx := context.Background()
+
+	testStore := &testStore{}
+	storageServer := newStorageServer(logger, testStore)
+	req := &spb.GetBlobKeysRequest{}
+	_, err := storageServer.GetBlobKeys(ctx, req)
 
 	if err != nil {
 		t.Error(err)

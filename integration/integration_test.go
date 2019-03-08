@@ -50,19 +50,19 @@ func TestFilePersistence(t *testing.T) {
 	defer conn.Close()
 
 	key, content := "key", bytes.Repeat([]byte("-"), 1024*1024*2)
-	metadata := &mpb.FileMetadata{
+	metadata := &mpb.Metadata{
 		Size: int64(len(content)),
 	}
 
 	client := mpb.NewMetadataServiceClient(conn)
 
-	preq := &mpb.PutFileRequest{Key: key, File: content, Metadata: metadata}
+	preq := &mpb.PutFileRequest{Path: key, File: content, Metadata: metadata}
 	_, err = client.PutFile(context.Background(), preq)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	greq := &mpb.GetFileRequest{Key: key}
+	greq := &mpb.GetFileRequest{Path: key}
 	gresp, err := client.GetFile(context.Background(), greq)
 	if err != nil {
 		t.Fatal(err)
@@ -76,7 +76,7 @@ func TestFilePersistence(t *testing.T) {
 		t.Fatalf("expected %v, got %v", content, gresp.File)
 	}
 
-	mreq := &mpb.GetMetadataRequest{Key: key}
+	mreq := &mpb.GetMetadataRequest{Path: key}
 	mresp, err := client.GetMetadata(context.Background(), mreq)
 	if err != nil {
 		t.Fatal(err)
@@ -118,19 +118,19 @@ func TestFileDeletion(t *testing.T) {
 	defer conn.Close()
 
 	key, content := "key", bytes.Repeat([]byte("-"), 1024*1024*2)
-	metadata := &mpb.FileMetadata{
+	metadata := &mpb.Metadata{
 		Size: int64(len(content)),
 	}
 
 	client := mpb.NewMetadataServiceClient(conn)
 
-	preq := &mpb.PutFileRequest{Key: key, File: content, Metadata: metadata}
+	preq := &mpb.PutFileRequest{Path: key, File: content, Metadata: metadata}
 	_, err = client.PutFile(context.Background(), preq)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	greq := &mpb.GetFileRequest{Key: key}
+	greq := &mpb.GetFileRequest{Path: key}
 	gresp, err := client.GetFile(context.Background(), greq)
 	if err != nil {
 		t.Fatal(err)
@@ -140,7 +140,7 @@ func TestFileDeletion(t *testing.T) {
 		t.Fatalf("expected %v, got %v", content, gresp.File)
 	}
 
-	dreq := &mpb.DeleteFileRequest{Key: key}
+	dreq := &mpb.DeleteFileRequest{Path: key}
 	_, err = client.DeleteFile(context.Background(), dreq)
 	if err != nil {
 		t.Fatal(err)
@@ -188,22 +188,22 @@ func TestSetMetadata(t *testing.T) {
 	key, content := "key", bytes.Repeat([]byte("-"), 1024*1024*2)
 
 	now := time.Now()
-	metadata := &mpb.FileMetadata{
-		Created:      &mpb.FileMetadata_UnixTimestamp{Seconds: now.Unix(), Nanoseconds: 0},
-		LastModified: &mpb.FileMetadata_UnixTimestamp{Seconds: now.Unix(), Nanoseconds: 0},
+	metadata := &mpb.Metadata{
+		Created:      &mpb.Metadata_UnixTimestamp{Seconds: now.Unix(), Nanoseconds: 0},
+		LastModified: &mpb.Metadata_UnixTimestamp{Seconds: now.Unix(), Nanoseconds: 0},
 		Permissions:  0600,
 		Size:         int64(len(content)),
 	}
 
 	client := mpb.NewMetadataServiceClient(conn)
 
-	preq := &mpb.PutFileRequest{Key: key, File: content, Metadata: metadata}
+	preq := &mpb.PutFileRequest{Path: key, File: content, Metadata: metadata}
 	_, err = client.PutFile(context.Background(), preq)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	greq := &mpb.GetFileRequest{Key: key}
+	greq := &mpb.GetFileRequest{Path: key}
 	gresp, err := client.GetFile(context.Background(), greq)
 	if err != nil {
 		t.Fatal(err)
@@ -229,13 +229,13 @@ func TestSetMetadata(t *testing.T) {
 			metadata.Created.Seconds, gresp.Metadata.LastModified.Seconds)
 	}
 
-	msreq := &mpb.SetMetadataRequest{Key: key, Metadata: metadata}
+	msreq := &mpb.SetMetadataRequest{Path: key, Metadata: metadata}
 	_, err = client.SetMetadata(context.Background(), msreq)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	mgreq := &mpb.GetMetadataRequest{Key: key}
+	mgreq := &mpb.GetMetadataRequest{Path: key}
 	mgresp, err := client.GetMetadata(context.Background(), mgreq)
 	if err != nil {
 		t.Fatal(err)
@@ -290,31 +290,39 @@ func TestDirKeys(t *testing.T) {
 
 	client := mpb.NewMetadataServiceClient(conn)
 
+	set := make(map[string]struct{})
 	for i := 0; i < 10; i++ {
 		key, content := fmt.Sprintf("key-%d", i), bytes.Repeat([]byte("-"), 1024*1024*2)
-		metadata := &mpb.FileMetadata{
+		set[key] = struct{}{}
+		metadata := &mpb.Metadata{
 			Size: int64(len(content)),
 		}
-		preq := &mpb.PutFileRequest{Key: key, File: content, Metadata: metadata}
+		preq := &mpb.PutFileRequest{Path: "/" + key, File: content, Metadata: metadata}
 		_, err = client.PutFile(context.Background(), preq)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 
-	dreq := &mpb.GetDirectoryKeysRequest{}
-	dres, err := client.GetDirectoryKeys(context.Background(), dreq)
+	dreq := &mpb.GetDirectoryEntriesRequest{Path: ""}
+	dres, err := client.GetDirectoryEntries(context.Background(), dreq)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if len(dres.Keys) != 10 {
-		t.Fatalf("expected len(dres.Keys)=%d, got %d", 10, len(dres.Keys))
+	if len(dres.Entries) != 10 {
+		t.Fatalf("expected len(dres.Entries)=%d, got %d", 10, len(dres.Entries))
 	}
 	for i := 0; i < 10; i++ {
-		if dres.Keys[i] != fmt.Sprintf("key-%d", i) {
-			t.Fatalf("expected %s, got %s", fmt.Sprintf("key-%d", i), dres.Keys[i])
+		_, ok := set[dres.Entries[i].Path]
+		if !ok {
+			t.Fatalf("%s not found in set", dres.Entries[i])
 		}
+		delete(set, dres.Entries[i].Path)
+	}
+
+	if len(set) != 0 {
+		t.Fatal("not all files were retrieved")
 	}
 
 	shutdownStorage()

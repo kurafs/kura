@@ -46,55 +46,52 @@ func newStorageServer(logger *log.Logger, store Store) *storageServer {
 	}
 }
 
-func (s *storageServer) GetFile(ctx context.Context, req *spb.GetFileRequest) (*spb.GetFileResponse, error) {
+func (s *storageServer) GetBlob(ctx context.Context, req *spb.GetBlobRequest) (*spb.GetBlobResponse, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	file, err := s.store.Read(req.Key)
+	blob, err := s.store.Read(req.Key)
 	if err != nil {
 		return nil, err
 	}
 
-	return &spb.GetFileResponse{File: file}, nil
+	return &spb.GetBlobResponse{Data: blob}, nil
 }
 
-func (s *storageServer) PutFile(ctx context.Context, req *spb.PutFileRequest) (*spb.PutFileResponse, error) {
+func (s *storageServer) PutBlob(ctx context.Context, req *spb.PutBlobRequest) (*spb.PutBlobResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if err := s.store.Write(req.Key, req.File); err != nil {
+	if err := s.store.Write(req.Key, req.Data); err != nil {
 		return nil, err
 	}
 
-	return &spb.PutFileResponse{}, nil
+	return &spb.PutBlobResponse{}, nil
 }
 
-func (s *storageServer) DeleteFile(ctx context.Context, req *spb.DeleteFileRequest) (*spb.DeleteFileResponse, error) {
+func (s *storageServer) DeleteBlob(ctx context.Context, req *spb.DeleteBlobRequest) (*spb.DeleteBlobResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	if !s.store.Has(req.Key) {
-		return &spb.DeleteFileResponse{}, errors.New("File does not exist")
+		return &spb.DeleteBlobResponse{}, errors.New("blob does not exist")
 	}
 
 	if err := s.store.Erase(req.Key); err != nil {
 		return nil, err
 	}
 
-	return &spb.DeleteFileResponse{}, nil
+	return &spb.DeleteBlobResponse{}, nil
 }
 
-func (s *storageServer) GetFileKeys(ctx context.Context, req *spb.GetFileKeysRequest) (*spb.GetFileKeysResponse, error) {
+func (s *storageServer) GetBlobKeys(ctx context.Context, req *spb.GetBlobKeysRequest) (*spb.GetBlobKeysResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	fileKeys := s.store.Keys()
-
 	keys := make([]string, 0)
-
-	for _, key := range fileKeys {
+	for _, key := range s.store.Keys() {
 		keys = append(keys, key)
 	}
 
-	return &spb.GetFileKeysResponse{Keys: keys}, nil
+	return &spb.GetBlobKeysResponse{Keys: keys}, nil
 }

@@ -16,36 +16,36 @@ syntax = "proto3";
 
 package storage;
 
-message GetFileRequest {
+message GetBlobRequest {
     string key = 1;
 }
 
-message GetFileResponse {
-    bytes file = 1;
+message GetBlobResponse {
+    bytes data = 1;
 }
 
-message PutFileRequest {
+message PutBlobRequest {
     string key = 1;
-    bytes file = 2;
+    bytes data = 2;
 }
 
-message PutFileResponse { }
+message PutBlobResponse { }
 
-message DeleteFileRequest {
+message DeleteBlobRequest {
     string key = 1;
 }
 
-message DeleteFileResponse { }
+message DeleteBlobResponse { }
 
-message GetFileKeysRequest { }
+message GetBlobKeysRequest { }
 
-message GetFileKeysResponse {
+message GetBlobKeysResponse {
   repeated string keys = 1;
 }
 
 service StorageService {
-    rpc GetFile (GetFileRequest) returns (GetFileResponse);
-    rpc PutFile (PutFileRequest) returns (PutFileResponse);
-    rpc DeleteFile (DeleteFileRequest) returns (DeleteFileResponse);
-    rpc GetFileKeys (GetFileKeysRequest) returns (GetFileKeysResponse);
+    rpc GetBlob (GetBlobRequest) returns (GetBlobResponse);
+    rpc PutBlob (PutBlobRequest) returns (PutBlobResponse);
+    rpc DeleteBlob (DeleteBlobRequest) returns (DeleteBlobResponse);
+    rpc GetBlobKeys (GetBlobKeysRequest) returns (GetBlobKeysResponse);
 }
