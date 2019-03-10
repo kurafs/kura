@@ -37,11 +37,12 @@ func newIdentityServer(logger *log.Logger, db *bolt.DB) *identityServer {
 	}
 }
 
-func (i *identityServer) GetPublicKey(ctx context.Context, req *ipb.GetKeyRequest) (*ipb.GetKeyResponse, error) {
+func (i *identityServer) GetIdentity(ctx context.Context, req *ipb.GetIdentityRequest) (*ipb.GetIdentityResponse, error) {
 	var pkey []byte
+	var server string
 	err := i.db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("user-keys"))
-		pkey = b.Get([]byte(req.Email))
+		pkey = tx.Bucket([]byte("user-keys")).Get([]byte(req.Email))
+		server = string(tx.Bucket([]byte("user-servers")).Get([]byte(req.Email)))
 		return nil
 	})
 
@@ -53,22 +54,37 @@ func (i *identityServer) GetPublicKey(ctx context.Context, req *ipb.GetKeyReques
 		return nil, errors.New("user not found")
 	}
 
-	return &ipb.GetKeyResponse{PublicKey: pkey}, nil
+	return &ipb.GetIdentityResponse{
+		PublicKey:      pkey,
+		MetadataServer: server,
+	}, nil
 }
 
-func (i *identityServer) PutPublicKey(ctx context.Context, req *ipb.PutKeyRequest) (*ipb.PutKeyResponse, error) {
+func (i *identityServer) PutIdentity(ctx context.Context, req *ipb.PutIdentityRequest) (*ipb.PutIdentityResponse, error) {
 	err := i.db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("user-keys"))
-		pkey := b.Get([]byte(req.Email))
-		if pkey != nil {
-			return errors.New("public key for email already exists")
+		{
+			b := tx.Bucket([]byte("user-keys"))
+			pkey := b.Get([]byte(req.Email))
+			if pkey != nil {
+				return errors.New("public key for email already exists")
+			}
+			err := b.Put([]byte(req.Email), req.PublicKey)
+			return err
 		}
-		err := b.Put([]byte(req.Email), req.PublicKey)
-		return err
+
+		{
+			b := tx.Bucket([]byte("user-servers"))
+			server := b.Get([]byte(req.Email))
+			if server != nil {
+				return errors.New("server for email already exists")
+			}
+			err := b.Put([]byte(req.Email), []byte(req.MetadataServer))
+			return err
+		}
 	})
 
 	if err != nil {
 		return nil, err
 	}
-	return &ipb.PutKeyResponse{}, nil
+	return &ipb.PutIdentityResponse{}, nil
 }
