@@ -1,7 +1,11 @@
 package fuseserver
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/sha256"
+	"fmt"
 	"os"
 	"path"
 	"sync"
@@ -68,6 +72,7 @@ type Dir struct {
 	fserver *fuseServer
 	path    string
 	inode   uint64
+	aeskey  []byte
 }
 
 func (d *Dir) Attr(ctx context.Context, a *fuse.Attr) error {
@@ -131,6 +136,37 @@ func (d *Dir) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	return nil, fuse.ENOENT
 }
 
+func wrap(ctx context.Context, cs cpb.CryptServiceClient) (*mpb.Metadata_Accessor, error) {
+	preq := &cpb.PublicKeyRequest{}
+	pres, err := cs.PublicKey(ctx, preq)
+	if err != nil {
+		return nil, err
+	}
+
+	h := sha256.New()
+	h.Write(pres.X)
+	h.Write(pres.Y)
+	sum := h.Sum(nil)
+
+	aeskey := make([]byte, 16)
+	_, err = rand.Read(aeskey)
+	if err != nil {
+		return nil, err
+	}
+
+	ereq := &cpb.EncryptionRequest{Plaintext: aeskey}
+	eres, err := cs.Encrypt(ctx, ereq)
+	if err != nil {
+		return nil, err
+	}
+
+	ma := mpb.Metadata_Accessor{
+		IdentityHash: sum,
+		EncryptedKey: eres.Ciphertext,
+	}
+	return &ma, nil
+}
+
 func (d *Dir) Create(
 	ctx context.Context,
 	req *fuse.CreateRequest,
@@ -139,6 +175,14 @@ func (d *Dir) Create(
 	d.fserver.mu.Lock()
 	defer d.fserver.mu.Unlock()
 
+	ma, err := wrap(ctx, d.fserver.cryptServerClient)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	alist := make([]*mpb.Metadata_Accessor, 0)
+	alist = append(alist, ma)
+
 	ts := time.Now().Unix()
 	metadata := &mpb.Metadata{
 		Created:      &mpb.Metadata_UnixTimestamp{Seconds: ts},
@@ -146,6 +190,7 @@ func (d *Dir) Create(
 		Permissions:  uint32(req.Mode),
 		Size:         int64(0),
 		IsDirectory:  false,
+		AccessList:   alist,
 	}
 
 	rq := &mpb.PutFileRequest{
@@ -153,7 +198,7 @@ func (d *Dir) Create(
 		File:     []byte{},
 		Metadata: metadata,
 	}
-	_, err := d.fserver.metadataServerClient.PutFile(ctx, rq)
+	_, err = d.fserver.metadataServerClient.PutFile(ctx, rq)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -283,10 +328,6 @@ func (f *File) Attr(ctx context.Context, a *fuse.Attr) error {
 	f.fserver.mu.Lock()
 	defer f.fserver.mu.Unlock()
 
-	return f.AttrLocked(ctx, a)
-}
-
-func (f *File) AttrLocked(ctx context.Context, a *fuse.Attr) error {
 	req := &mpb.GetMetadataRequest{Path: f.path}
 	res, err := f.fserver.metadataServerClient.GetMetadata(ctx, req)
 	if err != nil {
@@ -311,7 +352,37 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 		return nil, err
 	}
 
-	creq := &cpb.DecryptionRequest{Ciphertext: res.File}
+	preq := &cpb.PublicKeyRequest{}
+	pres, err := f.fserver.cryptServerClient.PublicKey(ctx, preq)
+	if err != nil {
+		return nil, err
+	}
+
+	h := sha256.New()
+	h.Write(pres.X)
+	h.Write(pres.Y)
+	sum := h.Sum(nil)
+
+	var ekey []byte
+	for _, a := range res.Metadata.AccessList {
+		if bytes.Equal(a.IdentityHash, sum) {
+			ekey = a.EncryptedKey
+			break
+		}
+	}
+
+	if ekey == nil {
+		return nil, fmt.Errorf("key for file not found")
+	}
+
+	dreq := &cpb.DecryptionRequest{Ciphertext: ekey}
+	dres, err := f.fserver.cryptServerClient.Decrypt(ctx, dreq)
+	if err != nil {
+		return nil, err
+	}
+
+	fkey := dres.Plaintext
+	creq := &cpb.DecryptionRequest{Ciphertext: res.File, AesKey: fkey}
 	cres, err := f.fserver.cryptServerClient.Decrypt(ctx, creq)
 	if err != nil {
 		return nil, err
@@ -328,26 +399,62 @@ func (f *File) Write(
 	f.fserver.mu.Lock()
 	defer f.fserver.mu.Unlock()
 
-	creq := &cpb.EncryptionRequest{Plaintext: req.Data}
-	cres, err := f.fserver.cryptServerClient.Encrypt(ctx, creq)
+	// TODO(irfansharif): Cache file keys somewhere to not make this request
+	// each time.
+	mreq := &mpb.GetMetadataRequest{Path: f.path}
+	mres, err := f.fserver.metadataServerClient.GetMetadata(ctx, mreq)
 	if err != nil {
 		return err
 	}
 
-	var attr fuse.Attr
-	f.AttrLocked(ctx, &attr)
+	preq := &cpb.PublicKeyRequest{}
+	pres, err := f.fserver.cryptServerClient.PublicKey(ctx, preq)
+	if err != nil {
+		return err
+	}
+
+	h := sha256.New()
+	h.Write(pres.X)
+	h.Write(pres.Y)
+	sum := h.Sum(nil)
+
+	var ekey []byte
+	for _, a := range mres.Metadata.AccessList {
+		if bytes.Equal(a.IdentityHash, sum) {
+			ekey = a.EncryptedKey
+			break
+		}
+	}
+
+	if ekey == nil {
+		return fmt.Errorf("key for file not found")
+	}
+
+	dreq := &cpb.DecryptionRequest{Ciphertext: ekey}
+	dres, err := f.fserver.cryptServerClient.Decrypt(ctx, dreq)
+	if err != nil {
+		return err
+	}
+
+	fkey := dres.Plaintext
+	ereq := &cpb.EncryptionRequest{Plaintext: req.Data, AesKey: fkey}
+	eres, err := f.fserver.cryptServerClient.Encrypt(ctx, ereq)
+	if err != nil {
+		return err
+	}
 
 	metadata := &mpb.Metadata{
 		Size:         int64(len(req.Data)),
 		LastModified: &mpb.Metadata_UnixTimestamp{Seconds: time.Now().Unix()},
-		Created:      &mpb.Metadata_UnixTimestamp{Seconds: attr.Crtime.Unix()},
-		Permissions:  uint32(attr.Mode),
+		Created:      mres.Metadata.Created,
+		Permissions:  mres.Metadata.Permissions,
 		IsDirectory:  false,
+		AccessList:   mres.Metadata.AccessList,
 	}
 
 	rq := &mpb.PutFileRequest{
 		Path:     f.path,
-		File:     []byte(cres.Ciphertext),
+		File:     []byte(eres.Ciphertext),
 		Metadata: metadata,
 	}
 	_, err = f.fserver.metadataServerClient.PutFile(ctx, rq)
