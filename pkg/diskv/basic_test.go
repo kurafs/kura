@@ -49,6 +49,87 @@ func TestWriteReadErase(t *testing.T) {
 	}
 }
 
+func TestWriteRename(t *testing.T) {
+	d := New(Options{
+		BasePath:     "test-data",
+		CacheSizeMax: 1024,
+	})
+	defer d.EraseAll()
+	k, nk, v := "a", "b", []byte{'c'}
+	if err := d.Write(k, v); err != nil {
+		t.Fatalf("write: %s", err)
+	}
+	if readVal, err := d.Read(k); err != nil {
+		t.Fatalf("read: %s", err)
+	} else if bytes.Compare(v, readVal) != 0 {
+		t.Fatalf("read: expected %s, got %s", v, readVal)
+	}
+	if err := d.Rename(k, nk); err != nil {
+		t.Fatalf("rename: %s", err)
+	}
+	if readVal, err := d.Read(nk); err != nil {
+		t.Fatalf("read: %s", err)
+	} else if bytes.Compare(v, readVal) != 0 {
+		t.Fatalf("read: expected %s, got %s", v, readVal)
+	}
+	if readVal, err := d.Read(k); err == nil {
+		t.Fatalf("read: expected missing key, got %s", readVal)
+	}
+	if err := d.Erase(nk); err != nil {
+		t.Fatalf("erase: %s", err)
+	}
+}
+
+func TestWriteRenameOverwrite(t *testing.T) {
+	d := New(Options{
+		BasePath:     "test-data",
+		CacheSizeMax: 1024,
+	})
+	defer d.EraseAll()
+
+	af, bf, cf := "a.txt", "b.txt", "c.txt"
+	bef, aft := []byte("bef"), []byte("aft")
+	if err := d.Write(af, bef); err != nil {
+		t.Fatalf("write: %s", err)
+	}
+	if readVal, err := d.Read(af); err != nil {
+		t.Fatalf("read: %s", err)
+	} else if bytes.Compare(bef, readVal) != 0 {
+		t.Fatalf("read: expected %s, got %s", bef, readVal)
+	}
+
+	if err := d.Rename(af, bf); err != nil {
+		t.Fatalf("rename: %s", err)
+	}
+	if readVal, err := d.Read(bf); err != nil {
+		t.Fatalf("read: %s", err)
+	} else if bytes.Compare(bef, readVal) != 0 {
+		t.Fatalf("read: expected %s, got %s", bef, readVal)
+	}
+
+	if err := d.Write(cf, aft); err != nil {
+		t.Fatalf("write: %s", err)
+	}
+	if readVal, err := d.Read(cf); err != nil {
+		t.Fatalf("read: %s", err)
+	} else if bytes.Compare(aft, readVal) != 0 {
+		t.Fatalf("read: expected %s, got %s", aft, readVal)
+	}
+
+	if err := d.Rename(cf, bf); err != nil {
+		t.Fatalf("rename: %s", err)
+	}
+	if readVal, err := d.Read(bf); err != nil {
+		t.Fatalf("read: %s", err)
+	} else if bytes.Compare(aft, readVal) != 0 {
+		t.Fatalf("read: expected %s, got %s", aft, readVal)
+	}
+
+	if err := d.Erase(bf); err != nil {
+		t.Fatalf("erase: %s", err)
+	}
+}
+
 func TestWRECache(t *testing.T) {
 	d := New(Options{
 		BasePath:     "test-data",

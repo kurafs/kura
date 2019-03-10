@@ -286,6 +286,43 @@ func (d *Diskv) writeStreamWithLock(pathKey *PathKey, r io.Reader, sync bool) er
 	return nil
 }
 
+// Rename renames source file named by oldKey to newKey. If the newKey already
+// exists, it's overwritten.
+func (d *Diskv) Rename(oldKey, newKey string) (err error) {
+	if newKey == "" {
+		return errEmptyKey
+	}
+
+	oldPathKey := d.transform(oldKey)
+	newPathKey := d.transform(newKey)
+
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	if err := d.ensurePathWithLock(newPathKey); err != nil {
+		return fmt.Errorf("ensure path: %s", err)
+	}
+
+	if err := os.Rename(
+		d.completeFilename(oldPathKey),
+		d.completeFilename(newPathKey),
+	); err != nil {
+		return err
+	}
+
+	d.bustCacheWithLock(oldPathKey.originalKey)
+	d.bustCacheWithLock(newPathKey.originalKey)
+
+	// erase from index
+	if d.Index != nil {
+		d.Index.Delete(oldKey)
+	}
+
+	// clean up and return
+	d.pruneDirsWithLock(oldKey)
+	return nil
+}
+
 // Import imports the source file into diskv under the destination key. If the
 // destination key already exists, it's overwritten. If move is true, the
 // source file is removed after a successful import.

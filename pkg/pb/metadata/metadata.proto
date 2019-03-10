@@ -113,7 +113,12 @@ message SetMetadataRequest {
 
 message SetMetadataResponse { }
 
-// TODO: Create RPC to copy folder recursively.
+message RenameRequest {
+  string old_path = 1;
+  string new_path = 2;
+}
+
+message RenameResponse { }
 
 service MetadataService { 
     rpc GetFile (GetFileRequest) returns (GetFileResponse);
@@ -124,6 +129,8 @@ service MetadataService {
     rpc CreateDirectory (CreateDirectoryRequest) returns (CreateDirectoryResponse);
     rpc DeleteDirectory (DeleteDirectoryRequest) returns (DeleteDirectoryResponse);
     rpc GetDirectoryEntries (GetDirectoryEntriesRequest) returns (GetDirectoryEntriesResponse);
+
+    rpc Rename (RenameRequest) returns (RenameResponse);
 
     rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse);
     rpc SetMetadata (SetMetadataRequest) returns (SetMetadataResponse);

@@ -58,11 +58,19 @@ message GetBlobKeysResponse {
   repeated string keys = 1;
 }
 
+message RenameBlobRequest {
+  string old_key = 1;
+  string new_key = 2;
+}
+
+message RenameBlobResponse { }
+
 service StorageService {
     rpc GetBlob (GetBlobRequest) returns (GetBlobResponse);
     rpc GetBlobStream (GetBlobStreamRequest) returns (stream GetBlobStreamResponse);
     rpc PutBlob (PutBlobRequest) returns (PutBlobResponse);
     rpc PutBlobStream (stream PutBlobStreamRequest) returns (PutBlobStreamResponse);
+    rpc RenameBlob (RenameBlobRequest) returns (RenameBlobResponse);
     rpc DeleteBlob (DeleteBlobRequest) returns (DeleteBlobResponse);
     rpc GetBlobKeys (GetBlobKeysRequest) returns (GetBlobKeysResponse);
 }

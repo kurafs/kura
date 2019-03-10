@@ -52,16 +52,22 @@ func (t *testStorageServiceClient) GetBlob(
 	return &spb.GetBlobResponse{Data: serialized}, nil
 }
 
-func (y *testStorageServiceClient) PutBlob(
+func (t *testStorageServiceClient) PutBlob(
 	ctx context.Context, in *spb.PutBlobRequest, opts ...grpc.CallOption,
 ) (*spb.PutBlobResponse, error) {
 	return &spb.PutBlobResponse{}, nil
 }
 
-func (y *testStorageServiceClient) DeleteBlob(
+func (t *testStorageServiceClient) DeleteBlob(
 	ctx context.Context, in *spb.DeleteBlobRequest, opts ...grpc.CallOption,
 ) (*spb.DeleteBlobResponse, error) {
 	return &spb.DeleteBlobResponse{}, nil
+}
+
+func (t *testStorageServiceClient) RenameBlob(
+	ctx context.Context, in *spb.RenameBlobRequest, opts ...grpc.CallOption,
+) (*spb.RenameBlobResponse, error) {
+	return &spb.RenameBlobResponse{}, nil
 }
 
 func (y *testStorageServiceClient) GetBlobKeys(
