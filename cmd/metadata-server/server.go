@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"path"
 	"strings"
@@ -288,6 +289,149 @@ func (s *Server) GetDirectoryEntries(ctx context.Context, req *mpb.GetDirectoryE
 	}
 
 	return &mpb.GetDirectoryEntriesResponse{Entries: entries}, nil
+}
+
+func (s *Server) Rename(ctx context.Context, req *mpb.RenameRequest) (*mpb.RenameResponse, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	metadata, err := s.getMetadataFile(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	oentry, _ := metadata.Entries[req.OldPath]
+	nentry, nexists := metadata.Entries[req.NewPath]
+
+	// Cases:
+	// OldPath      NewPathExists       NewPath     Result
+	// -------------------------------------------------------
+	// File         No                  N/A         Rename
+	// File         Yes                 File        Overwrite
+	// File         Yes                 Dir         Error!
+	// Dir          No                  N/A         Rename
+	// Dir          Yes                 File        Error!
+	// Dir          Yes                 Dir         Overwrite if empty, else Error!
+
+	// Cases for 'Error!'
+
+	// Take care of renaming a directory into a file, or vice versa.
+	if nexists && (oentry.IsDirectory != nentry.IsDirectory) {
+		return nil, fmt.Errorf("can't rename dir to file or vice-versa")
+	}
+
+	// Take care of attempt to copy directory into itself.
+	if nexists && nentry.IsDirectory && oentry.IsDirectory && req.OldPath == req.NewPath {
+		return nil, fmt.Errorf("can't move directory into itself")
+	}
+
+	// Say we have the following tree structure, a and a' are the same name but
+	// are distinguished to be able to talk about them.
+	//
+	// ├── a
+	// └── b
+	//     └── a'
+	//        [...]
+	//
+	// If we try 'mv a b', it should fail if a' is non-empty. If a' is empty, we
+	// should override to get the following:
+	//
+	// └── b
+	//     └── a
+	if nexists && nentry.IsDirectory && oentry.IsDirectory {
+		// We check if a there exists a directory under nentry with the same
+		// name as oentry, and if so, if said directory is empty.
+		empty := true
+		for path := range metadata.Entries {
+			if strings.HasPrefix(path, req.NewPath+"/") {
+				empty = false
+				break
+			}
+		}
+		if !empty {
+			return nil, fmt.Errorf("directory not empty")
+		}
+	}
+
+	// Cases for 'Rename'
+
+	if !nexists {
+		if !oentry.IsDirectory {
+			// File rename.
+			res, err := s.fileRenameLocked(ctx, req.OldPath, req.NewPath, metadata)
+			return res, err
+		}
+
+		// Directory rename.
+		res, err := s.directoryRenameLocked(ctx, req.OldPath, req.NewPath, metadata)
+		return res, err
+	}
+
+	// Cases for 'Overwrite'
+
+	if !oentry.IsDirectory {
+		// File overwrite.
+		res, err := s.fileRenameLocked(ctx, req.OldPath, req.NewPath, metadata)
+		return res, err
+	}
+
+	// Directory overwrite.
+	res, err := s.directoryRenameLocked(ctx, req.OldPath, req.NewPath, metadata)
+	return res, err
+}
+
+func (s *Server) fileRenameLocked(ctx context.Context, oldPath, newPath string, metadata *MetadataFile) (*mpb.RenameResponse, error) {
+	req := &spb.RenameBlobRequest{
+		OldKey: oldPath,
+		NewKey: newPath,
+	}
+
+	if _, err := s.storageClient.RenameBlob(ctx, req); err != nil {
+		return nil, err
+	}
+
+	metadata.Entries[newPath] = metadata.Entries[oldPath]
+	delete(metadata.Entries, oldPath)
+
+	if err := s.setMetadataFile(ctx, metadata); err != nil {
+		return nil, err
+	}
+
+	return &mpb.RenameResponse{}, nil
+}
+
+func (s *Server) directoryRenameLocked(ctx context.Context, oldPath, newPath string, metadata *MetadataFile) (*mpb.RenameResponse, error) {
+	// First change the name of the directory stored in metadata itself.
+	metadata.Entries[newPath] = metadata.Entries[oldPath]
+	delete(metadata.Entries, oldPath)
+
+	// Do all the subfiles/dirs.
+	for cpath, entry := range metadata.Entries {
+		if !strings.HasPrefix(cpath, oldPath+"/") {
+			continue
+		}
+
+		npath := path.Join(newPath, cpath[len(oldPath+"/"):])
+		if !entry.IsDirectory {
+			req := &spb.RenameBlobRequest{
+				OldKey: cpath,
+				NewKey: npath,
+			}
+
+			if _, err := s.storageClient.RenameBlob(ctx, req); err != nil {
+				return nil, err
+			}
+		}
+
+		metadata.Entries[npath] = metadata.Entries[cpath]
+		delete(metadata.Entries, cpath)
+	}
+
+	if err := s.setMetadataFile(ctx, metadata); err != nil {
+		return nil, err
+	}
+
+	return &mpb.RenameResponse{}, nil
 }
 
 func (s *Server) GetMetadata(ctx context.Context, req *mpb.GetMetadataRequest) (*mpb.GetMetadataResponse, error) {

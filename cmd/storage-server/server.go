@@ -31,6 +31,7 @@ type Store interface {
 	Has(key string) bool
 	Erase(key string) error
 	Keys() []string
+	Rename(oldKey, newKey string) error
 }
 
 type storageServer struct {
@@ -133,6 +134,17 @@ func (s *storageServer) DeleteBlob(ctx context.Context, req *spb.DeleteBlobReque
 	}
 
 	return &spb.DeleteBlobResponse{}, nil
+}
+
+func (s *storageServer) RenameBlob(ctx context.Context, req *spb.RenameBlobRequest) (*spb.RenameBlobResponse, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if err := s.store.Rename(req.OldKey, req.NewKey); err != nil {
+		return nil, err
+	}
+
+	return &spb.RenameBlobResponse{}, nil
 }
 
 func (s *storageServer) GetBlobKeys(ctx context.Context, req *spb.GetBlobKeysRequest) (*spb.GetBlobKeysResponse, error) {

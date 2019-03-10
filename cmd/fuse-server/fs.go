@@ -251,6 +251,27 @@ func (d *Dir) Remove(ctx context.Context, req *fuse.RemoveRequest) error {
 	return nil
 }
 
+func (d *Dir) Rename(
+	ctx context.Context,
+	req *fuse.RenameRequest,
+	newDir fs.Node,
+) error {
+	d.fserver.mu.Lock()
+	defer d.fserver.mu.Unlock()
+
+	dir := newDir.(*Dir)
+	rq := &mpb.RenameRequest{
+		OldPath: path.Join(d.path, req.OldName),
+		NewPath: path.Join(dir.path, req.NewName),
+	}
+	_, err := d.fserver.metadataServerClient.Rename(ctx, rq)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // File implements both fs.Node and fs.Handle.
 type File struct {
 	path    string

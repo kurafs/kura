@@ -34,7 +34,7 @@ func (m *GetBlobRequest) Reset()         { *m = GetBlobRequest{} }
 func (m *GetBlobRequest) String() string { return proto.CompactTextString(m) }
 func (*GetBlobRequest) ProtoMessage()    {}
 func (*GetBlobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{0}
+	return fileDescriptor_storage_93615289172d4604, []int{0}
 }
 func (m *GetBlobRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobRequest.Unmarshal(m, b)
@@ -72,7 +72,7 @@ func (m *GetBlobResponse) Reset()         { *m = GetBlobResponse{} }
 func (m *GetBlobResponse) String() string { return proto.CompactTextString(m) }
 func (*GetBlobResponse) ProtoMessage()    {}
 func (*GetBlobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{1}
+	return fileDescriptor_storage_93615289172d4604, []int{1}
 }
 func (m *GetBlobResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobResponse.Unmarshal(m, b)
@@ -110,7 +110,7 @@ func (m *GetBlobStreamRequest) Reset()         { *m = GetBlobStreamRequest{} }
 func (m *GetBlobStreamRequest) String() string { return proto.CompactTextString(m) }
 func (*GetBlobStreamRequest) ProtoMessage()    {}
 func (*GetBlobStreamRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{2}
+	return fileDescriptor_storage_93615289172d4604, []int{2}
 }
 func (m *GetBlobStreamRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobStreamRequest.Unmarshal(m, b)
@@ -148,7 +148,7 @@ func (m *GetBlobStreamResponse) Reset()         { *m = GetBlobStreamResponse{} }
 func (m *GetBlobStreamResponse) String() string { return proto.CompactTextString(m) }
 func (*GetBlobStreamResponse) ProtoMessage()    {}
 func (*GetBlobStreamResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{3}
+	return fileDescriptor_storage_93615289172d4604, []int{3}
 }
 func (m *GetBlobStreamResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobStreamResponse.Unmarshal(m, b)
@@ -187,7 +187,7 @@ func (m *PutBlobRequest) Reset()         { *m = PutBlobRequest{} }
 func (m *PutBlobRequest) String() string { return proto.CompactTextString(m) }
 func (*PutBlobRequest) ProtoMessage()    {}
 func (*PutBlobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{4}
+	return fileDescriptor_storage_93615289172d4604, []int{4}
 }
 func (m *PutBlobRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutBlobRequest.Unmarshal(m, b)
@@ -231,7 +231,7 @@ func (m *PutBlobResponse) Reset()         { *m = PutBlobResponse{} }
 func (m *PutBlobResponse) String() string { return proto.CompactTextString(m) }
 func (*PutBlobResponse) ProtoMessage()    {}
 func (*PutBlobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{5}
+	return fileDescriptor_storage_93615289172d4604, []int{5}
 }
 func (m *PutBlobResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutBlobResponse.Unmarshal(m, b)
@@ -263,7 +263,7 @@ func (m *PutBlobStreamRequest) Reset()         { *m = PutBlobStreamRequest{} }
 func (m *PutBlobStreamRequest) String() string { return proto.CompactTextString(m) }
 func (*PutBlobStreamRequest) ProtoMessage()    {}
 func (*PutBlobStreamRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{6}
+	return fileDescriptor_storage_93615289172d4604, []int{6}
 }
 func (m *PutBlobStreamRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutBlobStreamRequest.Unmarshal(m, b)
@@ -307,7 +307,7 @@ func (m *PutBlobStreamResponse) Reset()         { *m = PutBlobStreamResponse{} }
 func (m *PutBlobStreamResponse) String() string { return proto.CompactTextString(m) }
 func (*PutBlobStreamResponse) ProtoMessage()    {}
 func (*PutBlobStreamResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{7}
+	return fileDescriptor_storage_93615289172d4604, []int{7}
 }
 func (m *PutBlobStreamResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutBlobStreamResponse.Unmarshal(m, b)
@@ -338,7 +338,7 @@ func (m *DeleteBlobRequest) Reset()         { *m = DeleteBlobRequest{} }
 func (m *DeleteBlobRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteBlobRequest) ProtoMessage()    {}
 func (*DeleteBlobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{8}
+	return fileDescriptor_storage_93615289172d4604, []int{8}
 }
 func (m *DeleteBlobRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteBlobRequest.Unmarshal(m, b)
@@ -375,7 +375,7 @@ func (m *DeleteBlobResponse) Reset()         { *m = DeleteBlobResponse{} }
 func (m *DeleteBlobResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteBlobResponse) ProtoMessage()    {}
 func (*DeleteBlobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{9}
+	return fileDescriptor_storage_93615289172d4604, []int{9}
 }
 func (m *DeleteBlobResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteBlobResponse.Unmarshal(m, b)
@@ -405,7 +405,7 @@ func (m *GetBlobKeysRequest) Reset()         { *m = GetBlobKeysRequest{} }
 func (m *GetBlobKeysRequest) String() string { return proto.CompactTextString(m) }
 func (*GetBlobKeysRequest) ProtoMessage()    {}
 func (*GetBlobKeysRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{10}
+	return fileDescriptor_storage_93615289172d4604, []int{10}
 }
 func (m *GetBlobKeysRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobKeysRequest.Unmarshal(m, b)
@@ -436,7 +436,7 @@ func (m *GetBlobKeysResponse) Reset()         { *m = GetBlobKeysResponse{} }
 func (m *GetBlobKeysResponse) String() string { return proto.CompactTextString(m) }
 func (*GetBlobKeysResponse) ProtoMessage()    {}
 func (*GetBlobKeysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_d44917d2bed057f8, []int{11}
+	return fileDescriptor_storage_93615289172d4604, []int{11}
 }
 func (m *GetBlobKeysResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobKeysResponse.Unmarshal(m, b)
@@ -463,6 +463,82 @@ func (m *GetBlobKeysResponse) GetKeys() []string {
 	return nil
 }
 
+type RenameBlobRequest struct {
+	OldKey               string   `protobuf:"bytes,1,opt,name=old_key,json=oldKey,proto3" json:"old_key,omitempty"`
+	NewKey               string   `protobuf:"bytes,2,opt,name=new_key,json=newKey,proto3" json:"new_key,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *RenameBlobRequest) Reset()         { *m = RenameBlobRequest{} }
+func (m *RenameBlobRequest) String() string { return proto.CompactTextString(m) }
+func (*RenameBlobRequest) ProtoMessage()    {}
+func (*RenameBlobRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_storage_93615289172d4604, []int{12}
+}
+func (m *RenameBlobRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RenameBlobRequest.Unmarshal(m, b)
+}
+func (m *RenameBlobRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RenameBlobRequest.Marshal(b, m, deterministic)
+}
+func (dst *RenameBlobRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RenameBlobRequest.Merge(dst, src)
+}
+func (m *RenameBlobRequest) XXX_Size() int {
+	return xxx_messageInfo_RenameBlobRequest.Size(m)
+}
+func (m *RenameBlobRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_RenameBlobRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RenameBlobRequest proto.InternalMessageInfo
+
+func (m *RenameBlobRequest) GetOldKey() string {
+	if m != nil {
+		return m.OldKey
+	}
+	return ""
+}
+
+func (m *RenameBlobRequest) GetNewKey() string {
+	if m != nil {
+		return m.NewKey
+	}
+	return ""
+}
+
+type RenameBlobResponse struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *RenameBlobResponse) Reset()         { *m = RenameBlobResponse{} }
+func (m *RenameBlobResponse) String() string { return proto.CompactTextString(m) }
+func (*RenameBlobResponse) ProtoMessage()    {}
+func (*RenameBlobResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_storage_93615289172d4604, []int{13}
+}
+func (m *RenameBlobResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RenameBlobResponse.Unmarshal(m, b)
+}
+func (m *RenameBlobResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RenameBlobResponse.Marshal(b, m, deterministic)
+}
+func (dst *RenameBlobResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RenameBlobResponse.Merge(dst, src)
+}
+func (m *RenameBlobResponse) XXX_Size() int {
+	return xxx_messageInfo_RenameBlobResponse.Size(m)
+}
+func (m *RenameBlobResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_RenameBlobResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RenameBlobResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*GetBlobRequest)(nil), "storage.GetBlobRequest")
 	proto.RegisterType((*GetBlobResponse)(nil), "storage.GetBlobResponse")
@@ -476,6 +552,8 @@ func init() {
 	proto.RegisterType((*DeleteBlobResponse)(nil), "storage.DeleteBlobResponse")
 	proto.RegisterType((*GetBlobKeysRequest)(nil), "storage.GetBlobKeysRequest")
 	proto.RegisterType((*GetBlobKeysResponse)(nil), "storage.GetBlobKeysResponse")
+	proto.RegisterType((*RenameBlobRequest)(nil), "storage.RenameBlobRequest")
+	proto.RegisterType((*RenameBlobResponse)(nil), "storage.RenameBlobResponse")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -494,6 +572,7 @@ type StorageServiceClient interface {
 	GetBlobStream(ctx context.Context, in *GetBlobStreamRequest, opts ...grpc.CallOption) (StorageService_GetBlobStreamClient, error)
 	PutBlob(ctx context.Context, in *PutBlobRequest, opts ...grpc.CallOption) (*PutBlobResponse, error)
 	PutBlobStream(ctx context.Context, opts ...grpc.CallOption) (StorageService_PutBlobStreamClient, error)
+	RenameBlob(ctx context.Context, in *RenameBlobRequest, opts ...grpc.CallOption) (*RenameBlobResponse, error)
 	DeleteBlob(ctx context.Context, in *DeleteBlobRequest, opts ...grpc.CallOption) (*DeleteBlobResponse, error)
 	GetBlobKeys(ctx context.Context, in *GetBlobKeysRequest, opts ...grpc.CallOption) (*GetBlobKeysResponse, error)
 }
@@ -590,6 +669,15 @@ func (x *storageServicePutBlobStreamClient) CloseAndRecv() (*PutBlobStreamRespon
 	return m, nil
 }
 
+func (c *storageServiceClient) RenameBlob(ctx context.Context, in *RenameBlobRequest, opts ...grpc.CallOption) (*RenameBlobResponse, error) {
+	out := new(RenameBlobResponse)
+	err := c.cc.Invoke(ctx, "/storage.StorageService/RenameBlob", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *storageServiceClient) DeleteBlob(ctx context.Context, in *DeleteBlobRequest, opts ...grpc.CallOption) (*DeleteBlobResponse, error) {
 	out := new(DeleteBlobResponse)
 	err := c.cc.Invoke(ctx, "/storage.StorageService/DeleteBlob", in, out, opts...)
@@ -614,6 +702,7 @@ type StorageServiceServer interface {
 	GetBlobStream(*GetBlobStreamRequest, StorageService_GetBlobStreamServer) error
 	PutBlob(context.Context, *PutBlobRequest) (*PutBlobResponse, error)
 	PutBlobStream(StorageService_PutBlobStreamServer) error
+	RenameBlob(context.Context, *RenameBlobRequest) (*RenameBlobResponse, error)
 	DeleteBlob(context.Context, *DeleteBlobRequest) (*DeleteBlobResponse, error)
 	GetBlobKeys(context.Context, *GetBlobKeysRequest) (*GetBlobKeysResponse, error)
 }
@@ -705,6 +794,24 @@ func (x *storageServicePutBlobStreamServer) Recv() (*PutBlobStreamRequest, error
 	return m, nil
 }
 
+func _StorageService_RenameBlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenameBlobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StorageServiceServer).RenameBlob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/storage.StorageService/RenameBlob",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StorageServiceServer).RenameBlob(ctx, req.(*RenameBlobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _StorageService_DeleteBlob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteBlobRequest)
 	if err := dec(in); err != nil {
@@ -754,6 +861,10 @@ var _StorageService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _StorageService_PutBlob_Handler,
 		},
 		{
+			MethodName: "RenameBlob",
+			Handler:    _StorageService_RenameBlob_Handler,
+		},
+		{
 			MethodName: "DeleteBlob",
 			Handler:    _StorageService_DeleteBlob_Handler,
 		},
@@ -777,30 +888,34 @@ var _StorageService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "storage.proto",
 }
 
-func init() { proto.RegisterFile("storage.proto", fileDescriptor_storage_d44917d2bed057f8) }
+func init() { proto.RegisterFile("storage.proto", fileDescriptor_storage_93615289172d4604) }
 
-var fileDescriptor_storage_d44917d2bed057f8 = []byte{
-	// 348 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x93, 0xd1, 0x4e, 0xf2, 0x40,
-	0x10, 0x85, 0x53, 0xf8, 0x7f, 0x09, 0xa3, 0x80, 0x8c, 0x25, 0x90, 0xa2, 0x86, 0x6c, 0x42, 0x52,
-	0x2f, 0x24, 0x46, 0x13, 0xaf, 0x8c, 0x17, 0x46, 0xa3, 0x89, 0x37, 0xa4, 0x3c, 0x41, 0xc1, 0x89,
-	0x1a, 0x90, 0x62, 0x77, 0x31, 0xe9, 0xe3, 0xf9, 0x66, 0xa6, 0xed, 0xd8, 0xee, 0x96, 0x82, 0x77,
-	0xdb, 0x9d, 0x33, 0x67, 0xbf, 0x9c, 0x93, 0x42, 0x43, 0xaa, 0x20, 0xf4, 0x5f, 0x69, 0xb4, 0x0a,
-	0x03, 0x15, 0x60, 0x8d, 0x3f, 0x85, 0x80, 0xe6, 0x23, 0xa9, 0xbb, 0x45, 0x30, 0xf5, 0xe8, 0x73,
-	0x4d, 0x52, 0xe1, 0x21, 0x54, 0xe7, 0x14, 0xf5, 0xac, 0x81, 0xe5, 0xd6, 0xbd, 0xf8, 0x28, 0x86,
-	0xd0, 0xca, 0x34, 0x72, 0x15, 0x2c, 0x25, 0x21, 0xc2, 0xbf, 0x17, 0x5f, 0xf9, 0x89, 0xea, 0xc0,
-	0x4b, 0xce, 0xc2, 0x05, 0x9b, 0x65, 0x13, 0x15, 0x92, 0xff, 0xb1, 0xdd, 0xf0, 0x1c, 0x3a, 0x05,
-	0x25, 0xdb, 0xda, 0xf0, 0x7f, 0xf6, 0xb6, 0x5e, 0xce, 0xd9, 0x37, 0xfd, 0x10, 0xd7, 0xd0, 0x1c,
-	0xaf, 0x77, 0x33, 0x66, 0x40, 0x15, 0x0d, 0xa8, 0x0d, 0xad, 0x6c, 0x2f, 0x7d, 0x40, 0xdc, 0x82,
-	0xcd, 0x57, 0x7f, 0x30, 0xe6, 0x28, 0x15, 0x1d, 0xa5, 0x0b, 0x9d, 0xc2, 0x3e, 0x1b, 0x0f, 0xa1,
-	0x7d, 0x4f, 0x0b, 0x52, 0xb4, 0x3b, 0x4a, 0x1b, 0x50, 0x97, 0xf1, 0xb2, 0x0d, 0xc8, 0x79, 0x3c,
-	0x53, 0x24, 0x79, 0x5b, 0x9c, 0xc1, 0x91, 0x71, 0x9b, 0x47, 0x3f, 0xa7, 0x48, 0xf6, 0xac, 0x41,
-	0xd5, 0xad, 0x7b, 0xc9, 0xf9, 0xf2, 0xbb, 0x0a, 0xcd, 0x49, 0xda, 0xe8, 0x84, 0xc2, 0xaf, 0xf7,
-	0x19, 0xe1, 0x0d, 0xd4, 0x78, 0x1b, 0xbb, 0xa3, 0xdf, 0xf2, 0xcd, 0xaa, 0x9d, 0xde, 0xe6, 0x80,
-	0x1f, 0x19, 0x43, 0xc3, 0x68, 0x08, 0x4f, 0x8a, 0x52, 0x23, 0x3f, 0xe7, 0x74, 0xdb, 0x38, 0xf5,
-	0xbb, 0xb0, 0x62, 0x1e, 0x4e, 0x4e, 0xe3, 0x31, 0x6b, 0xd5, 0x78, 0x0a, 0xbd, 0xc5, 0x3c, 0x46,
-	0xee, 0x1a, 0x4f, 0x59, 0x9f, 0x1a, 0x4f, 0x69, 0x5d, 0xae, 0x85, 0x0f, 0x00, 0x79, 0x13, 0xe8,
-	0x64, 0xfa, 0x8d, 0x16, 0x9d, 0x7e, 0xe9, 0x8c, 0xc1, 0x9e, 0x60, 0x5f, 0x2b, 0x09, 0xfb, 0xc5,
-	0x1c, 0xb4, 0x42, 0x9d, 0xe3, 0xf2, 0x61, 0xea, 0x34, 0xdd, 0x4b, 0xfe, 0xcc, 0xab, 0x9f, 0x00,
-	0x00, 0x00, 0xff, 0xff, 0xf6, 0x89, 0x9d, 0x12, 0xaa, 0x03, 0x00, 0x00,
+var fileDescriptor_storage_93615289172d4604 = []byte{
+	// 402 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x94, 0xc1, 0x4e, 0xc2, 0x40,
+	0x10, 0x86, 0x53, 0x40, 0x08, 0xa3, 0x80, 0xac, 0x25, 0x90, 0xa2, 0x86, 0x6c, 0x42, 0x52, 0x0f,
+	0x12, 0xa3, 0x89, 0x27, 0xe3, 0xc1, 0x48, 0x34, 0xe1, 0x42, 0xca, 0x03, 0x98, 0x02, 0x13, 0x35,
+	0x94, 0x16, 0xdb, 0x45, 0xd2, 0x37, 0xf0, 0xb1, 0x4d, 0xbb, 0x6b, 0xbb, 0xdb, 0x16, 0xbc, 0x6d,
+	0x77, 0xfe, 0xf9, 0xf7, 0x63, 0xe6, 0x0f, 0xd0, 0x08, 0x98, 0xe7, 0xdb, 0xef, 0x38, 0xda, 0xf8,
+	0x1e, 0xf3, 0x48, 0x4d, 0x7c, 0x52, 0x0a, 0xcd, 0x17, 0x64, 0x4f, 0x8e, 0x37, 0xb7, 0xf0, 0x6b,
+	0x8b, 0x01, 0x23, 0xa7, 0x50, 0x5e, 0x61, 0xd8, 0xd3, 0x06, 0x9a, 0x59, 0xb7, 0xa2, 0x23, 0x1d,
+	0x42, 0x2b, 0xd1, 0x04, 0x1b, 0xcf, 0x0d, 0x90, 0x10, 0xa8, 0x2c, 0x6d, 0x66, 0xc7, 0xaa, 0x13,
+	0x2b, 0x3e, 0x53, 0x13, 0x74, 0x21, 0x9b, 0x31, 0x1f, 0xed, 0xf5, 0x7e, 0xc3, 0x6b, 0xe8, 0x64,
+	0x94, 0xc2, 0x56, 0x87, 0xa3, 0xc5, 0xc7, 0xd6, 0x5d, 0x09, 0x5f, 0xfe, 0x41, 0xef, 0xa1, 0x39,
+	0xdd, 0x1e, 0x66, 0x4c, 0x80, 0x4a, 0x12, 0x50, 0x1b, 0x5a, 0x49, 0x1f, 0x7f, 0x80, 0x3e, 0x82,
+	0x2e, 0xae, 0xfe, 0x61, 0x4c, 0x51, 0x4a, 0x32, 0x4a, 0x17, 0x3a, 0x99, 0x7e, 0x61, 0x3c, 0x84,
+	0xf6, 0x33, 0x3a, 0xc8, 0xf0, 0xf0, 0x28, 0x75, 0x20, 0xb2, 0x4c, 0x34, 0xeb, 0x40, 0xc4, 0x3c,
+	0x26, 0x18, 0x06, 0xa2, 0x9b, 0x5e, 0xc1, 0x99, 0x72, 0x9b, 0x8e, 0x7e, 0x85, 0x61, 0xd0, 0xd3,
+	0x06, 0x65, 0xb3, 0x6e, 0xc5, 0x67, 0x3a, 0x86, 0xb6, 0x85, 0xae, 0xbd, 0x56, 0x5e, 0xef, 0x42,
+	0xcd, 0x73, 0x96, 0x6f, 0x29, 0x41, 0xd5, 0x73, 0x96, 0x13, 0x0c, 0xa3, 0x82, 0x8b, 0xbb, 0xb8,
+	0x50, 0xe2, 0x05, 0x17, 0x77, 0x13, 0x4e, 0x27, 0xdb, 0xf0, 0x07, 0x6f, 0x7f, 0x2a, 0xd0, 0x9c,
+	0xf1, 0xb8, 0xcc, 0xd0, 0xff, 0xfe, 0x5c, 0x20, 0x79, 0x80, 0x9a, 0x40, 0x23, 0xdd, 0xd1, 0x5f,
+	0xb2, 0xd4, 0x1c, 0x19, 0xbd, 0x7c, 0x41, 0xfc, 0x82, 0x29, 0x34, 0x94, 0xf5, 0x93, 0x8b, 0xac,
+	0x54, 0x59, 0x8e, 0x71, 0xb9, 0xaf, 0xcc, 0xfd, 0x6e, 0xb4, 0x88, 0x47, 0xac, 0x45, 0xe2, 0x51,
+	0x33, 0x23, 0xf1, 0x64, 0x42, 0x11, 0xf1, 0x28, 0x4b, 0x95, 0x78, 0x8a, 0xc2, 0x22, 0xf1, 0x14,
+	0x66, 0xc1, 0xd4, 0xc8, 0x18, 0x20, 0x1d, 0x24, 0x31, 0x12, 0x7d, 0x6e, 0x49, 0x46, 0xbf, 0xb0,
+	0x26, 0xc0, 0xc6, 0x00, 0x69, 0x5a, 0x24, 0x9b, 0x5c, 0xd2, 0x24, 0x9b, 0x7c, 0xbc, 0xc8, 0x2b,
+	0x1c, 0x4b, 0x41, 0x22, 0xfd, 0xec, 0x38, 0xa5, 0xd0, 0x19, 0xe7, 0xc5, 0x45, 0xee, 0x34, 0xaf,
+	0xc6, 0xff, 0x1e, 0x77, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x2d, 0x3d, 0x76, 0x1d, 0x4e, 0x04,
+	0x00, 0x00,
 }

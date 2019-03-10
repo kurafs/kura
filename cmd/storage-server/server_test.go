@@ -52,6 +52,10 @@ func (t *testStore) Keys() []string {
 	return nil
 }
 
+func (t *testStore) Rename(_, _ string) error {
+	return nil
+}
+
 func TestGetBlob(t *testing.T) {
 	logger := log.Discarder()
 	ctx := context.Background()
