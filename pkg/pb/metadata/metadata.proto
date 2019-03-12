@@ -19,15 +19,21 @@ package metadata;
 // TODO (Franz): This should be encrypted; move this to the encryption
 // server when its implemented
 message Metadata {
-    message UnixTimestamp {
-        int64 seconds = 1;
-        int64 nanoseconds = 2;
-    }
-    UnixTimestamp created = 1;
-    UnixTimestamp last_modified = 2;
-    uint32 permissions = 3;
-    int64 size = 4;
-    bool is_directory = 5;
+  message UnixTimestamp {
+      int64 seconds = 1;
+      int64 nanoseconds = 2;
+  }
+  UnixTimestamp created = 1;
+  UnixTimestamp last_modified = 2;
+  uint32 permissions = 3;
+  int64 size = 4;
+  bool is_directory = 5;
+
+  message Accessor {
+    bytes identity_hash = 1;
+    bytes encrypted_key = 2;
+  }
+  repeated Accessor access_list = 6;
 }
 
 message GetFileRequest {
@@ -40,14 +46,14 @@ message GetFileResponse {
 }
 
 message GetFileStreamRequest {
-    string path = 1;
+  string path = 1;
 }
 
 message GetFileStreamResponse {
-    bytes chunk = 1;
+  bytes chunk = 1;
 
-    // Only set on the first message
-    Metadata metadata = 2;
+  // Only set on the first message
+  Metadata metadata = 2;
 }
 
 message PutFileRequest {
@@ -59,10 +65,10 @@ message PutFileRequest {
 message PutFileResponse { }
 
 message PutFileStreamRequest {
-    // path and metadata should only be set on the first request
-    string path = 1;
-    bytes chunk = 2;
-    Metadata metadata = 3;
+  // path and metadata should only be set on the first request
+  string path = 1;
+  bytes chunk = 2;
+  Metadata metadata = 3;
 }
 
 message PutFileStreamResponse { }
@@ -121,17 +127,17 @@ message RenameRequest {
 message RenameResponse { }
 
 service MetadataService { 
-    rpc GetFile (GetFileRequest) returns (GetFileResponse);
-    rpc GetFileStream (GetFileStreamRequest) returns (stream GetFileStreamResponse);
-    rpc PutFile (PutFileRequest) returns (PutFileResponse);
-    rpc PutFileStream (stream PutFileStreamRequest) returns (PutFileStreamResponse);
-    rpc DeleteFile (DeleteFileRequest) returns (DeleteFileResponse);
-    rpc CreateDirectory (CreateDirectoryRequest) returns (CreateDirectoryResponse);
-    rpc DeleteDirectory (DeleteDirectoryRequest) returns (DeleteDirectoryResponse);
-    rpc GetDirectoryEntries (GetDirectoryEntriesRequest) returns (GetDirectoryEntriesResponse);
+  rpc GetFile (GetFileRequest) returns (GetFileResponse);
+  rpc GetFileStream (GetFileStreamRequest) returns (stream GetFileStreamResponse);
+  rpc PutFile (PutFileRequest) returns (PutFileResponse);
+  rpc PutFileStream (stream PutFileStreamRequest) returns (PutFileStreamResponse);
+  rpc DeleteFile (DeleteFileRequest) returns (DeleteFileResponse);
+  rpc CreateDirectory (CreateDirectoryRequest) returns (CreateDirectoryResponse);
+  rpc DeleteDirectory (DeleteDirectoryRequest) returns (DeleteDirectoryResponse);
+  rpc GetDirectoryEntries (GetDirectoryEntriesRequest) returns (GetDirectoryEntriesResponse);
 
-    rpc Rename (RenameRequest) returns (RenameResponse);
+  rpc Rename (RenameRequest) returns (RenameResponse);
 
-    rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse);
-    rpc SetMetadata (SetMetadataRequest) returns (SetMetadataResponse);
+  rpc GetMetadata (GetMetadataRequest) returns (GetMetadataResponse);
+  rpc SetMetadata (SetMetadataRequest) returns (SetMetadataResponse);
 }
