@@ -16,22 +16,24 @@ syntax = "proto3";
 
 package identity;
 
-message GetKeyRequest {
+message GetIdentityRequest {
   string email = 1;
 }
 
-message GetKeyResponse {
-  bytes public_key = 1;
-}
-
-message PutKeyRequest {
-  string email = 1;
+message GetIdentityResponse {
+  string metadata_server = 1;
   bytes public_key = 2;
 }
 
-message PutKeyResponse { }
+message PutIdentityRequest {
+  string email = 1;
+  string metadata_server = 2;
+  bytes public_key = 3;
+}
+
+message PutIdentityResponse { }
 
 service IdentityService {
-  rpc GetPublicKey(GetKeyRequest) returns (GetKeyResponse);
-  rpc PutPublicKey(PutKeyRequest) returns (PutKeyResponse);
+  rpc GetIdentity(GetIdentityRequest) returns (GetIdentityResponse);
+  rpc PutIdentity(PutIdentityRequest) returns (PutIdentityResponse);
 }

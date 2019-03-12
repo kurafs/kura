@@ -138,6 +138,11 @@ func Start(logger *log.Logger, port int, dbStore string) (wait func(), shutdown 
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
+
+		_, err = tx.CreateBucketIfNotExists([]byte("user-servers"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
 		return nil
 	})
 	if err != nil {

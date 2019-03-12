@@ -15,8 +15,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/kurafs/kura/pkg/streaming"
-
 	cryptserver "github.com/kurafs/kura/cmd/crypt-server"
 	identityserver "github.com/kurafs/kura/cmd/identity-server"
 	metadataserver "github.com/kurafs/kura/cmd/metadata-server"
@@ -25,6 +23,7 @@ import (
 	cpb "github.com/kurafs/kura/pkg/pb/crypt"
 	ipb "github.com/kurafs/kura/pkg/pb/identity"
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
+	"github.com/kurafs/kura/pkg/streaming"
 	"google.golang.org/grpc"
 )
 
@@ -616,19 +615,19 @@ func TestIdentityServer(t *testing.T) {
 	defer conn.Close()
 
 	client := ipb.NewIdentityServiceClient(conn)
-	preq := &ipb.PutKeyRequest{
+	preq := &ipb.PutIdentityRequest{
 		Email:     "test@email.com",
 		PublicKey: []byte("public-key"),
 	}
-	_, err = client.PutPublicKey(context.Background(), preq)
+	_, err = client.PutIdentity(context.Background(), preq)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	greq := &ipb.GetKeyRequest{
+	greq := &ipb.GetIdentityRequest{
 		Email: "test@email.com",
 	}
-	gres, err := client.GetPublicKey(context.Background(), greq)
+	gres, err := client.GetIdentity(context.Background(), greq)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -661,10 +660,10 @@ func TestIdentityServerMissingUser(t *testing.T) {
 	defer conn.Close()
 
 	client := ipb.NewIdentityServiceClient(conn)
-	greq := &ipb.GetKeyRequest{
+	greq := &ipb.GetIdentityRequest{
 		Email: "test@email.com",
 	}
-	_, err = client.GetPublicKey(context.Background(), greq)
+	_, err = client.GetIdentity(context.Background(), greq)
 	if err == nil {
 		t.Fatal("expected 'user not found' error")
 	}
@@ -693,16 +692,16 @@ func TestIdentityServerOverwriteRejected(t *testing.T) {
 	defer conn.Close()
 
 	client := ipb.NewIdentityServiceClient(conn)
-	preq := &ipb.PutKeyRequest{
+	preq := &ipb.PutIdentityRequest{
 		Email:     "test@email.com",
 		PublicKey: []byte("public-key"),
 	}
-	_, err = client.PutPublicKey(context.Background(), preq)
+	_, err = client.PutIdentity(context.Background(), preq)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = client.PutPublicKey(context.Background(), preq)
+	_, err = client.PutIdentity(context.Background(), preq)
 	if err == nil {
 		t.Fatal("expected error due to overwrite")
 	}
