@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// +build !linux
+// +build linux
 
 package main
 
@@ -20,7 +20,6 @@ import (
 
 	cacheserver "github.com/kurafs/kura/cmd/cache-server"
 	cryptserver "github.com/kurafs/kura/cmd/crypt-server"
-	fuseserver "github.com/kurafs/kura/cmd/fuse-server"
 	identityserver "github.com/kurafs/kura/cmd/identity-server"
 	metadataserver "github.com/kurafs/kura/cmd/metadata-server"
 	storageserver "github.com/kurafs/kura/cmd/storage-server"
@@ -37,7 +36,6 @@ func main() {
 	// {cache,storage,metadata,identity}-servers.
 	commands = append(commands, cacheserver.CacheServerCmd)
 	commands = append(commands, cryptserver.CryptServerCmd)
-	commands = append(commands, fuseserver.FuseServerCmd)
 	commands = append(commands, identityserver.IdentityServerCmd)
 	commands = append(commands, metadataserver.MetadataServerCmd)
 	commands = append(commands, storageserver.StorageServerCmd)
