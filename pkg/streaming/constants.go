@@ -16,7 +16,7 @@ package streaming
 
 // ChunkSize is the size of a file chunk in bytes for streaming transfer
 // Apparently this is an optimal chunk size according to https://github.com/grpc/grpc.github.io/issues/371
-const ChunkSize = 64 * 1024
+const ChunkSize = 64 * 1024 // 6 KiB.
 
 // Threshold is the minimum size for a file to be streamed instead of transfered in one message
-const Threshold = 4 * 1024 * 1024 // Size in bytes
+const Threshold = 4 * 1024 * 1024 // Size in bytes; 4 MiB.

@@ -12,15 +12,19 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kurafs/kura/pkg/streaming"
-
 	"github.com/kurafs/kura/pkg/fuse"
 	"github.com/kurafs/kura/pkg/fuse/fs"
 	"github.com/kurafs/kura/pkg/log"
 	cpb "github.com/kurafs/kura/pkg/pb/crypt"
 	mpb "github.com/kurafs/kura/pkg/pb/metadata"
+	"github.com/kurafs/kura/pkg/streaming"
 	"google.golang.org/grpc"
 )
+
+// TODO(irfansharif): Methods returning Node should take care to return the same
+// fs.Node when the result is logically the same instance. Without this, each
+// fs.Node will get a new NodeID, causing spurious cache invalidations, extra
+// lookups and aliasing anomalies.
 
 type fuseServer struct {
 	logger               *log.Logger
@@ -68,6 +72,20 @@ func (f *fuseServer) Root() (fs.Node, error) {
 		inode:   fs.GenerateDynamicInode(0, "kura-root"),
 	}
 	return &dir, nil
+}
+
+func (f *fuseServer) Statfs(
+	ctx context.Context,
+	req *fuse.StatfsRequest,
+	resp *fuse.StatfsResponse,
+) error {
+	resp.Blocks = 262144
+	resp.Bfree = 262144
+	resp.Bavail = 32768
+	resp.Bsize = 1024 * 1024 // 1 MiB
+	resp.Namelen = 128
+	resp.Frsize = 1024 // 1 KiB
+	return nil
 }
 
 // Dir implements both fs.Node and fs.Handle for the root directory.
@@ -207,11 +225,9 @@ func (d *Dir) Create(
 	}
 
 	file := File{
-		path:        path.Join(d.path, req.Name),
-		fserver:     d.fserver,
-		inode:       fs.GenerateDynamicInode(d.inode, path.Join(d.path, req.Name)),
-		bufferWrite: false,
-		writeBuffer: make([]byte, 0, streaming.Threshold),
+		path:    path.Join(d.path, req.Name),
+		fserver: d.fserver,
+		inode:   fs.GenerateDynamicInode(d.inode, path.Join(d.path, req.Name)),
 	}
 	res.Node = fuse.NodeID(file.inode)
 	res.OpenResponse.Handle = fuse.HandleID(file.inode)
@@ -328,10 +344,9 @@ type File struct {
 	fserver *fuseServer
 	inode   uint64
 
-	// FUSE ends up splitting up larger writes so sometimes we need to buffer write requests
-	// before flushing to storage
-	writeBuffer []byte
-	bufferWrite bool
+	// FUSE ends up splitting up larger writes so sometimes we need to buffer
+	// write requests before flushing to storage.
+	buffer []byte
 }
 
 func (f *File) Attr(ctx context.Context, a *fuse.Attr) error {
@@ -347,8 +362,65 @@ func (f *File) Attr(ctx context.Context, a *fuse.Attr) error {
 	a.Inode = f.inode
 	a.Mode = os.FileMode(res.Metadata.Permissions)
 	a.Size = uint64(res.Metadata.Size)
-	a.Mtime = time.Unix(res.Metadata.LastModified.Seconds, 0)
-	a.Crtime = time.Unix(res.Metadata.Created.Seconds, 0)
+
+	// TODO(irfansharif): Investigate why these sometimes return nil. Happens
+	// when operating with finder.
+	if res.Metadata.LastModified != nil {
+		a.Mtime = time.Unix(res.Metadata.LastModified.Seconds, 0)
+	}
+	if res.Metadata.Created != nil {
+		a.Crtime = time.Unix(res.Metadata.Created.Seconds, 0)
+	}
+
+	return nil
+}
+
+func (f *File) Getattr(
+	ctx context.Context,
+	req *fuse.GetattrRequest,
+	resp *fuse.GetattrResponse,
+) error {
+	return f.Attr(ctx, &resp.Attr)
+}
+
+func (f *File) Setattr(
+	ctx context.Context,
+	req *fuse.SetattrRequest,
+	resp *fuse.SetattrResponse,
+) error {
+	f.fserver.mu.Lock()
+	defer f.fserver.mu.Unlock()
+
+	greq := &mpb.GetMetadataRequest{Path: f.path}
+	gres, err := f.fserver.metadataServerClient.GetMetadata(ctx, greq)
+	if err != nil {
+		return err
+	}
+
+	if req.Valid.Mode() {
+		gres.Metadata.Permissions = uint32(req.Mode)
+	}
+	if req.Valid.Size() {
+		gres.Metadata.Size = int64(req.Size)
+	}
+	if req.Valid.Mtime() {
+		gres.Metadata.LastModified = &mpb.Metadata_UnixTimestamp{Seconds: req.Mtime.Unix()}
+	}
+
+	sreq := &mpb.SetMetadataRequest{
+		Path:     f.path,
+		Metadata: gres.Metadata,
+	}
+	_, err = f.fserver.metadataServerClient.SetMetadata(ctx, sreq)
+	if err != nil {
+		return err
+	}
+
+	resp.Attr.Inode = f.inode
+	resp.Attr.Mode = os.FileMode(gres.Metadata.Permissions)
+	resp.Attr.Size = uint64(gres.Metadata.Size)
+	resp.Attr.Mtime = time.Unix(gres.Metadata.LastModified.Seconds, 0)
+	resp.Attr.Crtime = time.Unix(gres.Metadata.Created.Seconds, 0)
 	return nil
 }
 
@@ -408,22 +480,22 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 		return cres.Plaintext, nil
 	}
 
-	// TODO: Decrypt
+	// TODO(irfansharif): Decrypt streaming.
 	req := &mpb.GetFileStreamRequest{Path: f.path}
 	stream, err := f.fserver.metadataServerClient.GetFileStream(ctx, req)
 	if err != nil {
 		return nil, err
 	}
-	buf := make([]byte, 0, streaming.Threshold)
+	buffer := make([]byte, 0)
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
-			return buf, nil
+			return buffer, nil
 		}
 		if err != nil {
 			return nil, err
 		}
-		buf = append(buf, in.Chunk...)
+		buffer = append(buffer, in.Chunk...)
 	}
 }
 
@@ -435,20 +507,47 @@ func (f *File) Write(
 	f.fserver.mu.Lock()
 	defer f.fserver.mu.Unlock()
 
-	f.writeBuffer = append(f.writeBuffer, req.Data...)
-	f.fserver.logger.Infof("Wrote %d bytes to buffer, first five bytes: %x", len(req.Data), req.Data[:5])
+	if req.Offset == 0 {
+		f.buffer = append(f.buffer, req.Data...)
+	} else {
+		// NB: We do the simple thing of growing out the buffer (possibly more
+		// than needed), copying data as needed, and trimming down our
+		// reference.
+		f.buffer = append(f.buffer, req.Data...)
+		copy(f.buffer[req.Offset:], req.Data)
+		f.buffer = f.buffer[:req.Offset+int64(len(req.Data))]
+	}
+	resp.Size = len(req.Data)
+	return nil
+}
 
-	// XXX "._" files need to written immediately... This results
-	// in buffered writes having the first chunk being written to the path first
-	if len(req.Data) < streaming.Threshold && req.Offset == 0 && !f.bufferWrite {
+func (f *File) Flush(ctx context.Context, req *fuse.FlushRequest) error {
+	f.fserver.mu.Lock()
+	defer f.fserver.mu.Unlock()
+
+	if f.buffer == nil {
+		// Flush is (surprisingly) also called on Read requests. We do nothing.
+		return nil
+	}
+
+	mreq := &mpb.GetMetadataRequest{Path: f.path}
+	mres, err := f.fserver.metadataServerClient.GetMetadata(ctx, mreq)
+	if err != nil {
+		return err
+	}
+
+	metadata := &mpb.Metadata{
+		Size:         int64(len(f.buffer)),
+		LastModified: &mpb.Metadata_UnixTimestamp{Seconds: time.Now().Unix()},
+		Created:      mres.Metadata.Created,
+		Permissions:  mres.Metadata.Permissions,
+		IsDirectory:  false,
+		AccessList:   mres.Metadata.AccessList,
+	}
+
+	if len(f.buffer) < streaming.Threshold {
 		// TODO(irfansharif): Cache file keys somewhere to not make this request
 		// each time.
-		mreq := &mpb.GetMetadataRequest{Path: f.path}
-		mres, err := f.fserver.metadataServerClient.GetMetadata(ctx, mreq)
-		if err != nil {
-			return err
-		}
-
 		preq := &cpb.PublicKeyRequest{}
 		pres, err := f.fserver.cryptServerClient.PublicKey(ctx, preq)
 		if err != nil {
@@ -479,19 +578,10 @@ func (f *File) Write(
 		}
 
 		fkey := dres.Plaintext
-		ereq := &cpb.EncryptionRequest{Plaintext: req.Data, AesKey: fkey}
+		ereq := &cpb.EncryptionRequest{Plaintext: f.buffer, AesKey: fkey}
 		eres, err := f.fserver.cryptServerClient.Encrypt(ctx, ereq)
 		if err != nil {
 			return err
-		}
-
-		metadata := &mpb.Metadata{
-			Size:         int64(len(req.Data)),
-			LastModified: &mpb.Metadata_UnixTimestamp{Seconds: time.Now().Unix()},
-			Created:      mres.Metadata.Created,
-			Permissions:  mres.Metadata.Permissions,
-			IsDirectory:  false,
-			AccessList:   mres.Metadata.AccessList,
 		}
 
 		rq := &mpb.PutFileRequest{
@@ -503,45 +593,8 @@ func (f *File) Write(
 		if err != nil {
 			return err
 		}
-	} else {
-		f.bufferWrite = true
-	}
-	resp.Size = len(req.Data)
-	return nil
-}
-
-func (f *File) Open(ctx context.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
-	f.fserver.mu.Lock()
-	defer f.fserver.mu.Unlock()
-	f.bufferWrite = false
-	f.writeBuffer = make([]byte, 0, streaming.Threshold)
-	resp.Handle = fuse.HandleID(f.inode)
-	return f, nil
-}
-
-func (f *File) Release(ctx context.Context, req *fuse.ReleaseRequest) error {
-	f.fserver.mu.Lock()
-	defer f.fserver.mu.Unlock()
-
-	if !f.bufferWrite {
-		f.writeBuffer = nil
+		f.buffer = nil
 		return nil
-	}
-
-	f.fserver.logger.Infof("Writing %d bytes to storage for %s", len(f.writeBuffer), f.path)
-
-	mreq := &mpb.GetMetadataRequest{Path: f.path}
-	mres, err := f.fserver.metadataServerClient.GetMetadata(ctx, mreq)
-	if err != nil {
-		return err
-	}
-	metadata := &mpb.Metadata{
-		Size:         int64(len(f.writeBuffer)),
-		LastModified: &mpb.Metadata_UnixTimestamp{Seconds: time.Now().Unix()},
-		Created:      mres.Metadata.Created,
-		Permissions:  mres.Metadata.Permissions,
-		IsDirectory:  false,
-		AccessList:   mres.Metadata.AccessList,
 	}
 
 	stream, err := f.fserver.metadataServerClient.PutFileStream(ctx)
@@ -549,22 +602,61 @@ func (f *File) Release(ctx context.Context, req *fuse.ReleaseRequest) error {
 		return err
 	}
 
-	// TODO: Encrypt
-	chunker := streaming.NewChunker(f.writeBuffer)
+	// TODO(irfansharif): Encrypt chunks.
+	chunker := streaming.NewChunker(f.buffer)
 	chunker.Next()
-	fm := &mpb.PutFileStreamRequest{Path: f.path, Chunk: chunker.Value(), Metadata: metadata}
+	fm := &mpb.PutFileStreamRequest{
+		Path:     f.path,
+		Chunk:    chunker.Value(),
+		Metadata: metadata,
+	}
 	if err = stream.Send(fm); err != nil {
 		return err
 	}
 	for chunker.Next() {
-		if err = stream.Send(&mpb.PutFileStreamRequest{Chunk: chunker.Value()}); err != nil {
+		req := &mpb.PutFileStreamRequest{
+			Chunk: chunker.Value(),
+		}
+		if err = stream.Send(req); err != nil {
 			return err
 		}
 	}
 	if _, err = stream.CloseAndRecv(); err != nil {
 		return err
 	}
-
-	f.writeBuffer = nil
+	f.buffer = nil
 	return nil
+}
+
+// We provide sink implementations of xattributes to work with Finder. Not
+// implementing these results in Finder creating "._" files that don't work well
+// with FUSE.
+func (f *File) Setxattr(
+	ctx context.Context,
+	req *fuse.SetxattrRequest,
+) error {
+	return nil
+}
+
+func (f *File) Getxattr(
+	ctx context.Context,
+	req *fuse.GetxattrRequest,
+	resp *fuse.GetxattrResponse,
+) error {
+	return fuse.ErrNoXattr
+}
+
+func (f *File) Removexattr(
+	ctx context.Context,
+	req *fuse.RemovexattrRequest,
+) error {
+	return fuse.ErrNoXattr
+}
+
+func (f *File) Listxattr(
+	ctx context.Context,
+	req *fuse.ListxattrRequest,
+	resp *fuse.ListxattrResponse,
+) error {
+	return fuse.ErrNoXattr
 }
