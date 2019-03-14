@@ -6,10 +6,13 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
+	"io"
 	"os"
 	"path"
 	"sync"
 	"time"
+
+	"github.com/kurafs/kura/pkg/streaming"
 
 	"github.com/kurafs/kura/pkg/fuse"
 	"github.com/kurafs/kura/pkg/fuse/fs"
@@ -204,9 +207,11 @@ func (d *Dir) Create(
 	}
 
 	file := File{
-		path:    path.Join(d.path, req.Name),
-		fserver: d.fserver,
-		inode:   fs.GenerateDynamicInode(d.inode, path.Join(d.path, req.Name)),
+		path:        path.Join(d.path, req.Name),
+		fserver:     d.fserver,
+		inode:       fs.GenerateDynamicInode(d.inode, path.Join(d.path, req.Name)),
+		bufferWrite: false,
+		writeBuffer: make([]byte, 0, streaming.Threshold),
 	}
 	res.Node = fuse.NodeID(file.inode)
 	res.OpenResponse.Handle = fuse.HandleID(file.inode)
@@ -322,6 +327,11 @@ type File struct {
 	path    string
 	fserver *fuseServer
 	inode   uint64
+
+	// FUSE ends up splitting up larger writes so sometimes we need to buffer write requests
+	// before flushing to storage
+	writeBuffer []byte
+	bufferWrite bool
 }
 
 func (f *File) Attr(ctx context.Context, a *fuse.Attr) error {
@@ -346,71 +356,16 @@ func (f *File) ReadAll(ctx context.Context) ([]byte, error) {
 	f.fserver.mu.Lock()
 	defer f.fserver.mu.Unlock()
 
-	req := &mpb.GetFileRequest{Path: f.path}
-	res, err := f.fserver.metadataServerClient.GetFile(ctx, req)
-	if err != nil {
-		return nil, err
-	}
-
-	preq := &cpb.PublicKeyRequest{}
-	pres, err := f.fserver.cryptServerClient.PublicKey(ctx, preq)
-	if err != nil {
-		return nil, err
-	}
-
-	h := sha256.New()
-	h.Write(pres.X)
-	h.Write(pres.Y)
-	sum := h.Sum(nil)
-
-	var ekey []byte
-	for _, a := range res.Metadata.AccessList {
-		if bytes.Equal(a.IdentityHash, sum) {
-			ekey = a.EncryptedKey
-			break
-		}
-	}
-
-	if ekey == nil {
-		return nil, fmt.Errorf("key for file not found")
-	}
-
-	dreq := &cpb.DecryptionRequest{Ciphertext: ekey}
-	dres, err := f.fserver.cryptServerClient.Decrypt(ctx, dreq)
-	if err != nil {
-		return nil, err
-	}
-
-	fkey := dres.Plaintext
-	creq := &cpb.DecryptionRequest{Ciphertext: res.File, AesKey: fkey}
-	cres, err := f.fserver.cryptServerClient.Decrypt(ctx, creq)
-	if err != nil {
-		return nil, err
-	}
-
-	return cres.Plaintext, nil
-}
-
-func (f *File) Write(
-	ctx context.Context,
-	req *fuse.WriteRequest,
-	resp *fuse.WriteResponse,
-) error {
-	f.fserver.mu.Lock()
-	defer f.fserver.mu.Unlock()
-
-	// TODO(irfansharif): Cache file keys somewhere to not make this request
-	// each time.
 	mreq := &mpb.GetMetadataRequest{Path: f.path}
 	mres, err := f.fserver.metadataServerClient.GetMetadata(ctx, mreq)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	preq := &cpb.PublicKeyRequest{}
 	pres, err := f.fserver.cryptServerClient.PublicKey(ctx, preq)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	h := sha256.New()
@@ -427,24 +382,161 @@ func (f *File) Write(
 	}
 
 	if ekey == nil {
-		return fmt.Errorf("key for file not found")
+		return nil, fmt.Errorf("key for file not found")
 	}
 
-	dreq := &cpb.DecryptionRequest{Ciphertext: ekey}
-	dres, err := f.fserver.cryptServerClient.Decrypt(ctx, dreq)
+	if mres.Metadata.Size < streaming.Threshold {
+		req := &mpb.GetFileRequest{Path: f.path}
+		res, err := f.fserver.metadataServerClient.GetFile(ctx, req)
+		if err != nil {
+			return nil, err
+		}
+
+		dreq := &cpb.DecryptionRequest{Ciphertext: ekey}
+		dres, err := f.fserver.cryptServerClient.Decrypt(ctx, dreq)
+		if err != nil {
+			return nil, err
+		}
+
+		fkey := dres.Plaintext
+		creq := &cpb.DecryptionRequest{Ciphertext: res.File, AesKey: fkey}
+		cres, err := f.fserver.cryptServerClient.Decrypt(ctx, creq)
+		if err != nil {
+			return nil, err
+		}
+
+		return cres.Plaintext, nil
+	}
+
+	// TODO: Decrypt
+	req := &mpb.GetFileStreamRequest{Path: f.path}
+	stream, err := f.fserver.metadataServerClient.GetFileStream(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	buf := make([]byte, 0, streaming.Threshold)
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			return buf, nil
+		}
+		if err != nil {
+			return nil, err
+		}
+		buf = append(buf, in.Chunk...)
+	}
+}
+
+func (f *File) Write(
+	ctx context.Context,
+	req *fuse.WriteRequest,
+	resp *fuse.WriteResponse,
+) error {
+	f.fserver.mu.Lock()
+	defer f.fserver.mu.Unlock()
+
+	f.writeBuffer = append(f.writeBuffer, req.Data...)
+	f.fserver.logger.Infof("Wrote %d bytes to buffer, first five bytes: %x", len(req.Data), req.Data[:5])
+
+	// XXX "._" files need to written immediately... This results
+	// in buffered writes having the first chunk being written to the path first
+	if len(req.Data) < streaming.Threshold && req.Offset == 0 && !f.bufferWrite {
+		// TODO(irfansharif): Cache file keys somewhere to not make this request
+		// each time.
+		mreq := &mpb.GetMetadataRequest{Path: f.path}
+		mres, err := f.fserver.metadataServerClient.GetMetadata(ctx, mreq)
+		if err != nil {
+			return err
+		}
+
+		preq := &cpb.PublicKeyRequest{}
+		pres, err := f.fserver.cryptServerClient.PublicKey(ctx, preq)
+		if err != nil {
+			return err
+		}
+
+		h := sha256.New()
+		h.Write(pres.X)
+		h.Write(pres.Y)
+		sum := h.Sum(nil)
+
+		var ekey []byte
+		for _, a := range mres.Metadata.AccessList {
+			if bytes.Equal(a.IdentityHash, sum) {
+				ekey = a.EncryptedKey
+				break
+			}
+		}
+
+		if ekey == nil {
+			return fmt.Errorf("key for file not found")
+		}
+
+		dreq := &cpb.DecryptionRequest{Ciphertext: ekey}
+		dres, err := f.fserver.cryptServerClient.Decrypt(ctx, dreq)
+		if err != nil {
+			return err
+		}
+
+		fkey := dres.Plaintext
+		ereq := &cpb.EncryptionRequest{Plaintext: req.Data, AesKey: fkey}
+		eres, err := f.fserver.cryptServerClient.Encrypt(ctx, ereq)
+		if err != nil {
+			return err
+		}
+
+		metadata := &mpb.Metadata{
+			Size:         int64(len(req.Data)),
+			LastModified: &mpb.Metadata_UnixTimestamp{Seconds: time.Now().Unix()},
+			Created:      mres.Metadata.Created,
+			Permissions:  mres.Metadata.Permissions,
+			IsDirectory:  false,
+			AccessList:   mres.Metadata.AccessList,
+		}
+
+		rq := &mpb.PutFileRequest{
+			Path:     f.path,
+			File:     []byte(eres.Ciphertext),
+			Metadata: metadata,
+		}
+		_, err = f.fserver.metadataServerClient.PutFile(ctx, rq)
+		if err != nil {
+			return err
+		}
+	} else {
+		f.bufferWrite = true
+	}
+	resp.Size = len(req.Data)
+	return nil
+}
+
+func (f *File) Open(ctx context.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
+	f.fserver.mu.Lock()
+	defer f.fserver.mu.Unlock()
+	f.bufferWrite = false
+	f.writeBuffer = make([]byte, 0, streaming.Threshold)
+	resp.Handle = fuse.HandleID(f.inode)
+	return f, nil
+}
+
+func (f *File) Release(ctx context.Context, req *fuse.ReleaseRequest) error {
+	f.fserver.mu.Lock()
+	defer f.fserver.mu.Unlock()
+
+	if !f.bufferWrite {
+		f.writeBuffer = nil
+		return nil
+	}
+
+	f.fserver.logger.Infof("Writing %d bytes to storage for %s", len(f.writeBuffer), f.path)
+
+	mreq := &mpb.GetMetadataRequest{Path: f.path}
+	mres, err := f.fserver.metadataServerClient.GetMetadata(ctx, mreq)
 	if err != nil {
 		return err
 	}
-
-	fkey := dres.Plaintext
-	ereq := &cpb.EncryptionRequest{Plaintext: req.Data, AesKey: fkey}
-	eres, err := f.fserver.cryptServerClient.Encrypt(ctx, ereq)
-	if err != nil {
-		return err
-	}
-
 	metadata := &mpb.Metadata{
-		Size:         int64(len(req.Data)),
+		Size:         int64(len(f.writeBuffer)),
 		LastModified: &mpb.Metadata_UnixTimestamp{Seconds: time.Now().Unix()},
 		Created:      mres.Metadata.Created,
 		Permissions:  mres.Metadata.Permissions,
@@ -452,16 +544,27 @@ func (f *File) Write(
 		AccessList:   mres.Metadata.AccessList,
 	}
 
-	rq := &mpb.PutFileRequest{
-		Path:     f.path,
-		File:     []byte(eres.Ciphertext),
-		Metadata: metadata,
-	}
-	_, err = f.fserver.metadataServerClient.PutFile(ctx, rq)
+	stream, err := f.fserver.metadataServerClient.PutFileStream(ctx)
 	if err != nil {
 		return err
 	}
 
-	resp.Size = len(req.Data)
+	// TODO: Encrypt
+	chunker := streaming.NewChunker(f.writeBuffer)
+	chunker.Next()
+	fm := &mpb.PutFileStreamRequest{Path: f.path, Chunk: chunker.Value(), Metadata: metadata}
+	if err = stream.Send(fm); err != nil {
+		return err
+	}
+	for chunker.Next() {
+		if err = stream.Send(&mpb.PutFileStreamRequest{Chunk: chunker.Value()}); err != nil {
+			return err
+		}
+	}
+	if _, err = stream.CloseAndRecv(); err != nil {
+		return err
+	}
+
+	f.writeBuffer = nil
 	return nil
 }

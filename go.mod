@@ -5,7 +5,7 @@ require (
 	github.com/golang/protobuf v1.2.0
 	github.com/google/btree v0.0.0-20180813153112-4030bb1f1f0c
 	github.com/gorilla/websocket v1.4.0 // indirect
-	github.com/improbable-eng/grpc-web v0.0.0-20181010082815-1464bd937bd6
+	github.com/improbable-eng/grpc-web v0.9.1
 	github.com/rs/cors v1.6.0 // indirect
 	github.com/soheilhy/cmux v0.1.4
 	golang.org/x/crypto v0.0.0-20190219172222-a4c6cb3142f2
