@@ -35,7 +35,7 @@ func (m *EncryptionRequest) Reset()         { *m = EncryptionRequest{} }
 func (m *EncryptionRequest) String() string { return proto.CompactTextString(m) }
 func (*EncryptionRequest) ProtoMessage()    {}
 func (*EncryptionRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_crypt_072e351eb4757ad3, []int{0}
+	return fileDescriptor_crypt_ffa792509fdcc93a, []int{0}
 }
 func (m *EncryptionRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EncryptionRequest.Unmarshal(m, b)
@@ -80,7 +80,7 @@ func (m *EncryptionResponse) Reset()         { *m = EncryptionResponse{} }
 func (m *EncryptionResponse) String() string { return proto.CompactTextString(m) }
 func (*EncryptionResponse) ProtoMessage()    {}
 func (*EncryptionResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_crypt_072e351eb4757ad3, []int{1}
+	return fileDescriptor_crypt_ffa792509fdcc93a, []int{1}
 }
 func (m *EncryptionResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_EncryptionResponse.Unmarshal(m, b)
@@ -119,7 +119,7 @@ func (m *DecryptionRequest) Reset()         { *m = DecryptionRequest{} }
 func (m *DecryptionRequest) String() string { return proto.CompactTextString(m) }
 func (*DecryptionRequest) ProtoMessage()    {}
 func (*DecryptionRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_crypt_072e351eb4757ad3, []int{2}
+	return fileDescriptor_crypt_ffa792509fdcc93a, []int{2}
 }
 func (m *DecryptionRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DecryptionRequest.Unmarshal(m, b)
@@ -164,7 +164,7 @@ func (m *DecryptionResponse) Reset()         { *m = DecryptionResponse{} }
 func (m *DecryptionResponse) String() string { return proto.CompactTextString(m) }
 func (*DecryptionResponse) ProtoMessage()    {}
 func (*DecryptionResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_crypt_072e351eb4757ad3, []int{3}
+	return fileDescriptor_crypt_ffa792509fdcc93a, []int{3}
 }
 func (m *DecryptionResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DecryptionResponse.Unmarshal(m, b)
@@ -201,7 +201,7 @@ func (m *PublicKeyRequest) Reset()         { *m = PublicKeyRequest{} }
 func (m *PublicKeyRequest) String() string { return proto.CompactTextString(m) }
 func (*PublicKeyRequest) ProtoMessage()    {}
 func (*PublicKeyRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_crypt_072e351eb4757ad3, []int{4}
+	return fileDescriptor_crypt_ffa792509fdcc93a, []int{4}
 }
 func (m *PublicKeyRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PublicKeyRequest.Unmarshal(m, b)
@@ -233,7 +233,7 @@ func (m *PublicKeyResponse) Reset()         { *m = PublicKeyResponse{} }
 func (m *PublicKeyResponse) String() string { return proto.CompactTextString(m) }
 func (*PublicKeyResponse) ProtoMessage()    {}
 func (*PublicKeyResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_crypt_072e351eb4757ad3, []int{5}
+	return fileDescriptor_crypt_ffa792509fdcc93a, []int{5}
 }
 func (m *PublicKeyResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PublicKeyResponse.Unmarshal(m, b)
@@ -414,9 +414,9 @@ var _CryptService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "crypt.proto",
 }
 
-func init() { proto.RegisterFile("crypt.proto", fileDescriptor_crypt_072e351eb4757ad3) }
+func init() { proto.RegisterFile("crypt.proto", fileDescriptor_crypt_ffa792509fdcc93a) }
 
-var fileDescriptor_crypt_072e351eb4757ad3 = []byte{
+var fileDescriptor_crypt_ffa792509fdcc93a = []byte{
 	// 260 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x52, 0x3f, 0x4b, 0xc3, 0x40,
 	0x14, 0xe7, 0x04, 0x1b, 0xfa, 0xcc, 0x60, 0xde, 0xd2, 0x58, 0x44, 0xe4, 0x26, 0xa7, 0x0a, 0xd5,

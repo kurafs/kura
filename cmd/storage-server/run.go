@@ -40,10 +40,12 @@ Storage server detailed overview.
 
 func storageServerCmdRun(cmd *cli.Command, args []string) error {
 	var (
-		port      int
-		storePath string
+		port          int
+		storeRemotely bool
+		storePath     string
 	)
 	cmd.FlagSet.IntVar(&port, "port", 10669, "Port which the server will run on")
+	cmd.FlagSet.BoolVar(&storeRemotely, "remote-only", false, "If set, only stores data remotely.")
 	cmd.FlagSet.StringVar(&storePath, "store-path", "kura-store", "The filepath to store storage-server contents")
 	if err := cmd.FlagSet.Parse(args); err != nil {
 		return cli.CmdParseError(err)
@@ -54,7 +56,7 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 	logf := log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC | log.Lmode
 	logger := log.New(log.Writer(writer), log.Flags(logf), log.SkipBasePath())
 
-	wait, shutdown, err := Start(logger, port, storePath)
+	wait, shutdown, err := Start(logger, port, storeRemotely, storePath)
 	if err != nil {
 		return err
 	}
@@ -67,7 +69,7 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 }
 
 // TODO(irfansharif): Document, why public. What the done channel, teardown is.
-func Start(logger *log.Logger, port int, storePath string) (wait func(), shutdown func(), err error) {
+func Start(logger *log.Logger, port int, storeRemotely bool, storePath string) (wait func(), shutdown func(), err error) {
 	var wg sync.WaitGroup
 
 	grpcL, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
@@ -76,22 +78,37 @@ func Start(logger *log.Logger, port int, storePath string) (wait func(), shutdow
 		return nil, nil, err
 	}
 
-	store := diskv.New(diskv.Options{
-		BasePath:     storePath,
-		CacheSizeMax: 1024 * 1024, // 1MB cache size
-		AdvancedTransform: func(s string) *diskv.PathKey {
-			path := strings.Split(s, "/")
-			last := len(path) - 1
-			return &diskv.PathKey{
-				Path:     path[:last],
-				FileName: path[last],
-			}
-		},
-		InverseTransform: func(pk *diskv.PathKey) string {
-			return strings.Join(pk.Path, "/") + pk.FileName
-		},
-	})
-	storageServer := newStorageServer(logger, store)
+	var storageSinks []Store
+
+	gdriveStore := &gdriveServer{}
+	err = gdriveStore.Setup(logger)
+	if err != nil {
+		logger.Errorf("Unable to setup Google Drive: %v", err)
+	} else {
+		storageSinks = append(storageSinks, gdriveStore)
+	}
+
+	if !storeRemotely {
+		store := diskv.New(diskv.Options{
+			BasePath:     storePath,
+			CacheSizeMax: 1024 * 1024, // 1MB cache size
+			AdvancedTransform: func(s string) *diskv.PathKey {
+				path := strings.Split(s, "/")
+				last := len(path) - 1
+				return &diskv.PathKey{
+					Path:     path[:last],
+					FileName: path[last],
+				}
+			},
+			InverseTransform: func(pk *diskv.PathKey) string {
+				return strings.Join(pk.Path, "/") + pk.FileName
+			},
+		})
+
+		storageSinks = append(storageSinks, store)
+	}
+
+	storageServer := newStorageServer(logger, storageSinks)
 
 	grpcServer := grpc.NewServer()
 	spb.RegisterStorageServiceServer(grpcServer, storageServer)

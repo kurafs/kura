@@ -35,7 +35,7 @@ func TestFilePersistence(t *testing.T) {
 	}
 	defer os.RemoveAll(tdir)
 
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, false, tdir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +103,7 @@ func TestFileDeletion(t *testing.T) {
 	}
 	defer os.RemoveAll(tdir)
 
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, false, tdir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,7 +171,7 @@ func TestSetMetadata(t *testing.T) {
 	}
 	defer os.RemoveAll(tdir)
 
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, false, tdir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -274,7 +274,7 @@ func TestDirKeys(t *testing.T) {
 	}
 	defer os.RemoveAll(tdir)
 
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, false, tdir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -346,7 +346,7 @@ func TestLargeFilePersistence(t *testing.T) {
 	}
 	defer os.RemoveAll(tdir)
 
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, false, tdir)
 	if err != nil {
 		t.Fatal(err)
 	}

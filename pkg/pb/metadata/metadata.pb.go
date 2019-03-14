@@ -26,12 +26,12 @@ const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 // TODO (Franz): This should be encrypted; move this to the encryption
 // server when its implemented
 type Metadata struct {
-	Created              *Metadata_UnixTimestamp `protobuf:"bytes,1,opt,name=created,proto3" json:"created,omitempty"`
-	LastModified         *Metadata_UnixTimestamp `protobuf:"bytes,2,opt,name=last_modified,json=lastModified,proto3" json:"last_modified,omitempty"`
-	Permissions          uint32                  `protobuf:"varint,3,opt,name=permissions,proto3" json:"permissions,omitempty"`
-	Size                 int64                   `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
-	IsDirectory          bool                    `protobuf:"varint,5,opt,name=is_directory,json=isDirectory,proto3" json:"is_directory,omitempty"`
-	AccessList           []*Metadata_Accessor    `protobuf:"bytes,6,rep,name=access_list,json=accessList,proto3" json:"access_list,omitempty"`
+	Created              *Metadata_UnixTimestamp `protobuf:"bytes,1,opt,name=created" json:"created,omitempty"`
+	LastModified         *Metadata_UnixTimestamp `protobuf:"bytes,2,opt,name=last_modified,json=lastModified" json:"last_modified,omitempty"`
+	Permissions          uint32                  `protobuf:"varint,3,opt,name=permissions" json:"permissions,omitempty"`
+	Size                 int64                   `protobuf:"varint,4,opt,name=size" json:"size,omitempty"`
+	IsDirectory          bool                    `protobuf:"varint,5,opt,name=is_directory,json=isDirectory" json:"is_directory,omitempty"`
+	AccessList           []*Metadata_Accessor    `protobuf:"bytes,6,rep,name=access_list,json=accessList" json:"access_list,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                `json:"-"`
 	XXX_unrecognized     []byte                  `json:"-"`
 	XXX_sizecache        int32                   `json:"-"`
@@ -41,7 +41,7 @@ func (m *Metadata) Reset()         { *m = Metadata{} }
 func (m *Metadata) String() string { return proto.CompactTextString(m) }
 func (*Metadata) ProtoMessage()    {}
 func (*Metadata) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{0}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{0}
 }
 func (m *Metadata) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Metadata.Unmarshal(m, b)
@@ -104,8 +104,8 @@ func (m *Metadata) GetAccessList() []*Metadata_Accessor {
 }
 
 type Metadata_UnixTimestamp struct {
-	Seconds              int64    `protobuf:"varint,1,opt,name=seconds,proto3" json:"seconds,omitempty"`
-	Nanoseconds          int64    `protobuf:"varint,2,opt,name=nanoseconds,proto3" json:"nanoseconds,omitempty"`
+	Seconds              int64    `protobuf:"varint,1,opt,name=seconds" json:"seconds,omitempty"`
+	Nanoseconds          int64    `protobuf:"varint,2,opt,name=nanoseconds" json:"nanoseconds,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -115,7 +115,7 @@ func (m *Metadata_UnixTimestamp) Reset()         { *m = Metadata_UnixTimestamp{}
 func (m *Metadata_UnixTimestamp) String() string { return proto.CompactTextString(m) }
 func (*Metadata_UnixTimestamp) ProtoMessage()    {}
 func (*Metadata_UnixTimestamp) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{0, 0}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{0, 0}
 }
 func (m *Metadata_UnixTimestamp) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Metadata_UnixTimestamp.Unmarshal(m, b)
@@ -161,7 +161,7 @@ func (m *Metadata_Accessor) Reset()         { *m = Metadata_Accessor{} }
 func (m *Metadata_Accessor) String() string { return proto.CompactTextString(m) }
 func (*Metadata_Accessor) ProtoMessage()    {}
 func (*Metadata_Accessor) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{0, 1}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{0, 1}
 }
 func (m *Metadata_Accessor) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Metadata_Accessor.Unmarshal(m, b)
@@ -196,7 +196,7 @@ func (m *Metadata_Accessor) GetEncryptedKey() []byte {
 }
 
 type GetFileRequest struct {
-	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Path                 string   `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -206,7 +206,7 @@ func (m *GetFileRequest) Reset()         { *m = GetFileRequest{} }
 func (m *GetFileRequest) String() string { return proto.CompactTextString(m) }
 func (*GetFileRequest) ProtoMessage()    {}
 func (*GetFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{1}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{1}
 }
 func (m *GetFileRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetFileRequest.Unmarshal(m, b)
@@ -235,7 +235,7 @@ func (m *GetFileRequest) GetPath() string {
 
 type GetFileResponse struct {
 	File                 []byte    `protobuf:"bytes,1,opt,name=file,proto3" json:"file,omitempty"`
-	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -245,7 +245,7 @@ func (m *GetFileResponse) Reset()         { *m = GetFileResponse{} }
 func (m *GetFileResponse) String() string { return proto.CompactTextString(m) }
 func (*GetFileResponse) ProtoMessage()    {}
 func (*GetFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{2}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{2}
 }
 func (m *GetFileResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetFileResponse.Unmarshal(m, b)
@@ -280,7 +280,7 @@ func (m *GetFileResponse) GetMetadata() *Metadata {
 }
 
 type GetFileStreamRequest struct {
-	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Path                 string   `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -290,7 +290,7 @@ func (m *GetFileStreamRequest) Reset()         { *m = GetFileStreamRequest{} }
 func (m *GetFileStreamRequest) String() string { return proto.CompactTextString(m) }
 func (*GetFileStreamRequest) ProtoMessage()    {}
 func (*GetFileStreamRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{3}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{3}
 }
 func (m *GetFileStreamRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetFileStreamRequest.Unmarshal(m, b)
@@ -320,7 +320,7 @@ func (m *GetFileStreamRequest) GetPath() string {
 type GetFileStreamResponse struct {
 	Chunk []byte `protobuf:"bytes,1,opt,name=chunk,proto3" json:"chunk,omitempty"`
 	// Only set on the first message
-	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -330,7 +330,7 @@ func (m *GetFileStreamResponse) Reset()         { *m = GetFileStreamResponse{} }
 func (m *GetFileStreamResponse) String() string { return proto.CompactTextString(m) }
 func (*GetFileStreamResponse) ProtoMessage()    {}
 func (*GetFileStreamResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{4}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{4}
 }
 func (m *GetFileStreamResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetFileStreamResponse.Unmarshal(m, b)
@@ -365,9 +365,9 @@ func (m *GetFileStreamResponse) GetMetadata() *Metadata {
 }
 
 type PutFileRequest struct {
-	Path                 string    `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Path                 string    `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
 	File                 []byte    `protobuf:"bytes,2,opt,name=file,proto3" json:"file,omitempty"`
-	Metadata             *Metadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,3,opt,name=metadata" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -377,7 +377,7 @@ func (m *PutFileRequest) Reset()         { *m = PutFileRequest{} }
 func (m *PutFileRequest) String() string { return proto.CompactTextString(m) }
 func (*PutFileRequest) ProtoMessage()    {}
 func (*PutFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{5}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{5}
 }
 func (m *PutFileRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutFileRequest.Unmarshal(m, b)
@@ -428,7 +428,7 @@ func (m *PutFileResponse) Reset()         { *m = PutFileResponse{} }
 func (m *PutFileResponse) String() string { return proto.CompactTextString(m) }
 func (*PutFileResponse) ProtoMessage()    {}
 func (*PutFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{6}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{6}
 }
 func (m *PutFileResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutFileResponse.Unmarshal(m, b)
@@ -450,9 +450,9 @@ var xxx_messageInfo_PutFileResponse proto.InternalMessageInfo
 
 type PutFileStreamRequest struct {
 	// path and metadata should only be set on the first request
-	Path                 string    `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Path                 string    `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
 	Chunk                []byte    `protobuf:"bytes,2,opt,name=chunk,proto3" json:"chunk,omitempty"`
-	Metadata             *Metadata `protobuf:"bytes,3,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,3,opt,name=metadata" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -462,7 +462,7 @@ func (m *PutFileStreamRequest) Reset()         { *m = PutFileStreamRequest{} }
 func (m *PutFileStreamRequest) String() string { return proto.CompactTextString(m) }
 func (*PutFileStreamRequest) ProtoMessage()    {}
 func (*PutFileStreamRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{7}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{7}
 }
 func (m *PutFileStreamRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutFileStreamRequest.Unmarshal(m, b)
@@ -513,7 +513,7 @@ func (m *PutFileStreamResponse) Reset()         { *m = PutFileStreamResponse{} }
 func (m *PutFileStreamResponse) String() string { return proto.CompactTextString(m) }
 func (*PutFileStreamResponse) ProtoMessage()    {}
 func (*PutFileStreamResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{8}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{8}
 }
 func (m *PutFileStreamResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutFileStreamResponse.Unmarshal(m, b)
@@ -534,7 +534,7 @@ func (m *PutFileStreamResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_PutFileStreamResponse proto.InternalMessageInfo
 
 type DeleteFileRequest struct {
-	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Path                 string   `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -544,7 +544,7 @@ func (m *DeleteFileRequest) Reset()         { *m = DeleteFileRequest{} }
 func (m *DeleteFileRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteFileRequest) ProtoMessage()    {}
 func (*DeleteFileRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{9}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{9}
 }
 func (m *DeleteFileRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteFileRequest.Unmarshal(m, b)
@@ -581,7 +581,7 @@ func (m *DeleteFileResponse) Reset()         { *m = DeleteFileResponse{} }
 func (m *DeleteFileResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteFileResponse) ProtoMessage()    {}
 func (*DeleteFileResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{10}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{10}
 }
 func (m *DeleteFileResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteFileResponse.Unmarshal(m, b)
@@ -602,7 +602,7 @@ func (m *DeleteFileResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_DeleteFileResponse proto.InternalMessageInfo
 
 type GetDirectoryEntriesRequest struct {
-	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Path                 string   `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -612,7 +612,7 @@ func (m *GetDirectoryEntriesRequest) Reset()         { *m = GetDirectoryEntriesR
 func (m *GetDirectoryEntriesRequest) String() string { return proto.CompactTextString(m) }
 func (*GetDirectoryEntriesRequest) ProtoMessage()    {}
 func (*GetDirectoryEntriesRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{11}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{11}
 }
 func (m *GetDirectoryEntriesRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetDirectoryEntriesRequest.Unmarshal(m, b)
@@ -640,7 +640,7 @@ func (m *GetDirectoryEntriesRequest) GetPath() string {
 }
 
 type GetDirectoryEntriesResponse struct {
-	Entries              []*GetDirectoryEntriesResponse_DirectoryEntry `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
+	Entries              []*GetDirectoryEntriesResponse_DirectoryEntry `protobuf:"bytes,1,rep,name=entries" json:"entries,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}                                      `json:"-"`
 	XXX_unrecognized     []byte                                        `json:"-"`
 	XXX_sizecache        int32                                         `json:"-"`
@@ -650,7 +650,7 @@ func (m *GetDirectoryEntriesResponse) Reset()         { *m = GetDirectoryEntries
 func (m *GetDirectoryEntriesResponse) String() string { return proto.CompactTextString(m) }
 func (*GetDirectoryEntriesResponse) ProtoMessage()    {}
 func (*GetDirectoryEntriesResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{12}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{12}
 }
 func (m *GetDirectoryEntriesResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetDirectoryEntriesResponse.Unmarshal(m, b)
@@ -678,8 +678,8 @@ func (m *GetDirectoryEntriesResponse) GetEntries() []*GetDirectoryEntriesRespons
 }
 
 type GetDirectoryEntriesResponse_DirectoryEntry struct {
-	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	IsDirectory          bool     `protobuf:"varint,2,opt,name=is_directory,json=isDirectory,proto3" json:"is_directory,omitempty"`
+	Path                 string   `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
+	IsDirectory          bool     `protobuf:"varint,2,opt,name=is_directory,json=isDirectory" json:"is_directory,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -693,7 +693,7 @@ func (m *GetDirectoryEntriesResponse_DirectoryEntry) String() string {
 }
 func (*GetDirectoryEntriesResponse_DirectoryEntry) ProtoMessage() {}
 func (*GetDirectoryEntriesResponse_DirectoryEntry) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{12, 0}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{12, 0}
 }
 func (m *GetDirectoryEntriesResponse_DirectoryEntry) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetDirectoryEntriesResponse_DirectoryEntry.Unmarshal(m, b)
@@ -728,8 +728,8 @@ func (m *GetDirectoryEntriesResponse_DirectoryEntry) GetIsDirectory() bool {
 }
 
 type CreateDirectoryRequest struct {
-	Path                 string    `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Path                 string    `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -739,7 +739,7 @@ func (m *CreateDirectoryRequest) Reset()         { *m = CreateDirectoryRequest{}
 func (m *CreateDirectoryRequest) String() string { return proto.CompactTextString(m) }
 func (*CreateDirectoryRequest) ProtoMessage()    {}
 func (*CreateDirectoryRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{13}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{13}
 }
 func (m *CreateDirectoryRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateDirectoryRequest.Unmarshal(m, b)
@@ -783,7 +783,7 @@ func (m *CreateDirectoryResponse) Reset()         { *m = CreateDirectoryResponse
 func (m *CreateDirectoryResponse) String() string { return proto.CompactTextString(m) }
 func (*CreateDirectoryResponse) ProtoMessage()    {}
 func (*CreateDirectoryResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{14}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{14}
 }
 func (m *CreateDirectoryResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CreateDirectoryResponse.Unmarshal(m, b)
@@ -804,7 +804,7 @@ func (m *CreateDirectoryResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_CreateDirectoryResponse proto.InternalMessageInfo
 
 type DeleteDirectoryRequest struct {
-	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Path                 string   `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -814,7 +814,7 @@ func (m *DeleteDirectoryRequest) Reset()         { *m = DeleteDirectoryRequest{}
 func (m *DeleteDirectoryRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteDirectoryRequest) ProtoMessage()    {}
 func (*DeleteDirectoryRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{15}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{15}
 }
 func (m *DeleteDirectoryRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteDirectoryRequest.Unmarshal(m, b)
@@ -851,7 +851,7 @@ func (m *DeleteDirectoryResponse) Reset()         { *m = DeleteDirectoryResponse
 func (m *DeleteDirectoryResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteDirectoryResponse) ProtoMessage()    {}
 func (*DeleteDirectoryResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{16}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{16}
 }
 func (m *DeleteDirectoryResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteDirectoryResponse.Unmarshal(m, b)
@@ -872,7 +872,7 @@ func (m *DeleteDirectoryResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_DeleteDirectoryResponse proto.InternalMessageInfo
 
 type GetMetadataRequest struct {
-	Path                 string   `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
+	Path                 string   `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -882,7 +882,7 @@ func (m *GetMetadataRequest) Reset()         { *m = GetMetadataRequest{} }
 func (m *GetMetadataRequest) String() string { return proto.CompactTextString(m) }
 func (*GetMetadataRequest) ProtoMessage()    {}
 func (*GetMetadataRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{17}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{17}
 }
 func (m *GetMetadataRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetMetadataRequest.Unmarshal(m, b)
@@ -910,7 +910,7 @@ func (m *GetMetadataRequest) GetPath() string {
 }
 
 type GetMetadataResponse struct {
-	Metadata             *Metadata `protobuf:"bytes,1,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,1,opt,name=metadata" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -920,7 +920,7 @@ func (m *GetMetadataResponse) Reset()         { *m = GetMetadataResponse{} }
 func (m *GetMetadataResponse) String() string { return proto.CompactTextString(m) }
 func (*GetMetadataResponse) ProtoMessage()    {}
 func (*GetMetadataResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{18}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{18}
 }
 func (m *GetMetadataResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetMetadataResponse.Unmarshal(m, b)
@@ -948,8 +948,8 @@ func (m *GetMetadataResponse) GetMetadata() *Metadata {
 }
 
 type SetMetadataRequest struct {
-	Path                 string    `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata,proto3" json:"metadata,omitempty"`
+	Path                 string    `protobuf:"bytes,1,opt,name=path" json:"path,omitempty"`
+	Metadata             *Metadata `protobuf:"bytes,2,opt,name=metadata" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
 	XXX_sizecache        int32     `json:"-"`
@@ -959,7 +959,7 @@ func (m *SetMetadataRequest) Reset()         { *m = SetMetadataRequest{} }
 func (m *SetMetadataRequest) String() string { return proto.CompactTextString(m) }
 func (*SetMetadataRequest) ProtoMessage()    {}
 func (*SetMetadataRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{19}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{19}
 }
 func (m *SetMetadataRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SetMetadataRequest.Unmarshal(m, b)
@@ -1003,7 +1003,7 @@ func (m *SetMetadataResponse) Reset()         { *m = SetMetadataResponse{} }
 func (m *SetMetadataResponse) String() string { return proto.CompactTextString(m) }
 func (*SetMetadataResponse) ProtoMessage()    {}
 func (*SetMetadataResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{20}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{20}
 }
 func (m *SetMetadataResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_SetMetadataResponse.Unmarshal(m, b)
@@ -1024,8 +1024,8 @@ func (m *SetMetadataResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_SetMetadataResponse proto.InternalMessageInfo
 
 type RenameRequest struct {
-	OldPath              string   `protobuf:"bytes,1,opt,name=old_path,json=oldPath,proto3" json:"old_path,omitempty"`
-	NewPath              string   `protobuf:"bytes,2,opt,name=new_path,json=newPath,proto3" json:"new_path,omitempty"`
+	OldPath              string   `protobuf:"bytes,1,opt,name=old_path,json=oldPath" json:"old_path,omitempty"`
+	NewPath              string   `protobuf:"bytes,2,opt,name=new_path,json=newPath" json:"new_path,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -1035,7 +1035,7 @@ func (m *RenameRequest) Reset()         { *m = RenameRequest{} }
 func (m *RenameRequest) String() string { return proto.CompactTextString(m) }
 func (*RenameRequest) ProtoMessage()    {}
 func (*RenameRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{21}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{21}
 }
 func (m *RenameRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RenameRequest.Unmarshal(m, b)
@@ -1079,7 +1079,7 @@ func (m *RenameResponse) Reset()         { *m = RenameResponse{} }
 func (m *RenameResponse) String() string { return proto.CompactTextString(m) }
 func (*RenameResponse) ProtoMessage()    {}
 func (*RenameResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_metadata_38a8b2831e468447, []int{22}
+	return fileDescriptor_metadata_0f9f3a24c18ba2e3, []int{22}
 }
 func (m *RenameResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RenameResponse.Unmarshal(m, b)
@@ -1592,9 +1592,9 @@ var _MetadataService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "metadata.proto",
 }
 
-func init() { proto.RegisterFile("metadata.proto", fileDescriptor_metadata_38a8b2831e468447) }
+func init() { proto.RegisterFile("metadata.proto", fileDescriptor_metadata_0f9f3a24c18ba2e3) }
 
-var fileDescriptor_metadata_38a8b2831e468447 = []byte{
+var fileDescriptor_metadata_0f9f3a24c18ba2e3 = []byte{
 	// 816 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x56, 0xeb, 0x6e, 0xd3, 0x48,
 	0x14, 0x96, 0x93, 0x36, 0xc9, 0x9e, 0xdc, 0xb6, 0xd3, 0xb4, 0x75, 0xdc, 0xee, 0x6e, 0x9a, 0xed,

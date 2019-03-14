@@ -60,8 +60,8 @@ func TestGetBlob(t *testing.T) {
 	logger := log.Discarder()
 	ctx := context.Background()
 
-	testStore := &testStore{}
-	storageServer := newStorageServer(logger, testStore)
+	stores := []Store{&testStore{}}
+	storageServer := newStorageServer(logger, stores)
 	req := &spb.GetBlobRequest{Key: "get-blob-req"}
 	res, err := storageServer.GetBlob(ctx, req)
 	if err != nil {
@@ -77,8 +77,8 @@ func TestPutData(t *testing.T) {
 	logger := log.Discarder()
 	ctx := context.Background()
 
-	testStore := &testStore{}
-	storageServer := newStorageServer(logger, testStore)
+	stores := []Store{&testStore{}}
+	storageServer := newStorageServer(logger, stores)
 	req := &spb.PutBlobRequest{Key: "put-data-req", Data: []byte("data")}
 	_, err := storageServer.PutBlob(ctx, req)
 	if err != nil {
@@ -90,8 +90,8 @@ func TestDeleteBlob(t *testing.T) {
 	logger := log.Discarder()
 	ctx := context.Background()
 
-	testStore := &testStore{}
-	storageServer := newStorageServer(logger, testStore)
+	stores := []Store{&testStore{}}
+	storageServer := newStorageServer(logger, stores)
 	req := &spb.DeleteBlobRequest{Key: deleteFileReqKey}
 	_, err := storageServer.DeleteBlob(ctx, req)
 	if err != nil {
@@ -103,8 +103,8 @@ func TestGetBlobKeys(t *testing.T) {
 	logger := log.Discarder()
 	ctx := context.Background()
 
-	testStore := &testStore{}
-	storageServer := newStorageServer(logger, testStore)
+	stores := []Store{&testStore{}}
+	storageServer := newStorageServer(logger, stores)
 	req := &spb.GetBlobKeysRequest{}
 	_, err := storageServer.GetBlobKeys(ctx, req)
 

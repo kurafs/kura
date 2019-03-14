@@ -24,7 +24,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type GetIdentityRequest struct {
-	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	Email                string   `protobuf:"bytes,1,opt,name=email" json:"email,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -34,7 +34,7 @@ func (m *GetIdentityRequest) Reset()         { *m = GetIdentityRequest{} }
 func (m *GetIdentityRequest) String() string { return proto.CompactTextString(m) }
 func (*GetIdentityRequest) ProtoMessage()    {}
 func (*GetIdentityRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identity_2ea0d6755ca8ba04, []int{0}
+	return fileDescriptor_identity_a7808f9142c0839a, []int{0}
 }
 func (m *GetIdentityRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetIdentityRequest.Unmarshal(m, b)
@@ -62,7 +62,7 @@ func (m *GetIdentityRequest) GetEmail() string {
 }
 
 type GetIdentityResponse struct {
-	MetadataServer       string   `protobuf:"bytes,1,opt,name=metadata_server,json=metadataServer,proto3" json:"metadata_server,omitempty"`
+	MetadataServer       string   `protobuf:"bytes,1,opt,name=metadata_server,json=metadataServer" json:"metadata_server,omitempty"`
 	PublicKey            []byte   `protobuf:"bytes,2,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -73,7 +73,7 @@ func (m *GetIdentityResponse) Reset()         { *m = GetIdentityResponse{} }
 func (m *GetIdentityResponse) String() string { return proto.CompactTextString(m) }
 func (*GetIdentityResponse) ProtoMessage()    {}
 func (*GetIdentityResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identity_2ea0d6755ca8ba04, []int{1}
+	return fileDescriptor_identity_a7808f9142c0839a, []int{1}
 }
 func (m *GetIdentityResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetIdentityResponse.Unmarshal(m, b)
@@ -108,8 +108,8 @@ func (m *GetIdentityResponse) GetPublicKey() []byte {
 }
 
 type PutIdentityRequest struct {
-	Email                string   `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	MetadataServer       string   `protobuf:"bytes,2,opt,name=metadata_server,json=metadataServer,proto3" json:"metadata_server,omitempty"`
+	Email                string   `protobuf:"bytes,1,opt,name=email" json:"email,omitempty"`
+	MetadataServer       string   `protobuf:"bytes,2,opt,name=metadata_server,json=metadataServer" json:"metadata_server,omitempty"`
 	PublicKey            []byte   `protobuf:"bytes,3,opt,name=public_key,json=publicKey,proto3" json:"public_key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -120,7 +120,7 @@ func (m *PutIdentityRequest) Reset()         { *m = PutIdentityRequest{} }
 func (m *PutIdentityRequest) String() string { return proto.CompactTextString(m) }
 func (*PutIdentityRequest) ProtoMessage()    {}
 func (*PutIdentityRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identity_2ea0d6755ca8ba04, []int{2}
+	return fileDescriptor_identity_a7808f9142c0839a, []int{2}
 }
 func (m *PutIdentityRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutIdentityRequest.Unmarshal(m, b)
@@ -171,7 +171,7 @@ func (m *PutIdentityResponse) Reset()         { *m = PutIdentityResponse{} }
 func (m *PutIdentityResponse) String() string { return proto.CompactTextString(m) }
 func (*PutIdentityResponse) ProtoMessage()    {}
 func (*PutIdentityResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_identity_2ea0d6755ca8ba04, []int{3}
+	return fileDescriptor_identity_a7808f9142c0839a, []int{3}
 }
 func (m *PutIdentityResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutIdentityResponse.Unmarshal(m, b)
@@ -303,9 +303,9 @@ var _IdentityService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "identity.proto",
 }
 
-func init() { proto.RegisterFile("identity.proto", fileDescriptor_identity_2ea0d6755ca8ba04) }
+func init() { proto.RegisterFile("identity.proto", fileDescriptor_identity_a7808f9142c0839a) }
 
-var fileDescriptor_identity_2ea0d6755ca8ba04 = []byte{
+var fileDescriptor_identity_a7808f9142c0839a = []byte{
 	// 222 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0xcb, 0x4c, 0x49, 0xcd,
 	0x2b, 0xc9, 0x2c, 0xa9, 0xd4, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x80, 0xf1, 0x95, 0xb4,

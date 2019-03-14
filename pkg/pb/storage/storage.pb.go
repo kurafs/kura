@@ -24,7 +24,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type GetBlobRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Key                  string   `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -34,7 +34,7 @@ func (m *GetBlobRequest) Reset()         { *m = GetBlobRequest{} }
 func (m *GetBlobRequest) String() string { return proto.CompactTextString(m) }
 func (*GetBlobRequest) ProtoMessage()    {}
 func (*GetBlobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{0}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{0}
 }
 func (m *GetBlobRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobRequest.Unmarshal(m, b)
@@ -72,7 +72,7 @@ func (m *GetBlobResponse) Reset()         { *m = GetBlobResponse{} }
 func (m *GetBlobResponse) String() string { return proto.CompactTextString(m) }
 func (*GetBlobResponse) ProtoMessage()    {}
 func (*GetBlobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{1}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{1}
 }
 func (m *GetBlobResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobResponse.Unmarshal(m, b)
@@ -100,7 +100,7 @@ func (m *GetBlobResponse) GetData() []byte {
 }
 
 type GetBlobStreamRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Key                  string   `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -110,7 +110,7 @@ func (m *GetBlobStreamRequest) Reset()         { *m = GetBlobStreamRequest{} }
 func (m *GetBlobStreamRequest) String() string { return proto.CompactTextString(m) }
 func (*GetBlobStreamRequest) ProtoMessage()    {}
 func (*GetBlobStreamRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{2}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{2}
 }
 func (m *GetBlobStreamRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobStreamRequest.Unmarshal(m, b)
@@ -148,7 +148,7 @@ func (m *GetBlobStreamResponse) Reset()         { *m = GetBlobStreamResponse{} }
 func (m *GetBlobStreamResponse) String() string { return proto.CompactTextString(m) }
 func (*GetBlobStreamResponse) ProtoMessage()    {}
 func (*GetBlobStreamResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{3}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{3}
 }
 func (m *GetBlobStreamResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobStreamResponse.Unmarshal(m, b)
@@ -176,7 +176,7 @@ func (m *GetBlobStreamResponse) GetChunk() []byte {
 }
 
 type PutBlobRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Key                  string   `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
 	Data                 []byte   `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -187,7 +187,7 @@ func (m *PutBlobRequest) Reset()         { *m = PutBlobRequest{} }
 func (m *PutBlobRequest) String() string { return proto.CompactTextString(m) }
 func (*PutBlobRequest) ProtoMessage()    {}
 func (*PutBlobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{4}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{4}
 }
 func (m *PutBlobRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutBlobRequest.Unmarshal(m, b)
@@ -231,7 +231,7 @@ func (m *PutBlobResponse) Reset()         { *m = PutBlobResponse{} }
 func (m *PutBlobResponse) String() string { return proto.CompactTextString(m) }
 func (*PutBlobResponse) ProtoMessage()    {}
 func (*PutBlobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{5}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{5}
 }
 func (m *PutBlobResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutBlobResponse.Unmarshal(m, b)
@@ -252,7 +252,7 @@ func (m *PutBlobResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_PutBlobResponse proto.InternalMessageInfo
 
 type PutBlobStreamRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Key                  string   `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
 	Chunk                []byte   `protobuf:"bytes,2,opt,name=chunk,proto3" json:"chunk,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -263,7 +263,7 @@ func (m *PutBlobStreamRequest) Reset()         { *m = PutBlobStreamRequest{} }
 func (m *PutBlobStreamRequest) String() string { return proto.CompactTextString(m) }
 func (*PutBlobStreamRequest) ProtoMessage()    {}
 func (*PutBlobStreamRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{6}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{6}
 }
 func (m *PutBlobStreamRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutBlobStreamRequest.Unmarshal(m, b)
@@ -307,7 +307,7 @@ func (m *PutBlobStreamResponse) Reset()         { *m = PutBlobStreamResponse{} }
 func (m *PutBlobStreamResponse) String() string { return proto.CompactTextString(m) }
 func (*PutBlobStreamResponse) ProtoMessage()    {}
 func (*PutBlobStreamResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{7}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{7}
 }
 func (m *PutBlobStreamResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_PutBlobStreamResponse.Unmarshal(m, b)
@@ -328,7 +328,7 @@ func (m *PutBlobStreamResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_PutBlobStreamResponse proto.InternalMessageInfo
 
 type DeleteBlobRequest struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Key                  string   `protobuf:"bytes,1,opt,name=key" json:"key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -338,7 +338,7 @@ func (m *DeleteBlobRequest) Reset()         { *m = DeleteBlobRequest{} }
 func (m *DeleteBlobRequest) String() string { return proto.CompactTextString(m) }
 func (*DeleteBlobRequest) ProtoMessage()    {}
 func (*DeleteBlobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{8}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{8}
 }
 func (m *DeleteBlobRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteBlobRequest.Unmarshal(m, b)
@@ -375,7 +375,7 @@ func (m *DeleteBlobResponse) Reset()         { *m = DeleteBlobResponse{} }
 func (m *DeleteBlobResponse) String() string { return proto.CompactTextString(m) }
 func (*DeleteBlobResponse) ProtoMessage()    {}
 func (*DeleteBlobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{9}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{9}
 }
 func (m *DeleteBlobResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_DeleteBlobResponse.Unmarshal(m, b)
@@ -405,7 +405,7 @@ func (m *GetBlobKeysRequest) Reset()         { *m = GetBlobKeysRequest{} }
 func (m *GetBlobKeysRequest) String() string { return proto.CompactTextString(m) }
 func (*GetBlobKeysRequest) ProtoMessage()    {}
 func (*GetBlobKeysRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{10}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{10}
 }
 func (m *GetBlobKeysRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobKeysRequest.Unmarshal(m, b)
@@ -426,7 +426,7 @@ func (m *GetBlobKeysRequest) XXX_DiscardUnknown() {
 var xxx_messageInfo_GetBlobKeysRequest proto.InternalMessageInfo
 
 type GetBlobKeysResponse struct {
-	Keys                 []string `protobuf:"bytes,1,rep,name=keys,proto3" json:"keys,omitempty"`
+	Keys                 []string `protobuf:"bytes,1,rep,name=keys" json:"keys,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -436,7 +436,7 @@ func (m *GetBlobKeysResponse) Reset()         { *m = GetBlobKeysResponse{} }
 func (m *GetBlobKeysResponse) String() string { return proto.CompactTextString(m) }
 func (*GetBlobKeysResponse) ProtoMessage()    {}
 func (*GetBlobKeysResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{11}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{11}
 }
 func (m *GetBlobKeysResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_GetBlobKeysResponse.Unmarshal(m, b)
@@ -464,8 +464,8 @@ func (m *GetBlobKeysResponse) GetKeys() []string {
 }
 
 type RenameBlobRequest struct {
-	OldKey               string   `protobuf:"bytes,1,opt,name=old_key,json=oldKey,proto3" json:"old_key,omitempty"`
-	NewKey               string   `protobuf:"bytes,2,opt,name=new_key,json=newKey,proto3" json:"new_key,omitempty"`
+	OldKey               string   `protobuf:"bytes,1,opt,name=old_key,json=oldKey" json:"old_key,omitempty"`
+	NewKey               string   `protobuf:"bytes,2,opt,name=new_key,json=newKey" json:"new_key,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -475,7 +475,7 @@ func (m *RenameBlobRequest) Reset()         { *m = RenameBlobRequest{} }
 func (m *RenameBlobRequest) String() string { return proto.CompactTextString(m) }
 func (*RenameBlobRequest) ProtoMessage()    {}
 func (*RenameBlobRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{12}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{12}
 }
 func (m *RenameBlobRequest) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RenameBlobRequest.Unmarshal(m, b)
@@ -519,7 +519,7 @@ func (m *RenameBlobResponse) Reset()         { *m = RenameBlobResponse{} }
 func (m *RenameBlobResponse) String() string { return proto.CompactTextString(m) }
 func (*RenameBlobResponse) ProtoMessage()    {}
 func (*RenameBlobResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_storage_93615289172d4604, []int{13}
+	return fileDescriptor_storage_66978d0581c68e0f, []int{13}
 }
 func (m *RenameBlobResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_RenameBlobResponse.Unmarshal(m, b)
@@ -888,9 +888,9 @@ var _StorageService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "storage.proto",
 }
 
-func init() { proto.RegisterFile("storage.proto", fileDescriptor_storage_93615289172d4604) }
+func init() { proto.RegisterFile("storage.proto", fileDescriptor_storage_66978d0581c68e0f) }
 
-var fileDescriptor_storage_93615289172d4604 = []byte{
+var fileDescriptor_storage_66978d0581c68e0f = []byte{
 	// 402 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x94, 0xc1, 0x4e, 0xc2, 0x40,
 	0x10, 0x86, 0x53, 0x40, 0x08, 0xa3, 0x80, 0xac, 0x25, 0x90, 0xa2, 0x86, 0x6c, 0x42, 0x52, 0x0f,

@@ -17,6 +17,7 @@ package storageserver
 import (
 	"errors"
 	"io"
+	"math/rand"
 	"sync"
 
 	"github.com/kurafs/kura/pkg/log"
@@ -36,15 +37,15 @@ type Store interface {
 
 type storageServer struct {
 	mu     sync.RWMutex
-	store  Store
+	stores []Store
 	logger *log.Logger
 }
 
 var _ spb.StorageServiceServer = &storageServer{}
 
-func newStorageServer(logger *log.Logger, store Store) *storageServer {
+func newStorageServer(logger *log.Logger, stores []Store) *storageServer {
 	return &storageServer{
-		store:  store,
+		stores: stores,
 		logger: logger,
 	}
 }
@@ -53,7 +54,8 @@ func (s *storageServer) GetBlob(ctx context.Context, req *spb.GetBlobRequest) (*
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	blob, err := s.store.Read(req.Key)
+	index := rand.Intn(len(s.stores))
+	blob, err := s.stores[index].Read(req.Key)
 	if err != nil {
 		return nil, err
 	}
@@ -65,12 +67,14 @@ func (s *storageServer) GetBlobStream(req *spb.GetBlobStreamRequest, stream spb.
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	file, err := s.store.Read(req.Key)
+	// TODO(arhamahmed): stream storage reads
+	index := rand.Intn(len(s.stores))
+	blob, err := s.stores[index].Read(req.Key)
 	if err != nil {
 		return err
 	}
 
-	chunker := streaming.NewChunker(file)
+	chunker := streaming.NewChunker(blob)
 	for chunker.Next() {
 		if err := stream.Send(&spb.GetBlobStreamResponse{Chunk: chunker.Value()}); err != nil {
 			return err
@@ -84,8 +88,22 @@ func (s *storageServer) PutBlob(ctx context.Context, req *spb.PutBlobRequest) (*
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if err := s.store.Write(req.Key, req.Data); err != nil {
-		return nil, err
+	didErr := false
+	for _, store := range s.stores {
+		if err := store.Write(req.Key, req.Data); err != nil {
+			didErr = true
+			break
+		}
+	}
+
+	if didErr {
+		for _, store := range s.stores {
+			if store.Has(req.Key) {
+				if err := store.Erase(req.Key); err != nil {
+					return nil, errors.New("Failed writing to all storage sinks")
+				}
+			}
+		}
 	}
 
 	return &spb.PutBlobResponse{}, nil
@@ -115,8 +133,23 @@ func (s *storageServer) PutBlobStream(stream spb.StorageService_PutBlobStreamSer
 		fileBytes = append(fileBytes, in.Chunk...)
 	}
 
-	if err = s.store.Write(key, fileBytes); err != nil {
-		return err
+	// TODO(arhamahmed): call stream writes to storage
+	didErr := false
+	for _, store := range s.stores {
+		if err := store.Write(key, fileBytes); err != nil {
+			didErr = true
+			break
+		}
+	}
+
+	if didErr {
+		for _, store := range s.stores {
+			if store.Has(key) {
+				if err := store.Erase(key); err != nil {
+					return errors.New("Failed writing to all storage sinks")
+				}
+			}
+		}
 	}
 	return stream.SendAndClose(&spb.PutBlobStreamResponse{})
 }
@@ -125,12 +158,14 @@ func (s *storageServer) DeleteBlob(ctx context.Context, req *spb.DeleteBlobReque
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if !s.store.Has(req.Key) {
-		return &spb.DeleteBlobResponse{}, errors.New("blob does not exist")
-	}
+	for _, store := range s.stores {
+		if !store.Has(req.Key) {
+			return &spb.DeleteBlobResponse{}, errors.New("Blob does not exist")
+		}
 
-	if err := s.store.Erase(req.Key); err != nil {
-		return nil, err
+		if err := store.Erase(req.Key); err != nil {
+			return nil, err
+		}
 	}
 
 	return &spb.DeleteBlobResponse{}, nil
@@ -140,8 +175,10 @@ func (s *storageServer) RenameBlob(ctx context.Context, req *spb.RenameBlobReque
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if err := s.store.Rename(req.OldKey, req.NewKey); err != nil {
-		return nil, err
+	for _, store := range s.stores {
+		if err := store.Rename(req.OldKey, req.NewKey); err != nil {
+			return nil, err
+		}
 	}
 
 	return &spb.RenameBlobResponse{}, nil
@@ -151,10 +188,8 @@ func (s *storageServer) GetBlobKeys(ctx context.Context, req *spb.GetBlobKeysReq
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	keys := make([]string, 0)
-	for _, key := range s.store.Keys() {
-		keys = append(keys, key)
-	}
+	index := rand.Intn(len(s.stores))
+	keys := s.stores[index].Keys()
 
 	return &spb.GetBlobKeysResponse{Keys: keys}, nil
 }
