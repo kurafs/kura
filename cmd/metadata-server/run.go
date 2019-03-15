@@ -46,9 +46,11 @@ func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 	var (
 		port        int
 		storageAddr string
+		ip          string
 	)
 	cmd.FlagSet.StringVar(&storageAddr, "storage-addr", "localhost:10669", "Address of the storage server [host:port]")
 	cmd.FlagSet.IntVar(&port, "port", 10670, "Port on which the server will run on")
+	cmd.FlagSet.StringVar(&ip, "ip", "127.0.0.1", "IP (ipv4 addresses only) on which the server will run on")
 	if err := cmd.FlagSet.Parse(args); err != nil {
 		return cli.CmdParseError(err)
 	}
@@ -58,7 +60,7 @@ func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 	logf := log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC | log.Lmode
 	logger := log.New(log.Writer(writer), log.Flags(logf), log.SkipBasePath())
 
-	wait, shutdown, err := Start(logger, port, storageAddr)
+	wait, shutdown, err := Start(logger, port, storageAddr, ip)
 	if err != nil {
 		return err
 	}
@@ -71,10 +73,10 @@ func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 
 // TODO(irfansharif): Maybe use different type for storageAddr, to ensure both
 // host/port.
-func Start(logger *log.Logger, port int, storageAddr string) (wait func(), shutdown func(), err error) {
+func Start(logger *log.Logger, port int, storageAddr string, ip string) (wait func(), shutdown func(), err error) {
 	var wg sync.WaitGroup
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", ip, port))
 	if err != nil {
 		logger.Fatalf("failed to open TCP port: %v", err)
 		return nil, nil, err
