@@ -35,12 +35,12 @@ func TestFilePersistence(t *testing.T) {
 	}
 	defer os.RemoveAll(tdir)
 
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir, "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669")
+	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669", "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,12 +103,12 @@ func TestFileDeletion(t *testing.T) {
 	}
 	defer os.RemoveAll(tdir)
 
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir, "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669")
+	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669", "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,12 +171,12 @@ func TestSetMetadata(t *testing.T) {
 	}
 	defer os.RemoveAll(tdir)
 
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir, "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669")
+	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669", "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -274,12 +274,12 @@ func TestDirKeys(t *testing.T) {
 	}
 	defer os.RemoveAll(tdir)
 
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir, "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669")
+	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669", "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -346,12 +346,12 @@ func TestLargeFilePersistence(t *testing.T) {
 	}
 	defer os.RemoveAll(tdir)
 
-	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir)
+	waitStorage, shutdownStorage, err := storageserver.Start(logger, 10669, tdir, "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669")
+	waitMetadata, shutdownMetadata, err := metadataserver.Start(logger, 10670, "localhost:10669", "127.0.0.1")
 	if err != nil {
 		t.Fatal(err)
 	}
