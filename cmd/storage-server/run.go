@@ -42,9 +42,11 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 	var (
 		port      int
 		storePath string
+		ip        string
 	)
 	cmd.FlagSet.IntVar(&port, "port", 10669, "Port which the server will run on")
 	cmd.FlagSet.StringVar(&storePath, "store-path", "kura-store", "The filepath to store storage-server contents")
+	cmd.FlagSet.StringVar(&ip, "ip", "127.0.0.1", "IP (ipv4 addresses only) on which the server will run on")
 	if err := cmd.FlagSet.Parse(args); err != nil {
 		return cli.CmdParseError(err)
 	}
@@ -54,7 +56,7 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 	logf := log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC | log.Lmode
 	logger := log.New(log.Writer(writer), log.Flags(logf), log.SkipBasePath())
 
-	wait, shutdown, err := Start(logger, port, storePath)
+	wait, shutdown, err := Start(logger, port, storePath, ip)
 	if err != nil {
 		return err
 	}
@@ -67,10 +69,10 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 }
 
 // TODO(irfansharif): Document, why public. What the done channel, teardown is.
-func Start(logger *log.Logger, port int, storePath string) (wait func(), shutdown func(), err error) {
+func Start(logger *log.Logger, port int, storePath string, ip string) (wait func(), shutdown func(), err error) {
 	var wg sync.WaitGroup
 
-	grpcL, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", port))
+	grpcL, err := net.Listen("tcp", fmt.Sprintf("%s:%d", ip, port))
 	if err != nil {
 		logger.Errorf("failed to open TCP port: %v", err)
 		return nil, nil, err
