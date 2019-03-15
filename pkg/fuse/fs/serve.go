@@ -946,7 +946,8 @@ func (c *Server) handleRequest(ctx context.Context, node Node, snode *serveNode,
 				return err
 			}
 		}
-
+		// TODO(irfansharif): Shouldn't the following be encapsulated in an else
+		// statement?
 		if err := snode.attr(ctx, &s.Attr); err != nil {
 			return err
 		}

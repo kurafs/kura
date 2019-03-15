@@ -35,6 +35,8 @@ func (c *Chunker) Value() []byte {
 
 // Next advances the iterator to the next chunk
 func (c *Chunker) Next() bool {
+	// TODO(irfansharif): We need to start it with chunker.Next(), should be
+	// positioned at the beginning.
 	c.part++
 	if c.part*ChunkSize >= len(c.source) {
 		return false
