@@ -56,7 +56,7 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 	logf := log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC | log.Lmode
 	logger := log.New(log.Writer(writer), log.Flags(logf), log.SkipBasePath())
 
-	wait, shutdown, err := Start(logger, port, storePath, ip)
+	wait, shutdown, err := Start(logger, port, ip, storePath)
 	if err != nil {
 		return err
 	}
@@ -69,7 +69,7 @@ func storageServerCmdRun(cmd *cli.Command, args []string) error {
 }
 
 // TODO(irfansharif): Document, why public. What the done channel, teardown is.
-func Start(logger *log.Logger, port int, storePath string, ip string) (wait func(), shutdown func(), err error) {
+func Start(logger *log.Logger, port int, ip, storePath string) (wait func(), shutdown func(), err error) {
 	var wg sync.WaitGroup
 
 	grpcL, err := net.Listen("tcp", fmt.Sprintf("%s:%d", ip, port))

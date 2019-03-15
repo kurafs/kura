@@ -60,7 +60,7 @@ func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 	logf := log.Ldate | log.Ltime | log.Lmicroseconds | log.Llongfile | log.LUTC | log.Lmode
 	logger := log.New(log.Writer(writer), log.Flags(logf), log.SkipBasePath())
 
-	wait, shutdown, err := Start(logger, port, storageAddr, ip)
+	wait, shutdown, err := Start(logger, port, ip, storageAddr)
 	if err != nil {
 		return err
 	}
@@ -73,7 +73,7 @@ func metadataServerCmdRun(cmd *cli.Command, args []string) error {
 
 // TODO(irfansharif): Maybe use different type for storageAddr, to ensure both
 // host/port.
-func Start(logger *log.Logger, port int, storageAddr string, ip string) (wait func(), shutdown func(), err error) {
+func Start(logger *log.Logger, port int, ip, storageAddr string) (wait func(), shutdown func(), err error) {
 	var wg sync.WaitGroup
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", ip, port))
