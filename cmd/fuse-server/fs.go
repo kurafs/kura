@@ -660,3 +660,7 @@ func (f *File) Listxattr(
 ) error {
 	return fuse.ErrNoXattr
 }
+
+func (f *File) Fsync(ctx context.Context, req *fuse.FsyncRequest) error {
+	return nil
+}
