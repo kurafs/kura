@@ -507,16 +507,22 @@ func (f *File) Write(
 	f.fserver.mu.Lock()
 	defer f.fserver.mu.Unlock()
 
-	if req.Offset == 0 {
+	// NB: We do the simple thing of growing out the buffer (possibly more
+	// than needed), copying data as needed, and trimming down our
+	// reference.
+	if req.Offset > int64(len(f.buffer)) {
+		panic("offset out of bound")
+	}
+	if req.Offset == int64(len(f.buffer)) {
 		f.buffer = append(f.buffer, req.Data...)
-	} else {
-		// NB: We do the simple thing of growing out the buffer (possibly more
-		// than needed), copying data as needed, and trimming down our
-		// reference.
+	} else if req.Offset < int64(len(f.buffer)) && (req.Offset+int64(len(req.Data)) > int64(len(f.buffer))) {
 		f.buffer = append(f.buffer, req.Data...)
 		copy(f.buffer[req.Offset:], req.Data)
 		f.buffer = f.buffer[:req.Offset+int64(len(req.Data))]
+	} else {
+		copy(f.buffer[req.Offset:], req.Data)
 	}
+
 	resp.Size = len(req.Data)
 	return nil
 }
