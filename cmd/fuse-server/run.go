@@ -141,8 +141,6 @@ func mount(logger *log.Logger, mountPoint string) (*fuse.Conn, error) {
 		mountPoint,
 		fuse.FSName("kurafs"),
 		fuse.VolumeName("Kura"),
-		fuse.NoAppleDouble(),
-		fuse.NoAppleXattr(),
 		fuse.WritebackCache(),
 	)
 	if err != nil {
