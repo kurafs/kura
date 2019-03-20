@@ -443,7 +443,10 @@ func (s *Server) GetMetadata(ctx context.Context, req *mpb.GetMetadataRequest) (
 		return nil, err
 	}
 
-	value := metadata.Entries[req.Path]
+	value, ok := metadata.Entries[req.Path]
+	if !ok {
+		return nil, fmt.Errorf("file not found")
+	}
 	return &mpb.GetMetadataResponse{Metadata: &value}, nil
 }
 

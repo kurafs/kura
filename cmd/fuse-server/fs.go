@@ -79,12 +79,16 @@ func (f *fuseServer) Statfs(
 	req *fuse.StatfsRequest,
 	resp *fuse.StatfsResponse,
 ) error {
-	resp.Blocks = 262144
-	resp.Bfree = 262144
-	resp.Bavail = 32768
-	resp.Bsize = 1024 * 1024 // 1 MiB
-	resp.Namelen = 128
-	resp.Frsize = 1024 // 1 KiB
+	const blockSize = 4096
+	const fsBlocks = (1 << 50) / blockSize
+	resp.Blocks = fsBlocks  // Total data blocks in file system.
+	resp.Bfree = fsBlocks   // Free blocks in file system.
+	resp.Bavail = fsBlocks  // Free blocks in file system if you're not root.
+	resp.Files = 1E9        // Total files in file system.
+	resp.Ffree = 1E9        // Free files in file system.
+	resp.Bsize = blockSize  // Block size
+	resp.Namelen = 255      // Maximum file name length?
+	resp.Frsize = blockSize // Fragment size, smallest addressable data size in the file system.
 	return nil
 }
 
@@ -104,6 +108,7 @@ func (d *Dir) Attr(ctx context.Context, a *fuse.Attr) error {
 		a.Inode = d.inode
 		a.Mode = os.ModeDir | 0555
 		a.Size = 0
+		a.Blocks = a.Size / 512
 		return nil
 	}
 
@@ -116,9 +121,60 @@ func (d *Dir) Attr(ctx context.Context, a *fuse.Attr) error {
 	a.Inode = d.inode
 	a.Mode = os.ModeDir | os.FileMode(res.Metadata.Permissions)
 	a.Size = uint64(res.Metadata.Size)
+	a.Blocks = a.Size / 512
 	a.Mtime = time.Unix(res.Metadata.LastModified.Seconds, 0)
 	a.Crtime = time.Unix(res.Metadata.Created.Seconds, 0)
 	// TODO(irfansharif): Include AccessTime.
+	return nil
+}
+
+func (d *Dir) Getattr(
+	ctx context.Context,
+	req *fuse.GetattrRequest,
+	resp *fuse.GetattrResponse,
+) error {
+	return d.Attr(ctx, &resp.Attr)
+}
+
+func (d *Dir) Setattr(
+	ctx context.Context,
+	req *fuse.SetattrRequest,
+	resp *fuse.SetattrResponse,
+) error {
+	d.fserver.mu.Lock()
+	defer d.fserver.mu.Unlock()
+
+	greq := &mpb.GetMetadataRequest{Path: d.path}
+	gres, err := d.fserver.metadataServerClient.GetMetadata(ctx, greq)
+	if err != nil {
+		return err
+	}
+
+	if req.Valid.Mode() {
+		gres.Metadata.Permissions = uint32(req.Mode)
+	}
+	if req.Valid.Size() {
+		gres.Metadata.Size = int64(req.Size)
+	}
+	if req.Valid.Mtime() {
+		gres.Metadata.LastModified = &mpb.Metadata_UnixTimestamp{Seconds: req.Mtime.Unix()}
+	}
+
+	sreq := &mpb.SetMetadataRequest{
+		Path:     d.path,
+		Metadata: gres.Metadata,
+	}
+	_, err = d.fserver.metadataServerClient.SetMetadata(ctx, sreq)
+	if err != nil {
+		return err
+	}
+
+	resp.Attr.Inode = d.inode
+	resp.Attr.Mode = os.FileMode(gres.Metadata.Permissions)
+	resp.Attr.Size = uint64(gres.Metadata.Size)
+	resp.Attr.Blocks = uint64(gres.Metadata.Size / 512)
+	resp.Attr.Mtime = time.Unix(gres.Metadata.LastModified.Seconds, 0)
+	resp.Attr.Crtime = time.Unix(gres.Metadata.Created.Seconds, 0)
 	return nil
 }
 
@@ -362,6 +418,7 @@ func (f *File) Attr(ctx context.Context, a *fuse.Attr) error {
 	a.Inode = f.inode
 	a.Mode = os.FileMode(res.Metadata.Permissions)
 	a.Size = uint64(res.Metadata.Size)
+	a.Blocks = a.Size / 512
 
 	// TODO(irfansharif): Investigate why these sometimes return nil. Happens
 	// when operating with finder.
